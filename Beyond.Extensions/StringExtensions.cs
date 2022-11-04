@@ -156,6 +156,17 @@ public static class StringExtensions
         return a.IndexOf(b, StringComparison.OrdinalIgnoreCase) >= 0;
     }
 
+    public static bool ContainsRegex(this string str, string regex)
+    {
+        var rx = new Regex(regex, RegexOptions.Compiled);
+        return rx.IsMatch(str);
+    }
+
+    public static bool ContainsRegex(this string str, Regex regex)
+    {
+        return regex.IsMatch(str);
+    }
+
     public static string ConvertNewLineToWhiteSpace(this string str)
     {
         return Regex.Replace(str, @"\t|\n|\r", " ").Trim();
@@ -790,7 +801,6 @@ public static class StringExtensions
     {
         return char.IsPunctuation(s, index);
     }
-
     public static bool IsRegexMatch(this string input, string regex)
     {
         return Regex.Match(input, regex, RegexOptions.Compiled).Success;
