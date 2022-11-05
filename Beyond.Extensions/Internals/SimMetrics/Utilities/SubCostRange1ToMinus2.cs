@@ -1,0 +1,32 @@
+﻿using Beyond.Extensions.Internals.SimMetrics.API;
+
+namespace Beyond.Extensions.Internals.SimMetrics.Utilities;
+
+public sealed class SubCostRange1ToMinus2 : AbstractSubstitutionCost
+{
+    private const int charExactMatchScore = 1;
+    private const int charMismatchMatchScore = -2;
+
+    public override double GetCost(string firstWord, int firstWordIndex, string secondWord, int secondWordIndex)
+    {
+        if ((firstWord == null) || (secondWord == null))
+        {
+            return -2.0;
+        }
+        if ((firstWord.Length <= firstWordIndex) || (firstWordIndex < 0))
+        {
+            return -2.0;
+        }
+        if ((secondWord.Length <= secondWordIndex) || (secondWordIndex < 0))
+        {
+            return -2.0;
+        }
+        return ((firstWord[firstWordIndex] != secondWord[secondWordIndex]) ? ((double) (-2)) : ((double) 1));
+    }
+
+    public override double MaxCost => 1.0;
+
+    public override double MinCost => -2.0;
+
+    public override string ShortDescriptionString => "SubCostRange1ToMinus2";
+}
