@@ -3,7 +3,7 @@ using Beyond.Extensions.Internals.SimMetrics.Utilities;
 
 namespace Beyond.Extensions.Internals.SimMetrics.Metric;
 
-public sealed class CosineSimilarity : AbstractStringMetric
+internal sealed class CosineSimilarity : AbstractStringMetric
 {
     private double estimatedTimingConstant;
     private ITokeniser tokeniser;

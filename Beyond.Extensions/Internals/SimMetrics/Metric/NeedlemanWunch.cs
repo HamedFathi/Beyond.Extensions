@@ -3,7 +3,7 @@ using Beyond.Extensions.Internals.SimMetrics.Utilities;
 
 namespace Beyond.Extensions.Internals.SimMetrics.Metric;
 
-public sealed class NeedlemanWunch : AbstractStringMetric
+internal sealed class NeedlemanWunch : AbstractStringMetric
 {
     private AbstractSubstitutionCost dCostFunction;
     private const double defaultGapCost = 2.0;

@@ -1,6 +1,6 @@
 ﻿namespace Beyond.Extensions.Internals.SimMetrics.Utilities;
 
-public class TokeniserQGram3Extended : TokeniserQGram3
+internal class TokeniserQGram3Extended : TokeniserQGram3
 {
     public override Collection<string> Tokenize(string word)
     {

@@ -1,6 +1,6 @@
 ﻿namespace Beyond.Extensions.Internals.SimMetrics.API;
 
-public abstract class AbstractSubstitutionCost : ISubstitutionCost
+internal abstract class AbstractSubstitutionCost : ISubstitutionCost
 {
     protected AbstractSubstitutionCost()
     {

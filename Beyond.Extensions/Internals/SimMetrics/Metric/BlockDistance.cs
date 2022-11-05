@@ -3,7 +3,7 @@ using Beyond.Extensions.Internals.SimMetrics.Utilities;
 
 namespace Beyond.Extensions.Internals.SimMetrics.Metric;
 
-public sealed class BlockDistance : AbstractStringMetric
+internal sealed class BlockDistance : AbstractStringMetric
 {
     private double estimatedTimingConstant;
     private ITokeniser tokeniser;

@@ -2,7 +2,7 @@
 
 namespace Beyond.Extensions.Internals.SimMetrics.Metric;
 
-public sealed class ChapmanMeanLength : AbstractStringMetric
+internal sealed class ChapmanMeanLength : AbstractStringMetric
 {
     private const int chapmanMeanLengthMaxString = 500;
     private const double defaultMismatchScore = 0.0;

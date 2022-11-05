@@ -2,7 +2,7 @@
 
 namespace Beyond.Extensions.Internals.SimMetrics.Utilities;
 
-public class TokeniserQGram3 : AbstractTokeniserQGramN
+internal class TokeniserQGram3 : AbstractTokeniserQGramN
 {
     public TokeniserQGram3()
     {

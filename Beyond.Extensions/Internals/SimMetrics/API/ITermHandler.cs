@@ -1,6 +1,6 @@
 ﻿namespace Beyond.Extensions.Internals.SimMetrics.API;
 
-public interface ITermHandler
+internal interface ITermHandler
 {
     void AddWord(string termToAdd);
     bool IsWord(string termToTest);

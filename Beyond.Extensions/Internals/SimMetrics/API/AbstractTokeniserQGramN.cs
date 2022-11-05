@@ -2,7 +2,7 @@
 
 namespace Beyond.Extensions.Internals.SimMetrics.API;
 
-public abstract class AbstractTokeniserQGramN : ITokeniser
+internal abstract class AbstractTokeniserQGramN : ITokeniser
 {
     private int characterCombinationIndex;
     private const string defaultEndPadCharacter = "#";

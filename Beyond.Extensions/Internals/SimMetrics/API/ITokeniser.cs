@@ -1,6 +1,6 @@
 ﻿namespace Beyond.Extensions.Internals.SimMetrics.API;
 
-public interface ITokeniser
+internal interface ITokeniser
 {
     Collection<string> Tokenize(string word);
     Collection<string> TokenizeToSet(string word);

@@ -2,7 +2,7 @@
 
 namespace Beyond.Extensions.Internals.SimMetrics.Utilities;
 
-public sealed class DummyStopTermHandler : ITermHandler
+internal sealed class DummyStopTermHandler : ITermHandler
 {
     public void AddWord(string termToAdd)
     {

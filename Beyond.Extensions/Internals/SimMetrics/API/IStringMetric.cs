@@ -1,6 +1,6 @@
 ﻿namespace Beyond.Extensions.Internals.SimMetrics.API;
 
-public interface IStringMetric
+internal interface IStringMetric
 {
     double GetSimilarity(string firstWord, string secondWord);
     string GetSimilarityExplained(string firstWord, string secondWord);

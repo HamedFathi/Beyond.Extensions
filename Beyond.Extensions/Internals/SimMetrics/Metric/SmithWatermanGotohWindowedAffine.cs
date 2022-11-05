@@ -3,7 +3,7 @@ using Beyond.Extensions.Internals.SimMetrics.Utilities;
 
 namespace Beyond.Extensions.Internals.SimMetrics.Metric;
 
-public class SmithWatermanGotohWindowedAffine : AbstractStringMetric
+internal class SmithWatermanGotohWindowedAffine : AbstractStringMetric
 {
     private AbstractSubstitutionCost dCostFunction;
     private const double defaultMismatchScore = 0.0;

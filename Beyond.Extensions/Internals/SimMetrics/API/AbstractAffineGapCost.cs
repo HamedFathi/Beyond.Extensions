@@ -1,6 +1,6 @@
 ﻿namespace Beyond.Extensions.Internals.SimMetrics.API;
 
-public abstract class AbstractAffineGapCost : IAffineGapCost
+internal abstract class AbstractAffineGapCost : IAffineGapCost
 {
     protected AbstractAffineGapCost()
     {

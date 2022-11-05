@@ -1,6 +1,6 @@
 ﻿namespace Beyond.Extensions.Internals.SimMetrics.API;
 
-public interface ISubstitutionCost
+internal interface ISubstitutionCost
 {
     double GetCost(string firstWord, int firstWordIndex, string secondWord, int secondWordIndex);
 

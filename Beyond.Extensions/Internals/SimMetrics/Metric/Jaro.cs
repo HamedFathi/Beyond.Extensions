@@ -2,7 +2,7 @@
 
 namespace Beyond.Extensions.Internals.SimMetrics.Metric;
 
-public sealed class Jaro : AbstractStringMetric
+internal sealed class Jaro : AbstractStringMetric
 {
     private const double defaultMismatchScore = 0.0;
     private double estimatedTimingConstant = 4.1200000850949436E-05;

@@ -1,6 +1,6 @@
 ﻿namespace Beyond.Extensions.Internals.SimMetrics.Utilities;
 
-public class TokeniserSGram2Extended : TokeniserQGram2Extended
+internal class TokeniserSGram2Extended : TokeniserQGram2Extended
 {
     public TokeniserSGram2Extended()
     {

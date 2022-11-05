@@ -1,6 +1,6 @@
 ﻿namespace Beyond.Extensions.Internals.SimMetrics.Utilities;
 
-public static class MathFunctions
+internal static class MathFunctions
 {
     public static double MaxOf3(double firstNumber, double secondNumber, double thirdNumber)
     {

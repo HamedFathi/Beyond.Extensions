@@ -2,7 +2,7 @@
 
 namespace Beyond.Extensions.Internals.SimMetrics.Utilities;
 
-public sealed class SubCostRange1ToMinus2 : AbstractSubstitutionCost
+internal sealed class SubCostRange1ToMinus2 : AbstractSubstitutionCost
 {
     private const int charExactMatchScore = 1;
     private const int charMismatchMatchScore = -2;

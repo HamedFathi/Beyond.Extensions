@@ -2,7 +2,7 @@
 
 namespace Beyond.Extensions.Internals.SimMetrics.Utilities;
 
-public sealed class TokeniserWhitespace : ITokeniser
+internal sealed class TokeniserWhitespace : ITokeniser
 {
     private string delimiters = "\r\n\t \x00a0";
     private ITermHandler stopWordHandler = new DummyStopTermHandler();

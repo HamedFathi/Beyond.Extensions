@@ -1,6 +1,6 @@
 ﻿namespace Beyond.Extensions.Internals.SimMetrics.Utilities;
 
-public class TokeniserUtilities<T>
+internal class TokeniserUtilities<T>
 {
     private Collection<T> allTokens;
     private int firstSetTokenCount;

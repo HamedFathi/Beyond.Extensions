@@ -1,6 +1,6 @@
 ﻿namespace Beyond.Extensions.Internals.SimMetrics.API;
 
-public abstract class AbstractStringMetric : IStringMetric
+internal abstract class AbstractStringMetric : IStringMetric
 {
     protected AbstractStringMetric()
     {

@@ -3,7 +3,7 @@ using Beyond.Extensions.Internals.SimMetrics.Utilities;
 
 namespace Beyond.Extensions.Internals.SimMetrics.Metric;
 
-public sealed class JaroWinkler : AbstractStringMetric
+internal sealed class JaroWinkler : AbstractStringMetric
 {
     private double estimatedTimingConstant = 4.3420001020422205E-05;
     private AbstractStringMetric jaroStringMetric = new Jaro();

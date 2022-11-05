@@ -1,6 +1,6 @@
 ﻿namespace Beyond.Extensions.Internals.SimMetrics.API;
 
-public interface IAffineGapCost
+internal interface IAffineGapCost
 {
     double GetCost(string textToGap, int stringIndexStartGap, int stringIndexEndGap);
 

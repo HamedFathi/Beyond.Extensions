@@ -3,7 +3,7 @@ using Beyond.Extensions.Internals.SimMetrics.Utilities;
 
 namespace Beyond.Extensions.Internals.SimMetrics.Metric;
 
-public sealed class MatchingCoefficient : AbstractStringMetric
+internal sealed class MatchingCoefficient : AbstractStringMetric
 {
     private const double defaultMismatchScore = 0.0;
     private double estimatedTimingConstant;

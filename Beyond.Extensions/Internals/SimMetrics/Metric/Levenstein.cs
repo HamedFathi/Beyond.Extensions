@@ -3,7 +3,7 @@ using Beyond.Extensions.Internals.SimMetrics.Utilities;
 
 namespace Beyond.Extensions.Internals.SimMetrics.Metric;
 
-public sealed class Levenstein : AbstractStringMetric
+internal sealed class Levenstein : AbstractStringMetric
 {
     private AbstractSubstitutionCost dCostFunction = new SubCostRange0To1();
     private const double defaultMismatchScore = 0.0;

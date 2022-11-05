@@ -2,7 +2,7 @@
 
 namespace Beyond.Extensions.Internals.SimMetrics.Metric;
 
-public sealed class ChapmanLengthDeviation : AbstractStringMetric
+internal sealed class ChapmanLengthDeviation : AbstractStringMetric
 {
     public override double GetSimilarity(string firstWord, string secondWord)
     {

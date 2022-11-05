@@ -2,7 +2,7 @@
 
 namespace Beyond.Extensions.Internals.SimMetrics.Utilities;
 
-public sealed class AffineGapRange5To0Multiplier1 : AbstractAffineGapCost
+internal sealed class AffineGapRange5To0Multiplier1 : AbstractAffineGapCost
 {
     private const int charExactMatchScore = 5;
     private const int charMismatchMatchScore = 0;

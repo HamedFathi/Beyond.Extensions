@@ -3,7 +3,7 @@ using Beyond.Extensions.Internals.SimMetrics.Utilities;
 
 namespace Beyond.Extensions.Internals.SimMetrics.Metric;
 
-public sealed class SmithWaterman : AbstractStringMetric
+internal sealed class SmithWaterman : AbstractStringMetric
 {
     private AbstractSubstitutionCost dCostFunction;
     private const double defaultGapCost = 0.5;

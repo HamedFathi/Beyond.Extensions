@@ -2,7 +2,7 @@
 
 namespace Beyond.Extensions.Internals.SimMetrics.Utilities;
 
-public sealed class SubCostRange5ToMinus3 : AbstractSubstitutionCost
+internal sealed class SubCostRange5ToMinus3 : AbstractSubstitutionCost
 {
     private Collection<string>[] approx = new Collection<string>[7];
     private const int charApproximateMatchScore = 3;

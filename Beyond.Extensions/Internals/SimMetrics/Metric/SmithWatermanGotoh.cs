@@ -3,7 +3,7 @@ using Beyond.Extensions.Internals.SimMetrics.Utilities;
 
 namespace Beyond.Extensions.Internals.SimMetrics.Metric;
 
-public sealed class SmithWatermanGotoh : SmithWatermanGotohWindowedAffine
+internal sealed class SmithWatermanGotoh : SmithWatermanGotohWindowedAffine
 {
     private const int affineGapWindowSize = 0x7fffffff;
     private const double estimatedTimingConstant = 2.2000000171829015E-05;
