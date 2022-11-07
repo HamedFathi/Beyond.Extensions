@@ -5,6 +5,8 @@ namespace Beyond.Extensions.Internals.ObjectMapper;
 
 internal abstract class ObjectCopyBase
 {
+    private static readonly ConcurrentDictionary<Type, PropertyInfo[]> Cache = new();
+
     internal abstract void Copy(object source, object target);
 
     internal abstract void MapTypes(Type source, Type target);
@@ -20,10 +22,10 @@ internal abstract class ObjectCopyBase
     }
 
     protected static IEnumerable<PropertyMap> GetMatchingProperties
-            (Type sourceType, Type targetType)
+        (Type sourceType, Type targetType)
     {
-        var sourceProperties = sourceType.GetProperties();
-        var targetProperties = targetType.GetProperties();
+        var sourceProperties = Cache.GetOrAdd(sourceType, sourceType.GetProperties());
+        var targetProperties = Cache.GetOrAdd(targetType, targetType.GetProperties());
 
         return (from s in sourceProperties
                 from t in targetProperties
