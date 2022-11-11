@@ -27,8 +27,12 @@ public class Resolver : IResolver
         };
     }
 
-    public Resolver(params IPathElementFactory[]? pathElementFactories)
+    public Resolver(IPathElementFactory[] pathElementFactories, bool addDefaults = true)
     {
+        if (pathElementFactories == null) throw new ArgumentNullException(nameof(pathElementFactories));
+        if (pathElementFactories.Length == 0)
+            throw new ArgumentException("Value cannot be an empty collection.", nameof(pathElementFactories));
+
         var list = new List<IPathElementFactory>
         {
             new PropertyFactory(),
@@ -37,12 +41,10 @@ public class Resolver : IResolver
             new SelectionFactory()
         };
 
-        if (pathElementFactories is { Length: > 0 })
-        {
+        if (addDefaults)
             list.AddRange(pathElementFactories);
-        }
 
-        PathElementFactories = list;
+        PathElementFactories = addDefaults ? list : pathElementFactories;
     }
 
     public IList<IPathElement> CreatePath(string path)
