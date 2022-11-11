@@ -286,6 +286,10 @@ public static class TypeExtensions
         return type.GetInterface("IEnumerable") != null;
     }
 
+    public static bool IsGenericEnumerable(this Type type)
+    {
+        return type.IsEnumerable() && type.IsGenericType;
+    }
     public static bool IsGenericTypeDefinedAs(this Type type, Type otherType)
     {
         if (type == null) throw new ArgumentNullException(nameof(type));

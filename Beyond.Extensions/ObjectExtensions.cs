@@ -5,6 +5,7 @@
 // ReSharper disable IdentifierTypo
 
 using Beyond.Extensions.Internals.ObjectMapper;
+using Beyond.Extensions.Internals.PropertyPathResolver;
 
 namespace Beyond.Extensions.ObjectExtended;
 
@@ -240,6 +241,34 @@ public static partial class ObjectExtensions
         return obj1 is T obj2 && selector(obj).Equals(selector(obj2));
     }
 
+    public static TReturn? GetNestedPropertyValue<T, TReturn>([DisallowNull] this T obj, string propertyNestedPath)
+    {
+        return (TReturn?)obj.GetNestedPropertyValue(propertyNestedPath);
+    }
+    /*
+        Property
+        Property1.Property2
+        ArrayProperty[5]
+        DictionaryProperty['Key']
+        [0] //just an array index
+        ['Key'] //just a dictionary index
+        NestedArray2
+        NestedDictionary['Key1']['Key2']
+
+        For Dictionary you should use single quote '' but for Enumerable not.
+    */
+    public static object? GetNestedPropertyValue<T>([DisallowNull] this T? obj, string propertyNestedPath)
+    {
+        if (obj == null) throw new ArgumentNullException(nameof(obj));
+        if (propertyNestedPath == null) throw new ArgumentNullException(nameof(propertyNestedPath));
+        if (string.IsNullOrEmpty(propertyNestedPath))
+            throw new ArgumentException("Value cannot be null or empty.", nameof(propertyNestedPath));
+        if (string.IsNullOrWhiteSpace(propertyNestedPath))
+            throw new ArgumentException("Value cannot be null or whitespace.", nameof(propertyNestedPath));
+
+        IResolver resolver = new Resolver();
+        return resolver.Resolve(obj, propertyNestedPath);
+    }
     public static TypeCode GetTypeCode(this object value)
     {
         return Convert.GetTypeCode(value);
