@@ -205,7 +205,6 @@ public static partial class ObjectExtensions
     {
         return value.ConvertTo(defaultValue, true);
     }
-
     public static T[] CreateArray<T>(this T obj)
     {
         return new[] { obj };
@@ -226,10 +225,15 @@ public static partial class ObjectExtensions
     {
         yield return obj;
     }
-
     public static IList<T> CreateList<T>(this T obj)
     {
         return new List<T> { obj };
+    }
+
+    public static IReadOnlyCollection<T> CreateReadOnlyCollection<T>(this T obj)
+    {
+        var result = new ReadOnlyCollection<T>(obj.CreateList());
+        return result;
     }
 
     public static bool Equals<T, TResult>([DisallowNull] this T obj, object obj1, Func<T, TResult> selector)
@@ -245,18 +249,7 @@ public static partial class ObjectExtensions
     {
         return (TReturn?)obj.GetNestedPropertyValue(propertyNestedPath);
     }
-    /*
-        Property
-        Property1.Property2
-        ArrayProperty[5]
-        DictionaryProperty['Key']
-        [0] //just an array index
-        ['Key'] //just a dictionary index
-        NestedArray2
-        NestedDictionary['Key1']['Key2']
 
-        For Dictionary you should use single quote '' but for Enumerable not.
-    */
     public static object? GetNestedPropertyValue<T>([DisallowNull] this T? obj, string propertyNestedPath)
     {
         if (obj == null) throw new ArgumentNullException(nameof(obj));
@@ -269,6 +262,7 @@ public static partial class ObjectExtensions
         IResolver resolver = new Resolver();
         return resolver.Resolve(obj, propertyNestedPath);
     }
+
     public static TypeCode GetTypeCode(this object value)
     {
         return Convert.GetTypeCode(value);
@@ -518,6 +512,45 @@ public static partial class ObjectExtensions
         return @this == null || @this.IsDBNull();
     }
 
+    public static bool IsNumericType(this object o)
+    {
+        switch (Type.GetTypeCode(o.GetType()))
+        {
+            case TypeCode.Byte:
+            case TypeCode.SByte:
+            case TypeCode.UInt16:
+            case TypeCode.UInt32:
+            case TypeCode.UInt64:
+            case TypeCode.Int16:
+            case TypeCode.Int32:
+            case TypeCode.Int64:
+            case TypeCode.Decimal:
+            case TypeCode.Double:
+            case TypeCode.Single:
+                return true;
+            case TypeCode.Empty:
+            case TypeCode.Object:
+            case TypeCode.DBNull:
+            case TypeCode.Boolean:
+            case TypeCode.Char:
+            case TypeCode.DateTime:
+            case TypeCode.String:
+            default:
+                return false;
+        }
+    }
+    /*
+        Property
+        Property1.Property2
+        ArrayProperty[5]
+        DictionaryProperty['Key']
+        [0] //just an array index
+        ['Key'] //just a dictionary index
+        NestedArray2
+        NestedDictionary['Key1']['Key2']
+
+        For Dictionary you should use single quote '' but for Enumerable not.
+    */
     public static bool IsOfType<T>(this object obj)
     {
         return obj.IsOfType(typeof(T));
@@ -691,17 +724,6 @@ public static partial class ObjectExtensions
     {
         return objData.ToByteArrayByJsonSerializer();
     }
-
-    public static IEnumerable<T> ToEnumerableObject<T>(this T obj)
-    {
-        return new[] { obj };
-    }
-
-    public static IList<T> ToListObject<T>(this T obj)
-    {
-        return new[] { obj };
-    }
-
     public static TResult? Try<TType, TResult>(this TType @this, Func<TType, TResult> tryFunction)
     {
         try

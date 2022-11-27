@@ -45,6 +45,24 @@ public static class TypeExtensions
             .ToDictionary(k => k.Key, k => k.Value);
     }
 
+    public static Type?[] GenericTypeArguments(this Type type)
+    {
+        switch (type)
+        {
+            case { IsArray: true }:
+                return new[] { type.GetElementType() };
+            case { IsGenericType: true } when type.GetGenericTypeDefinition() == typeof(IEnumerable<>):
+                return type.GetGenericArguments();
+            default:
+            {
+                var enumType = type.GetInterfaces()
+                    .Where(t => t.IsGenericType &&
+                                t.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+                    .Select(t => t.GenericTypeArguments).FirstOrDefault();
+                return enumType ?? new[] { type };
+            }
+        }
+    }
     public static Type? GetCoreType(this Type input)
     {
         if (input == null) throw new ArgumentNullException(nameof(input));
@@ -61,6 +79,25 @@ public static class TypeExtensions
         return type.Assembly.GetName().GetPublicKeyToken()?.Length <= 0
             ? $"{type.FullName}, {type.Assembly.GetName().Name}"
             : type.AssemblyQualifiedName;
+    }
+
+    public static Type? GetGenericTypeArgument(this Type type)
+    {
+        switch (type)
+        {
+            case { IsArray: true }:
+                return type.GetElementType();
+            case { IsGenericType: true } when type.GetGenericTypeDefinition() == typeof(IEnumerable<>):
+                return type.GetGenericArguments()[0];
+            default:
+                {
+                    var enumType = type.GetInterfaces()
+                        .Where(t => t.IsGenericType &&
+                                    t.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+                        .Select(t => t.GenericTypeArguments[0]).FirstOrDefault();
+                    return enumType ?? type;
+                }
+        }
     }
 
     public static IEnumerable<Type> GetInternalTypes(this Type type, params Type[] simpleTypes)
@@ -197,6 +234,17 @@ public static class TypeExtensions
         return t.IsValueType || t.GetConstructor(Type.EmptyTypes) != null;
     }
 
+    public static bool HasIEnumerable(this Type type)
+    {
+        return type.GetInterfaces().Any(x => x == typeof(IEnumerable));
+    }
+
+    public static bool HasIEnumerableOfT(this Type type)
+    {
+        return type.GetInterfaces().Any(x => x.IsGenericType
+                                             && x.GetGenericTypeDefinition() == typeof(IEnumerable<>));
+    }
+
     public static bool HasInterface(this Type type)
     {
         foreach (var l in GetNestedInterfaces(type))
@@ -290,6 +338,7 @@ public static class TypeExtensions
     {
         return type.IsEnumerable() && type.IsGenericType;
     }
+
     public static bool IsGenericTypeDefinedAs(this Type type, Type otherType)
     {
         if (type == null) throw new ArgumentNullException(nameof(type));
@@ -338,6 +387,33 @@ public static class TypeExtensions
         return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
     }
 
+    public static bool IsNumericType(this Type t)
+    {
+        switch (Type.GetTypeCode(t))
+        {
+            case TypeCode.Byte:
+            case TypeCode.SByte:
+            case TypeCode.UInt16:
+            case TypeCode.UInt32:
+            case TypeCode.UInt64:
+            case TypeCode.Int16:
+            case TypeCode.Int32:
+            case TypeCode.Int64:
+            case TypeCode.Decimal:
+            case TypeCode.Double:
+            case TypeCode.Single:
+                return true;
+            case TypeCode.Empty:
+            case TypeCode.Object:
+            case TypeCode.DBNull:
+            case TypeCode.Boolean:
+            case TypeCode.Char:
+            case TypeCode.DateTime:
+            case TypeCode.String:
+            default:
+                return false;
+        }
+    }
     public static bool IsPrimitive(this Type type)
     {
         if (type == typeof(string)) return true;

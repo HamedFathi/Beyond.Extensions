@@ -9,7 +9,6 @@ namespace Beyond.Extensions.ListExtended;
 public static class ListExtensions
 {
     private static readonly Random Rnd = new(Guid.NewGuid().GetHashCode());
-
     public static void AddRange<T>(this IList<T>? container, IEnumerable<T>? rangeToAdd)
     {
         if (container == null || rangeToAdd == null) return;
@@ -148,6 +147,12 @@ public static class ListExtensions
         return list[0];
     }
 
+    public static T GetAndRemove<T>(this List<T> @this, int index)
+    {
+        var result = @this[index];
+        @this.RemoveAt(index);
+        return result;
+    }
     public static T GetRandomItem<T>(this List<T> list)
     {
         var count = list.Count;
