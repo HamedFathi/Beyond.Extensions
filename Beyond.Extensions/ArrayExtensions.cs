@@ -422,7 +422,10 @@ public static class ArrayExtensions
     {
         return source == null || source.Length == 0;
     }
-
+    public static string Join(this string[] values, string separator)
+    {
+        return string.Join(separator, values);
+    }
     public static string JoinNotNullOrEmpty(this string[] items, string separator)
     {
         if (items == null) throw new ArgumentNullException(nameof(items));

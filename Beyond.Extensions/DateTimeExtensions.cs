@@ -685,6 +685,10 @@ public static class DateTimeExtensions
         return @this.ToString("F", culture);
     }
 
+    public static string ToGmtFormattedDate(this DateTime date)
+    {
+        return date.ToString("yyyy'-'MM'-'dd hh':'mm':'ss tt 'GMT'");
+    }
     public static string ToLongDateShortTimeString(this DateTime @this)
     {
         return @this.ToString("f", DateTimeFormatInfo.CurrentInfo);

@@ -8,6 +8,7 @@ using Beyond.Extensions.Enums;
 using Beyond.Extensions.Internals.Base62;
 using Beyond.Extensions.Internals.Pluralizer;
 using Beyond.Extensions.Types;
+// ReSharper disable InconsistentNaming
 
 // ReSharper disable CommentTypo
 
@@ -19,24 +20,17 @@ public static class StringExtensions
 
     private static readonly Regex TabOrWhiteSpaceRegex =
         new(@"(\s*\\\$tb(\d+)\s*)|(\s*\\\$ws(\d+)\s*)", RegexOptions.Compiled);
-
     public static DirectoryInfo AsDirectoryInfo(this string @this)
     {
         if (@this.IsNullOrEmpty())
             throw new ArgumentNullException(nameof(@this), $"{nameof(@this)} path is null or empty");
         return new DirectoryInfo(@this);
     }
-
     public static FileStream AsFileStream(this string @this, FileMode fileMode, FileAccess fileAccess,
         FileShare fileShare, int bufferSize = 8192)
     {
         if (@this.IsNull()) throw new ArgumentNullException(nameof(@this), $"{nameof(@this)} file path is null");
         return new FileStream(@this, fileMode, fileAccess, fileShare, bufferSize);
-    }
-
-    public static string BreakLineToNewLine(this string @this)
-    {
-        return @this.Replace("<br />", "\r\n").Replace("<br>", "\r\n").Replace("<br/>", "\r\n");
     }
 
     public static int CompareOrdinal(this string strA, string strB)
@@ -165,6 +159,21 @@ public static class StringExtensions
     public static bool ContainsRegex(this string str, Regex regex)
     {
         return regex.IsMatch(str);
+    }
+
+    public static string ConvertBreaksToCRLF(this string plainText)
+    {
+        return new Regex("<br/>").Replace(plainText, "\r\n");
+    }
+
+    public static string ConvertBreaksToLF(this string plainText)
+    {
+        return new Regex("<br/>").Replace(plainText, "\n");
+    }
+
+    public static string ConvertCRLFToBreaks(this string plainText)
+    {
+        return new Regex("(\r\n|\n)").Replace(plainText, "<br/>");
     }
 
     public static string ConvertNewLineToWhiteSpace(this string str)
@@ -470,6 +479,11 @@ public static class StringExtensions
                 yield return match.Value;
     }
 
+    public static IEnumerable<string> GetPathParts(this string path)
+    {
+        return path.Split(new[] { Path.DirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries).ToList();
+    }
+
     public static Position GetPosition(this string text, int position)
     {
         var line = 1;
@@ -577,6 +591,26 @@ public static class StringExtensions
     public static string IfEmpty(this string value, string defaultValue)
     {
         return value.IsNotEmpty() ? value : defaultValue;
+    }
+
+    public static string IfNotNullOrEmptyElse(this string input, Func<string> alternateAction)
+    {
+        return string.IsNullOrEmpty(input) ? input : alternateAction();
+    }
+
+    public static string IfNotNullOrWhiteSpaceElse(this string input, Func<string> alternateAction)
+    {
+        return string.IsNullOrWhiteSpace(input) ? input : alternateAction();
+    }
+
+    public static string IfNullOrEmptyElse(this string input, string nullAlternateValue)
+    {
+        return !string.IsNullOrEmpty(input) ? input : nullAlternateValue;
+    }
+
+    public static string IfNullOrEmptyElse(this string input, Func<string> nullAlternateAction)
+    {
+        return !string.IsNullOrEmpty(input) ? input : nullAlternateAction();
     }
 
     public static string IfNullOrWhiteSpaceElse(this string input, string nullAlternateValue)
@@ -801,6 +835,7 @@ public static class StringExtensions
     {
         return char.IsPunctuation(s, index);
     }
+
     public static bool IsRegexMatch(this string input, string regex)
     {
         return Regex.Match(input, regex, RegexOptions.Compiled).Success;
@@ -878,6 +913,23 @@ public static class StringExtensions
     {
         return Regex.IsMatch(obj,
             @"^(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9])\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[0-9])$");
+    }
+
+    public static bool IsValidNumber(this string number)
+    {
+        return IsValidNumber(number, CultureInfo.CurrentCulture);
+    }
+
+    public static bool IsValidNumber(this string number, CultureInfo culture)
+    {
+        string _validNumberPattern =
+            @"^-?(?:\d+|\d{1,3}(?:"
+            + culture.NumberFormat.NumberGroupSeparator +
+            @"\d{3})+)?(?:\"
+            + culture.NumberFormat.NumberDecimalSeparator +
+            @"\d+)?$";
+
+        return new Regex(_validNumberPattern, RegexOptions.ECMAScript).IsMatch(number);
     }
 
     public static bool IsValidUrl(this string text)
@@ -980,11 +1032,6 @@ public static class StringExtensions
         return tokens.Any(t => word.Trim().ToLower().Contains(t.Trim()));
     }
 
-    public static string NewLineToBreakLine(this string @this)
-    {
-        return @this.Replace("\r\n", "<br />").Replace("\n", "<br />");
-    }
-
     public static bool NotIn(this string @this, params string[] values)
     {
         return Array.IndexOf(values, @this) == -1;
@@ -1061,9 +1108,54 @@ public static class StringExtensions
         return Path.Combine(list.ToArray());
     }
 
+    public static string PathRelativeTo(this string path, string root)
+    {
+        var pathParts = path.GetPathParts().ToList();
+        var rootParts = root.GetPathParts().ToList();
+
+        var length = pathParts.Count > rootParts.Count ? rootParts.Count : pathParts.Count;
+        for (int i = 0; i < length; i++)
+        {
+            if (pathParts.First() == rootParts.First())
+            {
+                pathParts.RemoveAt(0);
+                rootParts.RemoveAt(0);
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        for (int i = 0; i < rootParts.Count; i++)
+        {
+            pathParts.Insert(0, "..");
+        }
+
+        return pathParts.Count > 0 ? Path.Combine(pathParts.ToArray()) : string.Empty;
+    }
+
     public static string Pluralize(this string word)
     {
         return PluralizeHelper.Pluralize(word);
+    }
+
+    public static void ReadLines(this string text, Action<string> callback)
+    {
+        var reader = new StringReader(text);
+        while (reader.ReadLine() is { } line)
+        {
+            callback(line);
+        }
+    }
+
+    public static IEnumerable<string> ReadLines(this string text)
+    {
+        var reader = new StringReader(text);
+        while (reader.ReadLine() is { } line)
+        {
+            yield return line;
+        }
     }
 
     public static Match RegexMatch(this string @this, string pattern, RegexOptions regexOption)
@@ -1512,6 +1604,16 @@ public static class StringExtensions
         return Regex.Split(value, regexPattern, options);
     }
 
+    public static string SplitCamelCase(this string str)
+    {
+        return Regex.Replace(Regex.Replace(str, @"(\P{Ll})(\P{Ll}\p{Ll})", "$1 $2"), @"(\p{Ll})(\P{Ll})", "$1 $2");
+    }
+
+    public static string SplitPascalCase(this string str)
+    {
+        return SplitCamelCase(str);
+    }
+
     public static SqlDbType SqlTypeNameToSqlDbType(this string @this)
     {
         switch (@this.ToLower())
@@ -1790,6 +1892,13 @@ public static class StringExtensions
         return Convert.ToBase64String(bytes);
     }
 
+    public static bool ToBool(this string stringValue)
+    {
+        if (string.IsNullOrEmpty(stringValue)) return false;
+
+        return bool.Parse(stringValue);
+    }
+
     public static bool ToBoolean(this string value, bool defaultValue)
     {
         if (bool.TryParse(value, out var result)) return result;
@@ -1832,12 +1941,22 @@ public static class StringExtensions
         return str.Select(x => x);
     }
 
+    public static string[] ToDelimitedArray(this string content, char delimiter = ',')
+    {
+        string[] array = content.Split(delimiter);
+        for (var i = 0; i < array.Length; i++)
+        {
+            array[i] = array[i].Trim();
+        }
+
+        return array;
+    }
     public static DirectoryInfo ToDirectoryInfo(this string @this)
     {
         return new DirectoryInfo(@this);
     }
 
-    public static T ToEnum<T>(this string @this)
+    public static T ToEnum<T>(this string @this) where T : Enum
     {
         var enumType = typeof(T);
         return (T)Enum.Parse(enumType, @this);

@@ -12,7 +12,6 @@ namespace Beyond.Extensions.EnumerableExtended;
 public static class EnumerableExtensions
 {
     private static readonly Random Rnd = new(Guid.NewGuid().GetHashCode());
-
     public static string Aggregate<T>(this IEnumerable<T> enumeration, Func<T, string> toString, string separator)
     {
         if (toString == null)
@@ -36,11 +35,7 @@ public static class EnumerableExtensions
     public static bool All<T>(this IEnumerable<T> @this, params T[] values)
     {
         var list = @this.ToArray();
-        foreach (var value in values)
-            if (!list.Contains(value))
-                return false;
-
-        return true;
+        return values.All(value => list.Contains(value));
     }
 
     public static bool AllSafe<T>(this IEnumerable<T>? enumerable, Func<T, bool> predicate)
@@ -920,6 +915,10 @@ public static class EnumerableExtensions
         return enumerator.MoveNext() && !enumerator.MoveNext();
     }
 
+    public static string Join(this IEnumerable<string> values, string separator)
+    {
+        return string.Join(separator, values.ToArray());
+    }
     public static string Join<T>(this IEnumerable<T> collection, Func<T, string> func, string separator)
     {
         return string.Join(separator, collection.Select(func).ToArray());

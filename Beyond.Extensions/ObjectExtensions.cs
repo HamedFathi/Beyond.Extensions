@@ -22,7 +22,6 @@ public static partial class ObjectExtensions
     {
         return new Lazy<T>();
     }
-
     public static bool CanConvertTo<T>(this object? value)
     {
         if (value != null)
@@ -205,6 +204,7 @@ public static partial class ObjectExtensions
     {
         return value.ConvertTo(defaultValue, true);
     }
+
     public static T[] CreateArray<T>(this T obj)
     {
         return new[] { obj };
@@ -225,6 +225,7 @@ public static partial class ObjectExtensions
     {
         yield return obj;
     }
+
     public static IList<T> CreateList<T>(this T obj)
     {
         return new List<T> { obj };
@@ -419,6 +420,14 @@ public static partial class ObjectExtensions
         return value is T value1 ? value1 : default;
     }
 
+    public static bool IsAnonymousType(this object? instance)
+    {
+        if (instance == null)
+        {
+            return false;
+        }
+        return instance.GetType().Namespace == null;
+    }
     public static bool IsArray(this object? @this)
     {
         return @this != null && @this.GetType().IsArray;
