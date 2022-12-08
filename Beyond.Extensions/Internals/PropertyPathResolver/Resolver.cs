@@ -55,7 +55,7 @@ public class Resolver : IResolver
         {
             var pathElement = CreatePathElement(tempPath, out tempPath);
             pathElements.Add(pathElement);
-            //remove the dots chaining properties 
+            //remove the dots chaining properties
             //no PathElement could do this reliably
             //the only appropriate one would be Property, but there doesn't have to be a dot at the beginning (if it is the first PathElement, e.g. "Property1.Property2")
             //and I don't want that knowledge in PropertyFactory

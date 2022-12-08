@@ -13,6 +13,7 @@ public static class FieldInfoExtensions
             : Expression.Lambda<Func<TTarget, TField>>(Expression.Convert(fieldAccess, typeof(TField)), target);
         return lambda.Compile();
     }
+
     public static Action<TTarget, TField> SetField<TTarget, TField>(this FieldInfo field)
     {
         var target = Expression.Parameter(typeof(TTarget), "target");

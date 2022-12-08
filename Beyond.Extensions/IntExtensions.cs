@@ -15,6 +15,17 @@ public static class IntExtensions
         return Math.Abs(value);
     }
 
+    public static string ToSequentialLetters(this int value, bool lowercase = false)
+    {
+        string result = string.Empty;
+        while (--value >= 0)
+        {
+            result = (char)('A' + value % 26) + result;
+            value /= 26;
+        }
+        return lowercase ? result.ToLower() : result;
+    }
+
     public static bool Between(this int @this, int minValue, int maxValue)
     {
         return minValue.CompareTo(@this) == -1 && @this.CompareTo(maxValue) == -1;
@@ -96,7 +107,7 @@ public static class IntExtensions
     {
         if (!enumType.IsEnum) return null;
         var enumValue = Enum.ToObject(enumType, @this);
-        return ((Enum) enumValue).GetDescription(replaceNullWithEnumName);
+        return ((Enum)enumValue).GetDescription(replaceNullWithEnumName);
     }
 
     public static int HostToNetworkOrder(this int host)
@@ -207,12 +218,12 @@ public static class IntExtensions
 
     public static decimal PercentageOf(this int number, float percent)
     {
-        return (decimal) (number * percent / 100);
+        return (decimal)(number * percent / 100);
     }
 
     public static decimal PercentageOf(this int number, double percent)
     {
-        return (decimal) (number * percent / 100);
+        return (decimal)(number * percent / 100);
     }
 
     public static decimal PercentageOf(this int number, decimal percent)
@@ -230,7 +241,7 @@ public static class IntExtensions
     {
         decimal result = 0;
         if (position > 0 && total > 0)
-            result = position / (decimal) total * 100;
+            result = position / (decimal)total * 100;
         return result;
     }
 
@@ -240,7 +251,7 @@ public static class IntExtensions
 
         decimal result = 0;
         if (position > 0 && total > 0)
-            result = (decimal) position / total * 100;
+            result = (decimal)position / total * 100;
         return result;
     }
 
@@ -248,7 +259,7 @@ public static class IntExtensions
     {
         decimal result = 0;
         if (position > 0 && total > 0)
-            result = position / (decimal) total * 100;
+            result = position / (decimal)total * 100;
         return result;
     }
 
@@ -256,7 +267,7 @@ public static class IntExtensions
     {
         decimal result = 0;
         if (position > 0 && total > 0)
-            result = position / (decimal) total * 100;
+            result = position / (decimal)total * 100;
         return result;
     }
 
@@ -272,7 +283,7 @@ public static class IntExtensions
     {
         decimal result = 0;
         if (position > 0 && total > 0)
-            result = position / (decimal) total * 100;
+            result = position / (decimal)total * 100;
         return result;
     }
 

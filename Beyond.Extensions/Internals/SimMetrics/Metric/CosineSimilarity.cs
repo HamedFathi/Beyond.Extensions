@@ -24,7 +24,7 @@ internal sealed class CosineSimilarity : AbstractStringMetric
     {
         if (((firstWord != null) && (secondWord != null)) && (this.tokenUtilities.CreateMergedSet(this.tokeniser.Tokenize(firstWord), this.tokeniser.Tokenize(secondWord)).Count > 0))
         {
-            return (((double) this.tokenUtilities.CommonSetTerms()) / (Math.Pow((double) this.tokenUtilities.FirstSetTokenCount, 0.5) * Math.Pow((double) this.tokenUtilities.SecondSetTokenCount, 0.5)));
+            return (((double)this.tokenUtilities.CommonSetTerms()) / (Math.Pow((double)this.tokenUtilities.FirstSetTokenCount, 0.5) * Math.Pow((double)this.tokenUtilities.SecondSetTokenCount, 0.5)));
         }
         return 0.0;
     }

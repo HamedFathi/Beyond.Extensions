@@ -8,6 +8,7 @@ using Beyond.Extensions.Enums;
 using Beyond.Extensions.Internals.Base62;
 using Beyond.Extensions.Internals.Pluralizer;
 using Beyond.Extensions.Types;
+
 // ReSharper disable InconsistentNaming
 
 // ReSharper disable CommentTypo
@@ -20,17 +21,29 @@ public static class StringExtensions
 
     private static readonly Regex TabOrWhiteSpaceRegex =
         new(@"(\s*\\\$tb(\d+)\s*)|(\s*\\\$ws(\d+)\s*)", RegexOptions.Compiled);
+
     public static DirectoryInfo AsDirectoryInfo(this string @this)
     {
         if (@this.IsNullOrEmpty())
             throw new ArgumentNullException(nameof(@this), $"{nameof(@this)} path is null or empty");
         return new DirectoryInfo(@this);
     }
+
     public static FileStream AsFileStream(this string @this, FileMode fileMode, FileAccess fileAccess,
         FileShare fileShare, int bufferSize = 8192)
     {
         if (@this.IsNull()) throw new ArgumentNullException(nameof(@this), $"{nameof(@this)} file path is null");
         return new FileStream(@this, fileMode, fileAccess, fileShare, bufferSize);
+    }
+
+    public static string RemoveFirstAndLast(this string str)
+    {
+        if (string.IsNullOrEmpty(str)) throw new ArgumentException("Value cannot be null or empty.", nameof(str));
+        if (str.Length < 2)
+        {
+            throw new Exception($"Length of {nameof(str)} cannot be less than 2.");
+        }
+        return str.Substring(1, str.Length - 2);
     }
 
     public static int CompareOrdinal(this string strA, string strB)
@@ -1951,6 +1964,7 @@ public static class StringExtensions
 
         return array;
     }
+
     public static DirectoryInfo ToDirectoryInfo(this string @this)
     {
         return new DirectoryInfo(@this);

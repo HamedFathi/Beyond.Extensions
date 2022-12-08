@@ -32,7 +32,7 @@ internal sealed class MatchingCoefficient : AbstractStringMetric
                 num++;
             }
         }
-        return (double) num;
+        return (double)num;
     }
 
     public override double GetSimilarity(string firstWord, string secondWord)
@@ -41,7 +41,7 @@ internal sealed class MatchingCoefficient : AbstractStringMetric
         {
             double unnormalisedSimilarity = this.GetUnnormalisedSimilarity(firstWord, secondWord);
             int num2 = Math.Max(this.tokenUtilities.FirstTokenCount, this.tokenUtilities.SecondTokenCount);
-            return (unnormalisedSimilarity / ((double) num2));
+            return (unnormalisedSimilarity / ((double)num2));
         }
         return 0.0;
     }

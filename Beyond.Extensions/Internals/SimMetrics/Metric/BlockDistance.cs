@@ -45,7 +45,7 @@ internal sealed class BlockDistance : AbstractStringMetric
                 num += num3 - num2;
             }
         }
-        return (double) num;
+        return (double)num;
     }
 
     public override double GetSimilarity(string firstWord, string secondWord)
@@ -54,7 +54,7 @@ internal sealed class BlockDistance : AbstractStringMetric
         Collection<string> secondTokens = this.tokeniser.Tokenize(secondWord);
         int num = firstTokens.Count + secondTokens.Count;
         double actualSimilarity = this.GetActualSimilarity(firstTokens, secondTokens);
-        return ((num - actualSimilarity) / ((double) num));
+        return ((num - actualSimilarity) / ((double)num));
     }
 
     public override string GetSimilarityExplained(string firstWord, string secondWord)

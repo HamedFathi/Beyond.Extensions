@@ -3,6 +3,7 @@
 internal class SelectionFactory : IPathElementFactory
 {
     private const string SelectionIndicator = "[]";
+
     public IPathElement Create(string path, out string newPath)
     {
         newPath = path.Remove(0, SelectionIndicator.Length);

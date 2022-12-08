@@ -52,7 +52,7 @@ internal sealed class QGramsDistance : AbstractStringMetric
                 num += num4 - num2;
             }
         }
-        return (double) num;
+        return (double)num;
     }
 
     public override double GetSimilarity(string firstWord, string secondWord)
@@ -63,7 +63,7 @@ internal sealed class QGramsDistance : AbstractStringMetric
             int num2 = this.tokenUtilities.FirstTokenCount + this.tokenUtilities.SecondTokenCount;
             if (num2 != 0)
             {
-                return ((num2 - unnormalisedSimilarity) / ((double) num2));
+                return ((num2 - unnormalisedSimilarity) / ((double)num2));
             }
         }
         return 0.0;

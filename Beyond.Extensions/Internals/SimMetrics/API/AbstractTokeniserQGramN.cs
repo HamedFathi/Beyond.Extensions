@@ -17,6 +17,7 @@ internal abstract class AbstractTokeniserQGramN : ITokeniser
     }
 
     public abstract Collection<string> Tokenize(string word);
+
     public Collection<string> Tokenize(string word, bool extended, int tokenLength, int characterCombinationIndexValue)
     {
         int num3;

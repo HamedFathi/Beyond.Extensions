@@ -8,7 +8,7 @@ public static class ConvertibleExtensions
 {
     public static T ConvertTo<T>(this IConvertible obj)
     {
-        return (T) Convert.ChangeType(obj, typeof(T));
+        return (T)Convert.ChangeType(obj, typeof(T));
     }
 
     public static T? ConvertToOrDefault<T>(this IConvertible obj)

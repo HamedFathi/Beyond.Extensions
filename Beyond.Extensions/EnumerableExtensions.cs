@@ -12,12 +12,20 @@ namespace Beyond.Extensions.EnumerableExtended;
 public static class EnumerableExtensions
 {
     private static readonly Random Rnd = new(Guid.NewGuid().GetHashCode());
+
     public static string Aggregate<T>(this IEnumerable<T> enumeration, Func<T, string> toString, string separator)
     {
         if (toString == null)
             throw new ArgumentNullException(nameof(toString));
 
         return Aggregate(enumeration.Select(toString), separator);
+    }
+
+    public static int Count(this IEnumerable enumerable, bool excludeNullValues = false)
+    {
+        var list = enumerable.Cast<object?>();
+        if (excludeNullValues) list = list.Where(x => x != null);
+        return Enumerable.Count(list);
     }
 
     public static string Aggregate(this IEnumerable<string> enumeration, string separator)
@@ -919,6 +927,7 @@ public static class EnumerableExtensions
     {
         return string.Join(separator, values.ToArray());
     }
+
     public static string Join<T>(this IEnumerable<T> collection, Func<T, string> func, string separator)
     {
         return string.Join(separator, collection.Select(func).ToArray());

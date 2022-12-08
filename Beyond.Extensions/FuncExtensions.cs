@@ -9,6 +9,7 @@ public static class FuncExtensions
     {
         return x => func(x);
     }
+
     public static Expression<Func<T>> ToExpression<T>(this Func<T> func)
     {
         return () => func();

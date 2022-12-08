@@ -368,6 +368,7 @@ public static class ArrayExtensions
 
         return dest;
     }
+
     public static byte GetByte(this Array array, int index)
     {
         if (array == null) throw new ArgumentNullException(nameof(array));
@@ -422,10 +423,12 @@ public static class ArrayExtensions
     {
         return source == null || source.Length == 0;
     }
+
     public static string Join(this string[] values, string separator)
     {
         return string.Join(separator, values);
     }
+
     public static string JoinNotNullOrEmpty(this string[] items, string separator)
     {
         if (items == null) throw new ArgumentNullException(nameof(items));
@@ -672,7 +675,7 @@ public static class ArrayExtensions
         if (source == null) throw new ArgumentNullException(nameof(source));
         if (chunkSize <= 0) throw new ArgumentOutOfRangeException(nameof(chunkSize));
         return source
-            .Select((x, i) => new {Index = i, Value = x})
+            .Select((x, i) => new { Index = i, Value = x })
             .GroupBy(x => x.Index / chunkSize)
             .Select(x => x.Select(v => v.Value));
     }
@@ -765,7 +768,7 @@ public static class ArrayExtensions
         for (var i = 0; i < items.Length; i++)
         {
             var val = items.GetValue(i);
-            list.Add((T?) val);
+            list.Add((T?)val);
         }
 
         return list;

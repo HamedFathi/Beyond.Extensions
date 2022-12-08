@@ -43,7 +43,9 @@ internal abstract class AbstractStringMetric : IStringMetric
     }
 
     public abstract double GetSimilarity(string firstWord, string secondWord);
+
     public abstract string GetSimilarityExplained(string firstWord, string secondWord);
+
     public long GetSimilarityTimingActual(string firstWord, string secondWord)
     {
         long num = (DateTime.Now.Ticks - 0x89f7ff5f7b58000L) / 0x2710L;
@@ -53,6 +55,7 @@ internal abstract class AbstractStringMetric : IStringMetric
     }
 
     public abstract double GetSimilarityTimingEstimated(string firstWord, string secondWord);
+
     public abstract double GetUnnormalisedSimilarity(string firstWord, string secondWord);
 
     public abstract string LongDescriptionString { get; }

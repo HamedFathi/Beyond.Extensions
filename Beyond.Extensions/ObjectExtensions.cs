@@ -22,6 +22,7 @@ public static partial class ObjectExtensions
     {
         return new Lazy<T>();
     }
+
     public static bool CanConvertTo<T>(this object? value)
     {
         if (value != null)
@@ -248,6 +249,18 @@ public static partial class ObjectExtensions
 
     public static TReturn? GetNestedPropertyValue<T, TReturn>([DisallowNull] this T obj, string propertyNestedPath)
     {
+        /*
+        Property
+        Property1.Property2
+        ArrayProperty[5]
+        DictionaryProperty['Key']
+        [0] //just an array index
+        ['Key'] //just a dictionary index
+        NestedArray2
+        NestedDictionary['Key1']['Key2']
+
+        NOTE: For Dictionary you should use single quote '' but for Enumerable not.
+        */
         return (TReturn?)obj.GetNestedPropertyValue(propertyNestedPath);
     }
 
@@ -428,6 +441,7 @@ public static partial class ObjectExtensions
         }
         return instance.GetType().Namespace == null;
     }
+
     public static bool IsArray(this object? @this)
     {
         return @this != null && @this.GetType().IsArray;
@@ -537,6 +551,7 @@ public static partial class ObjectExtensions
             case TypeCode.Double:
             case TypeCode.Single:
                 return true;
+
             case TypeCode.Empty:
             case TypeCode.Object:
             case TypeCode.DBNull:
@@ -548,18 +563,7 @@ public static partial class ObjectExtensions
                 return false;
         }
     }
-    /*
-        Property
-        Property1.Property2
-        ArrayProperty[5]
-        DictionaryProperty['Key']
-        [0] //just an array index
-        ['Key'] //just a dictionary index
-        NestedArray2
-        NestedDictionary['Key1']['Key2']
 
-        For Dictionary you should use single quote '' but for Enumerable not.
-    */
     public static bool IsOfType<T>(this object obj)
     {
         return obj.IsOfType(typeof(T));
@@ -656,6 +660,15 @@ public static partial class ObjectExtensions
         return Array.IndexOf(values, obj) == -1;
     }
 
+    public static IEnumerable<object?> ToObjectArray(object? obj)
+    {
+        if (obj is IEnumerable enumerable)
+        {
+            return enumerable.Cast<object?>();
+        }
+        return new[] { obj };
+    }
+
     public static bool NotIn<T>(this T @this, IEnumerable<T>? items)
     {
         return !@this.In(items);
@@ -733,6 +746,7 @@ public static partial class ObjectExtensions
     {
         return objData.ToByteArrayByJsonSerializer();
     }
+
     public static TResult? Try<TType, TResult>(this TType @this, Func<TType, TResult> tryFunction)
     {
         try

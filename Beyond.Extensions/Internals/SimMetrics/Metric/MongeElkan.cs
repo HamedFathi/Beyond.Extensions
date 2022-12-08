@@ -59,7 +59,7 @@ internal class MongeElkan : AbstractStringMetric
             }
             num += num3;
         }
-        return (num / ((double) collection.Count));
+        return (num / ((double)collection.Count));
     }
 
     public override string GetSimilarityExplained(string firstWord, string secondWord)

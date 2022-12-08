@@ -689,6 +689,7 @@ public static class DateTimeExtensions
     {
         return date.ToString("yyyy'-'MM'-'dd hh':'mm':'ss tt 'GMT'");
     }
+
     public static string ToLongDateShortTimeString(this DateTime @this)
     {
         return @this.ToString("f", DateTimeFormatInfo.CurrentInfo);

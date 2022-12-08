@@ -59,7 +59,7 @@ internal sealed class Jaro : AbstractStringMetric
             }
         }
         num3 /= 2;
-        return (((((double) length) / (3.0 * firstWord.Length)) + (((double) length) / (3.0 * secondWord.Length))) + (((double) (length - num3)) / (3.0 * length)));
+        return (((((double)length) / (3.0 * firstWord.Length)) + (((double)length) / (3.0 * secondWord.Length))) + (((double)(length - num3)) / (3.0 * length)));
     }
 
     public override string GetSimilarityExplained(string firstWord, string secondWord)

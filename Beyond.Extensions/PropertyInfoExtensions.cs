@@ -15,6 +15,7 @@ public static class PropertyInfoExtensions
                 target);
         return lambda.Compile();
     }
+
     public static Action<TTarget, TProperty>? SetProperty<TTarget, TProperty>(this PropertyInfo property)
     {
         var target = Expression.Parameter(property.DeclaringType!, "target");
