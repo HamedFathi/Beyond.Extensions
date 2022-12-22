@@ -15,37 +15,17 @@ internal class TokeniserUtilities<T>
         this.tokenSet = new Collection<T>();
     }
 
-    private void AddTokens(Collection<T> tokenList)
-    {
-        foreach (T local in tokenList)
-        {
-            this.allTokens.Add(local);
-        }
-    }
+    public int FirstSetTokenCount => this.firstSetTokenCount;
 
-    private void AddUniqueTokens(Collection<T> tokenList)
-    {
-        foreach (T local in tokenList)
-        {
-            if (!this.tokenSet.Contains(local))
-            {
-                this.tokenSet.Add(local);
-            }
-        }
-    }
+    public int FirstTokenCount => this.firstTokenCount;
 
-    private int CalculateUniqueTokensCount(Collection<T> tokenList)
-    {
-        Collection<T> collection = new Collection<T>();
-        foreach (T local in tokenList)
-        {
-            if (!collection.Contains(local))
-            {
-                collection.Add(local);
-            }
-        }
-        return collection.Count;
-    }
+    public Collection<T> MergedTokens => this.allTokens;
+
+    public int SecondSetTokenCount => this.secondSetTokenCount;
+
+    public int SecondTokenCount => this.secondTokenCount;
+
+    public Collection<T> TokenSet => this.tokenSet;
 
     public int CommonSetTerms()
     {
@@ -96,15 +76,35 @@ internal class TokeniserUtilities<T>
         this.AddTokens(firstTokens);
     }
 
-    public int FirstSetTokenCount => this.firstSetTokenCount;
+    private void AddTokens(Collection<T> tokenList)
+    {
+        foreach (T local in tokenList)
+        {
+            this.allTokens.Add(local);
+        }
+    }
 
-    public int FirstTokenCount => this.firstTokenCount;
+    private void AddUniqueTokens(Collection<T> tokenList)
+    {
+        foreach (T local in tokenList)
+        {
+            if (!this.tokenSet.Contains(local))
+            {
+                this.tokenSet.Add(local);
+            }
+        }
+    }
 
-    public Collection<T> MergedTokens => this.allTokens;
-
-    public int SecondSetTokenCount => this.secondSetTokenCount;
-
-    public int SecondTokenCount => this.secondTokenCount;
-
-    public Collection<T> TokenSet => this.tokenSet;
+    private int CalculateUniqueTokensCount(Collection<T> tokenList)
+    {
+        Collection<T> collection = new Collection<T>();
+        foreach (T local in tokenList)
+        {
+            if (!collection.Contains(local))
+            {
+                collection.Add(local);
+            }
+        }
+        return collection.Count;
+    }
 }

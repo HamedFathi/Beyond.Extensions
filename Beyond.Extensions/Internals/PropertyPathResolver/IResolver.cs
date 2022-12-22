@@ -9,8 +9,8 @@ public interface IResolver
     IList<IPathElement> CreatePath(string path);
 
     /// <summary>
-    /// Returns the object defined by the path elements.
-    /// Any access exception (e.g. NullReference) is propagated.
+    /// Returns the object defined by the path elements. Any access exception (e.g. NullReference)
+    /// is propagated.
     /// </summary>
     /// <param name="target"></param>
     /// <param name="pathElements"></param>
@@ -18,8 +18,7 @@ public interface IResolver
     object? Resolve(object? target, IList<IPathElement> pathElements);
 
     /// <summary>
-    /// Returns the object defined by the path.
-    /// Any access exception (e.g. NullReference) is propagated.
+    /// Returns the object defined by the path. Any access exception (e.g. NullReference) is propagated.
     /// </summary>
     /// <param name="target"></param>
     /// <param name="path"></param>

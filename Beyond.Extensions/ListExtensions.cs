@@ -16,44 +16,13 @@ public static class ListExtensions
         foreach (var toAdd in rangeToAdd) container.Add(toAdd);
     }
 
-    public static IEnumerable<T> FastReverse<T>(this IList<T> items)
-    {
-        for (var i = items.Count - 1; i >= 0; i--)
-        {
-            yield return items[i];
-        }
-    }
-
-    public static void ForEachReverse<T>(this IList<T> items, Action<T> action)
-    {
-        for (var i = items.Count - 1; i >= 0; i--)
-        {
-            action(items[i]);
-        }
-    }
-
     public static void AddRangeUnique<T>(this IList<T> list, T[] items) where T : class
     {
         foreach (var item in items)
             if (!list.Contains(item))
                 list.Add(item);
     }
-    public static IEnumerable<T> FastReverse<T>(this IList<T> items)
-    {
-        if (items == null) throw new ArgumentNullException(nameof(items));
 
-        for (var i = items.Count - 1; i >= 0; i--)
-        {
-            yield return items[i];
-        }
-    }
-    public static void ForEachReverse<T>(this IList<T> items, Action<T> action)
-    {
-        for (var i = items.Count - 1; i >= 0; i--)
-        {
-            action(items[i]);
-        }
-    }
     public static void AddRangeUnique<T>(this IList<T> list, IEnumerable<T> items) where T : class
     {
         foreach (var item in items)
@@ -171,12 +140,28 @@ public static class ListExtensions
         return list;
     }
 
+    public static IEnumerable<T> FastReverse<T>(this IList<T> items)
+    {
+        for (var i = items.Count - 1; i >= 0; i--)
+        {
+            yield return items[i];
+        }
+    }
+
     public static T? First<T>(this IList<T> list)
     {
         if (list == null) throw new ArgumentNullException(nameof(list));
         if (list.Count == 0)
             return default;
         return list[0];
+    }
+
+    public static void ForEachReverse<T>(this IList<T> items, Action<T> action)
+    {
+        for (var i = items.Count - 1; i >= 0; i--)
+        {
+            action(items[i]);
+        }
     }
 
     public static T GetAndRemove<T>(this List<T> @this, int index)

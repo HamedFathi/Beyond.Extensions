@@ -7,30 +7,9 @@ internal sealed class Jaro : AbstractStringMetric
     private const double defaultMismatchScore = 0.0;
     private double estimatedTimingConstant = 4.1200000850949436E-05;
 
-    private static StringBuilder GetCommonCharacters(string firstWord, string secondWord, int distanceSep)
-    {
-        if ((firstWord == null) || (secondWord == null))
-        {
-            return null;
-        }
-        StringBuilder builder = new StringBuilder();
-        StringBuilder builder2 = new StringBuilder(secondWord);
-        for (int i = 0; i < firstWord.Length; i++)
-        {
-            char ch = firstWord[i];
-            bool flag = false;
-            for (int j = Math.Max(0, i - distanceSep); !flag && (j < Math.Min(i + distanceSep, secondWord.Length)); j++)
-            {
-                if (builder2[j] == ch)
-                {
-                    flag = true;
-                    builder.Append(ch);
-                    builder2[j] = '#';
-                }
-            }
-        }
-        return builder;
-    }
+    public override string LongDescriptionString => "Implements the Jaro algorithm providing a similarity measure between two strings allowing character transpositions to a degree";
+
+    public override string ShortDescriptionString => "Jaro";
 
     public override double GetSimilarity(string firstWord, string secondWord)
     {
@@ -83,7 +62,28 @@ internal sealed class Jaro : AbstractStringMetric
         return this.GetSimilarity(firstWord, secondWord);
     }
 
-    public override string LongDescriptionString => "Implements the Jaro algorithm providing a similarity measure between two strings allowing character transpositions to a degree";
-
-    public override string ShortDescriptionString => "Jaro";
+    private static StringBuilder GetCommonCharacters(string firstWord, string secondWord, int distanceSep)
+    {
+        if ((firstWord == null) || (secondWord == null))
+        {
+            return null;
+        }
+        StringBuilder builder = new StringBuilder();
+        StringBuilder builder2 = new StringBuilder(secondWord);
+        for (int i = 0; i < firstWord.Length; i++)
+        {
+            char ch = firstWord[i];
+            bool flag = false;
+            for (int j = Math.Max(0, i - distanceSep); !flag && (j < Math.Min(i + distanceSep, secondWord.Length)); j++)
+            {
+                if (builder2[j] == ch)
+                {
+                    flag = true;
+                    builder.Append(ch);
+                    builder2[j] = '#';
+                }
+            }
+        }
+        return builder;
+    }
 }

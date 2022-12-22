@@ -1,5 +1,6 @@
 ﻿// ReSharper disable CheckNamespace
 // ReSharper disable UnusedMember.Global
+
 namespace Beyond.Extensions.ObservableCollectionExtended;
 
 public static class ObservableCollectionExtensions

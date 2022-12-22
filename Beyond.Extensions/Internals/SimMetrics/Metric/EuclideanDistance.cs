@@ -21,26 +21,9 @@ internal sealed class EuclideanDistance : AbstractStringMetric
         this.tokenUtilities = new TokeniserUtilities<string>();
     }
 
-    private double GetActualDistance(Collection<string> firstTokens, Collection<string> secondTokens)
-    {
-        Collection<string> collection = this.tokenUtilities.CreateMergedList(firstTokens, secondTokens);
-        int num = 0;
-        foreach (string str in collection)
-        {
-            int num2 = 0;
-            int num3 = 0;
-            if (firstTokens.Contains(str))
-            {
-                num2++;
-            }
-            if (secondTokens.Contains(str))
-            {
-                num3++;
-            }
-            num += (num2 - num3) * (num2 - num3);
-        }
-        return Math.Sqrt((double)num);
-    }
+    public override string LongDescriptionString => "Implements the Euclidean Distancey algorithm providing a similarity measure between two stringsusing the vector space of combined terms as the dimensions";
+
+    public override string ShortDescriptionString => "EuclideanDistance";
 
     public double GetEuclidDistance(string firstWord, string secondWord)
     {
@@ -85,7 +68,24 @@ internal sealed class EuclideanDistance : AbstractStringMetric
         return this.GetEuclidDistance(firstWord, secondWord);
     }
 
-    public override string LongDescriptionString => "Implements the Euclidean Distancey algorithm providing a similarity measure between two stringsusing the vector space of combined terms as the dimensions";
-
-    public override string ShortDescriptionString => "EuclideanDistance";
+    private double GetActualDistance(Collection<string> firstTokens, Collection<string> secondTokens)
+    {
+        Collection<string> collection = this.tokenUtilities.CreateMergedList(firstTokens, secondTokens);
+        int num = 0;
+        foreach (string str in collection)
+        {
+            int num2 = 0;
+            int num3 = 0;
+            if (firstTokens.Contains(str))
+            {
+                num2++;
+            }
+            if (secondTokens.Contains(str))
+            {
+                num3++;
+            }
+            num += (num2 - num3) * (num2 - num3);
+        }
+        return Math.Sqrt((double)num);
+    }
 }

@@ -4,10 +4,10 @@ namespace Beyond.Extensions.Internals.SimMetrics.Utilities;
 
 internal sealed class SubCostRange5ToMinus3 : AbstractSubstitutionCost
 {
-    private Collection<string>[] approx = new Collection<string>[7];
     private const int charApproximateMatchScore = 3;
     private const int charExactMatchScore = 5;
     private const int charMismatchMatchScore = -3;
+    private Collection<string>[] approx = new Collection<string>[7];
 
     public SubCostRange5ToMinus3()
     {
@@ -37,6 +37,12 @@ internal sealed class SubCostRange5ToMinus3 : AbstractSubstitutionCost
         this.approx[6].Add(",");
         this.approx[6].Add(".");
     }
+
+    public override double MaxCost => 5.0;
+
+    public override double MinCost => -3.0;
+
+    public override string ShortDescriptionString => "SubCostRange5ToMinus3";
 
     public override double GetCost(string firstWord, int firstWordIndex, string secondWord, int secondWordIndex)
     {
@@ -68,10 +74,4 @@ internal sealed class SubCostRange5ToMinus3 : AbstractSubstitutionCost
         }
         return -3.0;
     }
-
-    public override double MaxCost => 5.0;
-
-    public override double MinCost => -3.0;
-
-    public override string ShortDescriptionString => "SubCostRange5ToMinus3";
 }

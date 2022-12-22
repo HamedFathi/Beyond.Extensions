@@ -24,6 +24,10 @@ internal sealed class SmithWatermanGotoh : SmithWatermanGotohWindowedAffine
     {
     }
 
+    public override string LongDescriptionString => "Implements the Smith-Waterman-Gotoh algorithm providing a similarity measure between two string";
+
+    public override string ShortDescriptionString => "SmithWatermanGotoh";
+
     public override double GetSimilarityTimingEstimated(string firstWord, string secondWord)
     {
         if ((firstWord != null) && (secondWord != null))
@@ -34,8 +38,4 @@ internal sealed class SmithWatermanGotoh : SmithWatermanGotohWindowedAffine
         }
         return 0.0;
     }
-
-    public override string LongDescriptionString => "Implements the Smith-Waterman-Gotoh algorithm providing a similarity measure between two string";
-
-    public override string ShortDescriptionString => "SmithWatermanGotoh";
 }

@@ -32,6 +32,7 @@ public static class TypeExtensions
         {
             return false;
         }
+
         var destinationType = typeof(T);
         return CanBeCastTo(type, destinationType);
     }
@@ -42,10 +43,12 @@ public static class TypeExtensions
         {
             return false;
         }
+
         if (type == destinationType)
         {
             return true;
         }
+
         return destinationType.IsAssignableFrom(type);
     }
 
@@ -74,27 +77,32 @@ public static class TypeExtensions
         {
             return false;
         }
+
         var typeInfo = type.GetTypeInfo();
         if (typeInfo.IsGenericType && type.GetGenericTypeDefinition() == openType)
         {
             return true;
         }
+
         foreach (var @interface in type.GetInterfaces())
             if (@interface.Closes(openType))
             {
                 return true;
             }
+
         var baseType = typeInfo.BaseType;
         if (baseType == null)
         {
             return false;
         }
+
         var baseTypeInfo = baseType.GetTypeInfo();
         var closes = baseTypeInfo.IsGenericType && baseType.GetGenericTypeDefinition() == openType;
         if (closes)
         {
             return true;
         }
+
         return typeInfo.BaseType?.Closes(openType) ?? false;
     }
 
@@ -158,11 +166,13 @@ public static class TypeExtensions
         {
             return null;
         }
+
         var typeInfo = type.GetTypeInfo();
         if (typeInfo.IsInterface && typeInfo.IsGenericType && type.GetGenericTypeDefinition() == openType)
         {
             return type;
         }
+
         foreach (var interfaceType in type.GetInterfaces())
         {
             var interfaceTypeInfo = interfaceType.GetTypeInfo();
@@ -171,10 +181,12 @@ public static class TypeExtensions
                 return interfaceType;
             }
         }
+
         if (!type.IsConcrete())
         {
             return null;
         }
+
         return typeInfo.BaseType == typeof(object)
             ? null
             : typeInfo.BaseType?.FindInterfaceThatCloses(openType);
@@ -212,7 +224,26 @@ public static class TypeExtensions
         }
     }
 
+    public static Type?[] GenericTypeArguments(this Type type)
+    {
+        switch (type)
+        {
+            case { IsArray: true }:
+                return new[] { type.GetElementType() };
 
+            case { IsGenericType: true } when type.GetGenericTypeDefinition() == typeof(IEnumerable<>):
+                return type.GetGenericArguments();
+
+            default:
+                {
+                    var enumType = type.GetInterfaces()
+                        .Where(t => t.IsGenericType &&
+                                    t.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+                        .Select(t => t.GenericTypeArguments).FirstOrDefault();
+                    return enumType ?? new[] { type };
+                }
+        }
+    }
 
     public static T? GetAttribute<T>(this Type type) where T : Attribute
     {
@@ -237,6 +268,7 @@ public static class TypeExtensions
             var parameterList = string.Join(", ", parameters);
             return $"{type.Name}<{parameterList}>";
         }
+
         return type.FullName;
     }
 
@@ -249,24 +281,6 @@ public static class TypeExtensions
             : type.AssemblyQualifiedName;
     }
 
-    public static Type?[] GenericTypeArguments(this Type type)
-    {
-        switch (type)
-        {
-            case { IsArray: true }:
-                return new[] { type.GetElementType() };
-            case { IsGenericType: true } when type.GetGenericTypeDefinition() == typeof(IEnumerable<>):
-                return type.GetGenericArguments();
-            default:
-            {
-                var enumType = type.GetInterfaces()
-                    .Where(t => t.IsGenericType &&
-                                t.GetGenericTypeDefinition() == typeof(IEnumerable<>))
-                    .Select(t => t.GenericTypeArguments).FirstOrDefault();
-                return enumType ?? new[] { type };
-            }
-        }
-    }
     public static Type GetInnerTypeFromNullable(this Type nullableType)
     {
         return nullableType.GetGenericArguments()[0];
@@ -360,6 +374,7 @@ public static class TypeExtensions
             var parameterList = string.Join(", ", parameters);
             return $"{type.Name}<{parameterList}>";
         }
+
         return type.Name;
     }
 
@@ -374,6 +389,7 @@ public static class TypeExtensions
         {
             return t.Name;
         }
+
         var sb = new StringBuilder();
         sb.Append(t.Name.Substring(0, t.Name.LastIndexOf("`", StringComparison.Ordinal)));
         sb.Append(t.GetGenericArguments().Aggregate("<",
@@ -437,16 +453,7 @@ public static class TypeExtensions
         return t.IsValueType || t.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
             null, Type.EmptyTypes, null) != null;
     }
-    public static bool IsIEnumerable(this Type type)
-    {
-        return type.GetInterfaces().Any(x => x == typeof(IEnumerable));
-    }
 
-    public static bool IsIEnumerableOfT(this Type type)
-    {
-        return type.GetInterfaces().Any(x => x.IsGenericType
-                                             && x.GetGenericTypeDefinition() == typeof(IEnumerable<>));
-    }
     public static bool HasIEnumerable(this Type type)
     {
         return type.GetInterfaces().Any(x => x == typeof(IEnumerable));
@@ -491,6 +498,7 @@ public static class TypeExtensions
         {
             return false;
         }
+
         foreach (var interfaceType in pluggedType.GetInterfaces())
         {
             if (interfaceType.GetTypeInfo().IsGenericType &&
@@ -499,6 +507,7 @@ public static class TypeExtensions
                 return true;
             }
         }
+
         return false;
     }
 
@@ -508,14 +517,17 @@ public static class TypeExtensions
         {
             throw new Exception("Duh, its gotta be enumerable");
         }
+
         if (type.IsArray)
         {
             return type.GetElementType()!;
         }
+
         if (type.GetTypeInfo().IsGenericType)
         {
             return type.GetGenericArguments()[0];
         }
+
         throw new Exception($"I don't know how to figure out what this is a collection of. Can you tell me? {type}");
     }
 
@@ -557,6 +569,7 @@ public static class TypeExtensions
         {
             return false;
         }
+
         var typeInfo = type.GetTypeInfo();
         return !typeInfo.IsAbstract && !typeInfo.IsInterface;
     }
@@ -567,6 +580,7 @@ public static class TypeExtensions
         {
             return false;
         }
+
         return pluggedType.IsConcrete() && typeof(T).IsAssignableFrom(pluggedType);
     }
 
@@ -610,11 +624,6 @@ public static class TypeExtensions
                !exceptions.Any(s => nameToCheck.Name != null && nameToCheck.Name.StartsWith(s));
     }
 
-    public static bool IsGenericType(this Type type)
-    {
-        return type.GetTypeInfo().IsGenericTypeDefinition;
-    }
-
     public static bool IsEnumerable(this Type type)
     {
         return type.GetInterfaces().Any(x => x == typeof(IEnumerable));
@@ -637,8 +646,14 @@ public static class TypeExtensions
         {
             return false;
         }
+
         var genericArgs = type.GetGenericArguments();
         return genericArgs.Length == 1 && typeof(IEnumerable<>).MakeGenericType(genericArgs).IsAssignableFrom(type);
+    }
+
+    public static bool IsGenericType(this Type type)
+    {
+        return type.GetTypeInfo().IsGenericTypeDefinition;
     }
 
     public static bool IsGenericTypeDefinedAs(this Type type, Type otherType)
@@ -648,6 +663,17 @@ public static class TypeExtensions
             return false;
 
         return type.GetGenericTypeDefinition() == otherType;
+    }
+
+    public static bool IsIEnumerable(this Type type)
+    {
+        return type.GetInterfaces().Any(x => x == typeof(IEnumerable));
+    }
+
+    public static bool IsIEnumerableOfT(this Type type)
+    {
+        return type.GetInterfaces().Any(x => x.IsGenericType
+                                             && x.GetGenericTypeDefinition() == typeof(IEnumerable<>));
     }
 
     public static bool IsImplemented(this Type type, Type baseType)
@@ -665,6 +691,7 @@ public static class TypeExtensions
         {
             return false;
         }
+
         return type.Namespace?.StartsWith(nameSpace) ?? false;
     }
 
@@ -713,6 +740,7 @@ public static class TypeExtensions
         {
             return false;
         }
+
         return theType.GetTypeInfo().IsGenericType && theType.GetGenericTypeDefinition() == typeof(Nullable<>);
     }
 
@@ -721,6 +749,7 @@ public static class TypeExtensions
         if (type is not { IsValueType: true }) return false;
         return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
     }
+
     public static bool IsNumeric(this Type type)
     {
         return type.IsFloatingPoint() || type.IsIntegerBased();
@@ -761,6 +790,7 @@ public static class TypeExtensions
         {
             return false;
         }
+
         var typeInfo = type.GetTypeInfo();
         return typeInfo.IsGenericTypeDefinition || typeInfo.ContainsGenericParameters;
     }
@@ -848,6 +878,7 @@ public static class TypeExtensions
         {
             return typeName;
         }
+
         var genericParamSelector = typeInfo.IsGenericTypeDefinition ? t => t.Name : selector;
         var genericTypeList = string.Join(",", type.GetGenericArguments().Select(genericParamSelector).ToArray());
         var tickLocation = typeName.IndexOf('`');
@@ -855,6 +886,7 @@ public static class TypeExtensions
         {
             typeName = typeName.Substring(0, tickLocation);
         }
+
         return $"{typeName}<{genericTypeList}>";
     }
 

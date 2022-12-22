@@ -5,10 +5,10 @@ namespace Beyond.Extensions.Internals.SimMetrics.Metric;
 
 internal sealed class NeedlemanWunch : AbstractStringMetric
 {
-    private AbstractSubstitutionCost dCostFunction;
     private const double defaultGapCost = 2.0;
     private const double defaultMismatchScore = 0.0;
     private const double defaultPerfectMatchScore = 1.0;
+    private AbstractSubstitutionCost dCostFunction;
     private double estimatedTimingConstant;
     private double gapCost;
 
@@ -30,6 +30,22 @@ internal sealed class NeedlemanWunch : AbstractStringMetric
         this.gapCost = costG;
         this.dCostFunction = costFunction;
     }
+
+    public AbstractSubstitutionCost DCostFunction
+    {
+        get => this.dCostFunction;
+        set => this.dCostFunction = value;
+    }
+
+    public double GapCost
+    {
+        get => this.gapCost;
+        set => this.gapCost = value;
+    }
+
+    public override string LongDescriptionString => "Implements the Needleman-Wunch algorithm providing an edit distance based similarity measure between two strings";
+
+    public override string ShortDescriptionString => "NeedlemanWunch";
 
     public override double GetSimilarity(string firstWord, string secondWord)
     {
@@ -123,20 +139,4 @@ internal sealed class NeedlemanWunch : AbstractStringMetric
         }
         return numArray[length][index];
     }
-
-    public AbstractSubstitutionCost DCostFunction
-    {
-        get => this.dCostFunction;
-        set => this.dCostFunction = value;
-    }
-
-    public double GapCost
-    {
-        get => this.gapCost;
-        set => this.gapCost = value;
-    }
-
-    public override string LongDescriptionString => "Implements the Needleman-Wunch algorithm providing an edit distance based similarity measure between two strings";
-
-    public override string ShortDescriptionString => "NeedlemanWunch";
 }

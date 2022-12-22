@@ -11,7 +11,6 @@ namespace Beyond.Extensions.ObjectExtended;
 
 public static partial class ObjectExtensions
 {
-
     public static bool Any<T>(this T obj, params T[] values)
     {
         return Array.IndexOf(values, obj) != -1;
@@ -440,6 +439,7 @@ public static partial class ObjectExtensions
         {
             return false;
         }
+
         return instance.GetType().Namespace == null;
     }
 
@@ -535,14 +535,7 @@ public static partial class ObjectExtensions
     {
         return @this == null || @this.IsDBNull();
     }
-    public static IEnumerable<object?> ToObjectArray(object? obj)
-    {
-        if (obj is IEnumerable enumerable)
-        {
-            return enumerable.Cast<object?>();
-        }
-        return new[] { obj };
-    }
+
     public static bool IsNumericType(this object o)
     {
         switch (Type.GetTypeCode(o.GetType()))
@@ -668,15 +661,6 @@ public static partial class ObjectExtensions
         return Array.IndexOf(values, obj) == -1;
     }
 
-    public static IEnumerable<object?> ToObjectArray(object? obj)
-    {
-        if (obj is IEnumerable enumerable)
-        {
-            return enumerable.Cast<object?>();
-        }
-        return new[] { obj };
-    }
-
     public static bool NotIn<T>(this T @this, IEnumerable<T>? items)
     {
         return !@this.In(items);
@@ -753,6 +737,16 @@ public static partial class ObjectExtensions
     public static byte[]? ToByteArrayByJsonSerializer<T>(T? objData)
     {
         return objData.ToByteArrayByJsonSerializer();
+    }
+
+    public static IEnumerable<object?> ToObjectArray(object? obj)
+    {
+        if (obj is IEnumerable enumerable)
+        {
+            return enumerable.Cast<object?>();
+        }
+
+        return new[] { obj };
     }
 
     public static TResult? Try<TType, TResult>(this TType @this, Func<TType, TResult> tryFunction)

@@ -2,6 +2,10 @@
 
 internal interface IStringMetric
 {
+    string LongDescriptionString { get; }
+
+    string ShortDescriptionString { get; }
+
     double GetSimilarity(string firstWord, string secondWord);
 
     string GetSimilarityExplained(string firstWord, string secondWord);
@@ -11,8 +15,4 @@ internal interface IStringMetric
     double GetSimilarityTimingEstimated(string firstWord, string secondWord);
 
     double GetUnnormalisedSimilarity(string firstWord, string secondWord);
-
-    string LongDescriptionString { get; }
-
-    string ShortDescriptionString { get; }
 }

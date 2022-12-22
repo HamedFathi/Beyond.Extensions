@@ -8,6 +8,16 @@ internal sealed class TokeniserWhitespace : ITokeniser
     private ITermHandler stopWordHandler = new DummyStopTermHandler();
     private TokeniserUtilities<string> tokenUtilities = new TokeniserUtilities<string>();
 
+    public string Delimiters => this.delimiters;
+
+    public string ShortDescriptionString => "TokeniserWhitespace";
+
+    public ITermHandler StopWordHandler
+    {
+        get => this.stopWordHandler;
+        set => this.stopWordHandler = value;
+    }
+
     public Collection<string> Tokenize(string word)
     {
         Collection<string> collection = new Collection<string>();
@@ -47,15 +57,5 @@ internal sealed class TokeniserWhitespace : ITokeniser
             return this.tokenUtilities.CreateSet(this.Tokenize(word));
         }
         return null;
-    }
-
-    public string Delimiters => this.delimiters;
-
-    public string ShortDescriptionString => "TokeniserWhitespace";
-
-    public ITermHandler StopWordHandler
-    {
-        get => this.stopWordHandler;
-        set => this.stopWordHandler = value;
     }
 }

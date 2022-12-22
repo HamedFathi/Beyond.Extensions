@@ -5,27 +5,13 @@ namespace Beyond.Extensions.Internals.SimMetrics.Metric;
 
 internal sealed class JaroWinkler : AbstractStringMetric
 {
-    private double estimatedTimingConstant = 4.3420001020422205E-05;
-    private AbstractStringMetric jaroStringMetric = new Jaro();
     private const int minPrefixTestLength = 4;
     private const double prefixAdustmentScale = 0.10000000149011612;
+    private double estimatedTimingConstant = 4.3420001020422205E-05;
+    private AbstractStringMetric jaroStringMetric = new Jaro();
+    public override string LongDescriptionString => "Implements the Jaro-Winkler algorithm providing a similarity measure between two strings allowing character transpositions to a degree adjusting the weighting for common prefixes";
 
-    private static int GetPrefixLength(string firstWord, string secondWord)
-    {
-        if ((firstWord == null) || (secondWord == null))
-        {
-            return 4;
-        }
-        int num = MathFunctions.MinOf3(4, firstWord.Length, secondWord.Length);
-        for (int i = 0; i < num; i++)
-        {
-            if (firstWord[i] != secondWord[i])
-            {
-                return i;
-            }
-        }
-        return num;
-    }
+    public override string ShortDescriptionString => "JaroWinkler";
 
     public override double GetSimilarity(string firstWord, string secondWord)
     {
@@ -59,7 +45,20 @@ internal sealed class JaroWinkler : AbstractStringMetric
         return this.GetSimilarity(firstWord, secondWord);
     }
 
-    public override string LongDescriptionString => "Implements the Jaro-Winkler algorithm providing a similarity measure between two strings allowing character transpositions to a degree adjusting the weighting for common prefixes";
-
-    public override string ShortDescriptionString => "JaroWinkler";
+    private static int GetPrefixLength(string firstWord, string secondWord)
+    {
+        if ((firstWord == null) || (secondWord == null))
+        {
+            return 4;
+        }
+        int num = MathFunctions.MinOf3(4, firstWord.Length, secondWord.Length);
+        for (int i = 0; i < num; i++)
+        {
+            if (firstWord[i] != secondWord[i])
+            {
+                return i;
+            }
+        }
+        return num;
+    }
 }

@@ -2,8 +2,6 @@
 
 public class Selection : IEnumerable<object>
 {
-    public IReadOnlyCollection<object?> Entries { get; }
-
     public Selection(IEnumerable entries)
     {
         var list = new List<object?>();
@@ -11,6 +9,8 @@ public class Selection : IEnumerable<object>
             list.Add(entry);
         Entries = list;
     }
+
+    public IReadOnlyCollection<object?> Entries { get; }
 
     IEnumerator IEnumerable.GetEnumerator()
     {

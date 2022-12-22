@@ -4,9 +4,9 @@ namespace Beyond.Extensions.Internals.SimMetrics.API;
 
 internal abstract class AbstractTokeniserQGramN : ITokeniser
 {
-    private int characterCombinationIndex;
     private const string defaultEndPadCharacter = "#";
     private const string defaultStartPadCharacter = "?";
+    private int characterCombinationIndex;
     private int qGramLength;
     private ITermHandler stopWordHandler;
     private string suppliedWord;
@@ -14,6 +14,40 @@ internal abstract class AbstractTokeniserQGramN : ITokeniser
 
     protected AbstractTokeniserQGramN()
     {
+    }
+
+    public int CharacterCombinationIndex
+    {
+        get => this.characterCombinationIndex;
+        set => this.characterCombinationIndex = value;
+    }
+
+    public string Delimiters => string.Empty;
+
+    public int QGramLength
+    {
+        get => this.qGramLength;
+        set => this.qGramLength = value;
+    }
+
+    public abstract string ShortDescriptionString { get; }
+
+    public ITermHandler StopWordHandler
+    {
+        get => this.stopWordHandler;
+        set => this.stopWordHandler = value;
+    }
+
+    public string SuppliedWord
+    {
+        get => this.suppliedWord;
+        set => this.suppliedWord = value;
+    }
+
+    public TokeniserUtilities<string> TokenUtilities
+    {
+        get => this.tokenUtilities;
+        set => this.tokenUtilities = value;
     }
 
     public abstract Collection<string> Tokenize(string word);
@@ -84,39 +118,5 @@ internal abstract class AbstractTokeniserQGramN : ITokeniser
             return this.TokenUtilities.CreateSet(this.Tokenize(word));
         }
         return null;
-    }
-
-    public int CharacterCombinationIndex
-    {
-        get => this.characterCombinationIndex;
-        set => this.characterCombinationIndex = value;
-    }
-
-    public string Delimiters => string.Empty;
-
-    public int QGramLength
-    {
-        get => this.qGramLength;
-        set => this.qGramLength = value;
-    }
-
-    public abstract string ShortDescriptionString { get; }
-
-    public ITermHandler StopWordHandler
-    {
-        get => this.stopWordHandler;
-        set => this.stopWordHandler = value;
-    }
-
-    public string SuppliedWord
-    {
-        get => this.suppliedWord;
-        set => this.suppliedWord = value;
-    }
-
-    public TokeniserUtilities<string> TokenUtilities
-    {
-        get => this.tokenUtilities;
-        set => this.tokenUtilities = value;
     }
 }

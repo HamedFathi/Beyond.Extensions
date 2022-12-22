@@ -21,6 +21,10 @@ internal sealed class OverlapCoefficient : AbstractStringMetric
         this.tokenUtilities = new TokeniserUtilities<string>();
     }
 
+    public override string LongDescriptionString => "Implements the Overlap Coefficient algorithm providing a similarity measure between two string where it is determined to what degree a string is a subset of another";
+
+    public override string ShortDescriptionString => "OverlapCoefficient";
+
     public override double GetSimilarity(string firstWord, string secondWord)
     {
         if ((firstWord != null) && (secondWord != null))
@@ -51,8 +55,4 @@ internal sealed class OverlapCoefficient : AbstractStringMetric
     {
         return this.GetSimilarity(firstWord, secondWord);
     }
-
-    public override string LongDescriptionString => "Implements the Overlap Coefficient algorithm providing a similarity measure between two string where it is determined to what degree a string is a subset of another";
-
-    public override string ShortDescriptionString => "OverlapCoefficient";
 }

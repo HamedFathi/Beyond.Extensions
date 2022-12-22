@@ -1,5 +1,6 @@
 ﻿// ReSharper disable CheckNamespace
 // ReSharper disable UnusedMember.Global
+
 namespace Beyond.Extensions.PropertyInfoExtended;
 
 public static class PropertyInfoExtensions

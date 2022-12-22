@@ -6,16 +6,6 @@ public class Resolver : IResolver
 {
     private IList<IPathElementFactory>? _pathElementFactories;
 
-    /// <summary>
-    /// contains the path element factories used to resolve given paths
-    /// more specific factories must be before more generic ones, because the first applicable one is taken
-    /// </summary>
-    public IList<IPathElementFactory>? PathElementFactories
-    {
-        get => _pathElementFactories;
-        set => _pathElementFactories = value ?? throw new ArgumentNullException($"The {nameof(PathElementFactories)} must not be null");
-    }
-
     public Resolver()
     {
         PathElementFactories = new List<IPathElementFactory>
@@ -45,6 +35,16 @@ public class Resolver : IResolver
             list.AddRange(pathElementFactories);
 
         PathElementFactories = addDefaults ? list : pathElementFactories;
+    }
+
+    /// <summary>
+    /// contains the path element factories used to resolve given paths more specific factories must
+    /// be before more generic ones, because the first applicable one is taken
+    /// </summary>
+    public IList<IPathElementFactory>? PathElementFactories
+    {
+        get => _pathElementFactories;
+        set => _pathElementFactories = value ?? throw new ArgumentNullException($"The {nameof(PathElementFactories)} must not be null");
     }
 
     public IList<IPathElement> CreatePath(string path)
@@ -85,17 +85,6 @@ public class Resolver : IResolver
         return result;
     }
 
-    private IPathElement CreatePathElement(string path, out string newPath)
-    {
-        //get the first applicable path element type
-        var pathElementFactory = PathElementFactories?.FirstOrDefault(f => f.IsApplicable(path));
-
-        if (pathElementFactory == null)
-            throw new InvalidOperationException($"There is no applicable path element factory for {path}");
-
-        return pathElementFactory.Create(path, out newPath);
-    }
-
     public object? ResolveSafe(object? target, IList<IPathElement> pathElements)
     {
         try
@@ -118,5 +107,16 @@ public class Resolver : IResolver
         {
             return null;
         }
+    }
+
+    private IPathElement CreatePathElement(string path, out string newPath)
+    {
+        //get the first applicable path element type
+        var pathElementFactory = PathElementFactories?.FirstOrDefault(f => f.IsApplicable(path));
+
+        if (pathElementFactory == null)
+            throw new InvalidOperationException($"There is no applicable path element factory for {path}");
+
+        return pathElementFactory.Create(path, out newPath);
     }
 }

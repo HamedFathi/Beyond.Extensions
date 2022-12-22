@@ -12,10 +12,6 @@ namespace Beyond.Extensions.ArrayExtended;
 
 public static class ArrayExtensions
 {
-    public static Array ToArrayObject<T>(this T[] array)
-    {
-        return array as Array;
-    }
     public static bool All<T>(this T[] array, Func<T, bool> predicate)
     {
         if (array == null) throw new ArgumentNullException(nameof(array));
@@ -718,6 +714,11 @@ public static class ArrayExtensions
     {
         if (source == null) throw new ArgumentNullException(nameof(source));
         return source.AsEnumerable().StdDevP();
+    }
+
+    public static Array ToArrayObject<T>(this T[] array)
+    {
+        return array as Array;
     }
 
     public static DataTable ToDataTable<T>(this T[] @this)

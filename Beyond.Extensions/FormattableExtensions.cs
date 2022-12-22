@@ -1,6 +1,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable IdentifierTypo
 // ReSharper disable UnusedMember.Global
+
 namespace Beyond.Extensions.FormattableExtended;
 
 public static class FormattableExtensions

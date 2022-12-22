@@ -175,7 +175,7 @@ public static class XmlExtensions
     }
 
     public static string SortXmlText(this string xmlText, bool sortAttributes = true, Action<XElement>? postSort = null,
-            params string[]? customAttributes)
+        params string[]? customAttributes)
     {
         var xmlTree = XElement.Parse(xmlText);
         var sortedXmlTree = SortXmlElement(xmlTree, sortAttributes, postSort, customAttributes);

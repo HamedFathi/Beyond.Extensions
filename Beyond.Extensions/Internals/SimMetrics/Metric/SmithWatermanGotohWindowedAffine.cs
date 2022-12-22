@@ -5,10 +5,10 @@ namespace Beyond.Extensions.Internals.SimMetrics.Metric;
 
 internal class SmithWatermanGotohWindowedAffine : AbstractStringMetric
 {
-    private AbstractSubstitutionCost dCostFunction;
     private const double defaultMismatchScore = 0.0;
     private const double defaultPerfectScore = 1.0;
     private const int defaultWindowSize = 100;
+    private AbstractSubstitutionCost dCostFunction;
     private double estimatedTimingConstant;
     private AbstractAffineGapCost gGapFunction;
     private int windowSize;
@@ -48,6 +48,22 @@ internal class SmithWatermanGotohWindowedAffine : AbstractStringMetric
         this.dCostFunction = costFunction;
         this.windowSize = affineGapWindowSize;
     }
+
+    public AbstractSubstitutionCost DCostFunction
+    {
+        get => this.dCostFunction;
+        set => this.dCostFunction = value;
+    }
+
+    public AbstractAffineGapCost GGapFunction
+    {
+        get => this.gGapFunction;
+        set => this.gGapFunction = value;
+    }
+
+    public override string LongDescriptionString => "Implements the Smith-Waterman-Gotoh algorithm with a windowed affine gap providing a similarity measure between two string";
+
+    public override string ShortDescriptionString => "SmithWatermanGotohWindowedAffine";
 
     public override double GetSimilarity(string firstWord, string secondWord)
     {
@@ -196,20 +212,4 @@ internal class SmithWatermanGotohWindowedAffine : AbstractStringMetric
         }
         return num4;
     }
-
-    public AbstractSubstitutionCost DCostFunction
-    {
-        get => this.dCostFunction;
-        set => this.dCostFunction = value;
-    }
-
-    public AbstractAffineGapCost GGapFunction
-    {
-        get => this.gGapFunction;
-        set => this.gGapFunction = value;
-    }
-
-    public override string LongDescriptionString => "Implements the Smith-Waterman-Gotoh algorithm with a windowed affine gap providing a similarity measure between two string";
-
-    public override string ShortDescriptionString => "SmithWatermanGotohWindowedAffine";
 }

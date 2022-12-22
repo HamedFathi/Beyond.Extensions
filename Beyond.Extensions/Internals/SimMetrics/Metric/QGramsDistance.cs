@@ -21,39 +21,9 @@ internal sealed class QGramsDistance : AbstractStringMetric
         this.tokenUtilities = new TokeniserUtilities<string>();
     }
 
-    private double GetActualSimilarity(Collection<string> firstTokens, Collection<string> secondTokens)
-    {
-        Collection<string> collection = this.tokenUtilities.CreateMergedSet(firstTokens, secondTokens);
-        int num = 0;
-        foreach (string str in collection)
-        {
-            int num2 = 0;
-            for (int i = 0; i < firstTokens.Count; i++)
-            {
-                if (firstTokens[i].Equals(str))
-                {
-                    num2++;
-                }
-            }
-            int num4 = 0;
-            for (int j = 0; j < secondTokens.Count; j++)
-            {
-                if (secondTokens[j].Equals(str))
-                {
-                    num4++;
-                }
-            }
-            if (num2 > num4)
-            {
-                num += num2 - num4;
-            }
-            else
-            {
-                num += num4 - num2;
-            }
-        }
-        return (double)num;
-    }
+    public override string LongDescriptionString => "Implements the Q Grams Distance algorithm providing a similarity measure between two strings using the qGram approach check matching qGrams/possible matching qGrams";
+
+    public override string ShortDescriptionString => "QGramsDistance";
 
     public override double GetSimilarity(string firstWord, string secondWord)
     {
@@ -93,7 +63,37 @@ internal sealed class QGramsDistance : AbstractStringMetric
         return this.GetActualSimilarity(firstTokens, secondTokens);
     }
 
-    public override string LongDescriptionString => "Implements the Q Grams Distance algorithm providing a similarity measure between two strings using the qGram approach check matching qGrams/possible matching qGrams";
-
-    public override string ShortDescriptionString => "QGramsDistance";
+    private double GetActualSimilarity(Collection<string> firstTokens, Collection<string> secondTokens)
+    {
+        Collection<string> collection = this.tokenUtilities.CreateMergedSet(firstTokens, secondTokens);
+        int num = 0;
+        foreach (string str in collection)
+        {
+            int num2 = 0;
+            for (int i = 0; i < firstTokens.Count; i++)
+            {
+                if (firstTokens[i].Equals(str))
+                {
+                    num2++;
+                }
+            }
+            int num4 = 0;
+            for (int j = 0; j < secondTokens.Count; j++)
+            {
+                if (secondTokens[j].Equals(str))
+                {
+                    num4++;
+                }
+            }
+            if (num2 > num4)
+            {
+                num += num2 - num4;
+            }
+            else
+            {
+                num += num4 - num2;
+            }
+        }
+        return (double)num;
+    }
 }

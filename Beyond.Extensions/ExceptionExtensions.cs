@@ -1,6 +1,7 @@
 ﻿// ReSharper disable CheckNamespace
 // ReSharper disable UnusedMember.Global
 // ReSharper disable IdentifierTypo
+
 namespace Beyond.Extensions.ExceptionExtended;
 
 public static class ExceptionExtensions

@@ -21,19 +21,9 @@ internal sealed class MatchingCoefficient : AbstractStringMetric
         this.tokenUtilities = new TokeniserUtilities<string>();
     }
 
-    private double GetActualSimilarity(Collection<string> firstTokens, Collection<string> secondTokens)
-    {
-        this.tokenUtilities.CreateMergedList(firstTokens, secondTokens);
-        int num = 0;
-        foreach (string str in firstTokens)
-        {
-            if (secondTokens.Contains(str))
-            {
-                num++;
-            }
-        }
-        return (double)num;
-    }
+    public override string LongDescriptionString => "Implements the Matching Coefficient algorithm providing a similarity measure between two strings";
+
+    public override string ShortDescriptionString => "MatchingCoefficient";
 
     public override double GetSimilarity(string firstWord, string secondWord)
     {
@@ -69,7 +59,17 @@ internal sealed class MatchingCoefficient : AbstractStringMetric
         return this.GetActualSimilarity(firstTokens, secondTokens);
     }
 
-    public override string LongDescriptionString => "Implements the Matching Coefficient algorithm providing a similarity measure between two strings";
-
-    public override string ShortDescriptionString => "MatchingCoefficient";
+    private double GetActualSimilarity(Collection<string> firstTokens, Collection<string> secondTokens)
+    {
+        this.tokenUtilities.CreateMergedList(firstTokens, secondTokens);
+        int num = 0;
+        foreach (string str in firstTokens)
+        {
+            if (secondTokens.Contains(str))
+            {
+                num++;
+            }
+        }
+        return (double)num;
+    }
 }

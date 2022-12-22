@@ -25,6 +25,10 @@ public class SelectionEnumerator : IEnumerator<object>
         }
     }
 
+    public void Dispose()
+    {
+    }
+
     public bool MoveNext()
     {
         _currentIndex++;
@@ -34,9 +38,5 @@ public class SelectionEnumerator : IEnumerator<object>
     public void Reset()
     {
         _currentIndex = -1;
-    }
-
-    public void Dispose()
-    {
     }
 }

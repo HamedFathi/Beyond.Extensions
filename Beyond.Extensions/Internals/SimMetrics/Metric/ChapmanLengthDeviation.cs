@@ -4,6 +4,10 @@ namespace Beyond.Extensions.Internals.SimMetrics.Metric;
 
 internal sealed class ChapmanLengthDeviation : AbstractStringMetric
 {
+    public override string LongDescriptionString => "Implements the Chapman Length Deviation algorithm whereby the length deviation of the word strings is used to determine if the strings are similar in size - This apporach is not intended to be used single handedly but rather alongside other approaches";
+
+    public override string ShortDescriptionString => "ChapmanLengthDeviation";
+
     public override double GetSimilarity(string firstWord, string secondWord)
     {
         if ((firstWord == null) || (secondWord == null))
@@ -33,8 +37,4 @@ internal sealed class ChapmanLengthDeviation : AbstractStringMetric
     {
         return this.GetSimilarity(firstWord, secondWord);
     }
-
-    public override string LongDescriptionString => "Implements the Chapman Length Deviation algorithm whereby the length deviation of the word strings is used to determine if the strings are similar in size - This apporach is not intended to be used single handedly but rather alongside other approaches";
-
-    public override string ShortDescriptionString => "ChapmanLengthDeviation";
 }

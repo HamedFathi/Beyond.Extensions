@@ -21,6 +21,10 @@ internal sealed class JaccardSimilarity : AbstractStringMetric
         this.tokenUtilities = new TokeniserUtilities<string>();
     }
 
+    public override string LongDescriptionString => "Implements the Jaccard Similarity algorithm providing a similarity measure between two strings";
+
+    public override string ShortDescriptionString => "JaccardSimilarity";
+
     public override double GetSimilarity(string firstWord, string secondWord)
     {
         if ((firstWord != null) && (secondWord != null))
@@ -54,8 +58,4 @@ internal sealed class JaccardSimilarity : AbstractStringMetric
     {
         return this.GetSimilarity(firstWord, secondWord);
     }
-
-    public override string LongDescriptionString => "Implements the Jaccard Similarity algorithm providing a similarity measure between two strings";
-
-    public override string ShortDescriptionString => "JaccardSimilarity";
 }

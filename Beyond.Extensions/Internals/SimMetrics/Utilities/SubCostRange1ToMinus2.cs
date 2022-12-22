@@ -7,6 +7,12 @@ internal sealed class SubCostRange1ToMinus2 : AbstractSubstitutionCost
     private const int charExactMatchScore = 1;
     private const int charMismatchMatchScore = -2;
 
+    public override double MaxCost => 1.0;
+
+    public override double MinCost => -2.0;
+
+    public override string ShortDescriptionString => "SubCostRange1ToMinus2";
+
     public override double GetCost(string firstWord, int firstWordIndex, string secondWord, int secondWordIndex)
     {
         if ((firstWord == null) || (secondWord == null))
@@ -23,10 +29,4 @@ internal sealed class SubCostRange1ToMinus2 : AbstractSubstitutionCost
         }
         return ((firstWord[firstWordIndex] != secondWord[secondWordIndex]) ? ((double)(-2)) : ((double)1));
     }
-
-    public override double MaxCost => 1.0;
-
-    public override double MinCost => -2.0;
-
-    public override string ShortDescriptionString => "SubCostRange1ToMinus2";
 }

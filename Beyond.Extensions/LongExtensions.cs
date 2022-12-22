@@ -2,6 +2,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+
 namespace Beyond.Extensions.LongExtended;
 
 public static class LongExtensions
@@ -15,16 +16,7 @@ public static class LongExtensions
     {
         return minValue.CompareTo(@this) == -1 && @this.CompareTo(maxValue) == -1;
     }
-    public static string ToSequentialLetters(this long value, bool lowercase = false)
-    {
-        var result = string.Empty;
-        while (--value >= 0)
-        {
-            result = (char)('A' + value % 26) + result;
-            value /= 26;
-        }
-        return lowercase ? result.ToLower() : result;
-    }
+
     public static DateTime ConvertFromUnixTimeStamp(this long timestamp)
     {
         var dt = new DateTime(1970, 1, 1);
@@ -286,6 +278,18 @@ public static class LongExtensions
         } while (input > 0);
 
         return text;
+    }
+
+    public static string ToSequentialLetters(this long value, bool lowercase = false)
+    {
+        var result = string.Empty;
+        while (--value >= 0)
+        {
+            result = (char)('A' + value % 26) + result;
+            value /= 26;
+        }
+
+        return lowercase ? result.ToLower() : result;
     }
 
     public static TimeSpan Weeks(this long @this)

@@ -28,41 +28,12 @@ public static class StringExtensions
             throw new ArgumentNullException(nameof(@this), $"{nameof(@this)} path is null or empty");
         return new DirectoryInfo(@this);
     }
-    public static IEnumerable<string> SplitAndKeepSeparators(this string text, params char[] separator)
-    {
-        if (text == null) throw new ArgumentNullException(nameof(text));
-        if (separator == null) throw new ArgumentNullException(nameof(separator));
 
-        var start = 0;
-        int index;
-        while ((index = text.IndexOfAny(separator, start)) != -1)
-        {
-            if (index - start > 0)
-                yield return text.Substring(start, index - start);
-            yield return text.Substring(index, 1);
-            start = index + 1;
-        }
-
-        if (start < text.Length)
-        {
-            yield return text.Substring(start);
-        }
-    }
     public static FileStream AsFileStream(this string @this, FileMode fileMode, FileAccess fileAccess,
         FileShare fileShare, int bufferSize = 8192)
     {
         if (@this.IsNull()) throw new ArgumentNullException(nameof(@this), $"{nameof(@this)} file path is null");
         return new FileStream(@this, fileMode, fileAccess, fileShare, bufferSize);
-    }
-
-    public static string RemoveFirstAndLast(this string str)
-    {
-        if (string.IsNullOrEmpty(str)) throw new ArgumentException("Value cannot be null or empty.", nameof(str));
-        if (str.Length < 2)
-        {
-            throw new Exception($"Length of {nameof(str)} cannot be less than 2.");
-        }
-        return str.Substring(1, str.Length - 2);
     }
 
     public static int CompareOrdinal(this string strA, string strB)
@@ -106,33 +77,12 @@ public static class StringExtensions
 
         return sb.ToString();
     }
-    public static string RemoveFirstAndLastChars(this string str)
-    {
-        if (string.IsNullOrEmpty(str)) throw new ArgumentException("Value cannot be null or empty.", nameof(str));
-        if (str.Length < 2)
-        {
-            throw new Exception($"Length of {nameof(str)} cannot be less than 2.");
-        }
-        return str.Substring(1, str.Length - 2);
-    }
+
     public static string ConcatWith(this string @this, params string[] values)
     {
         return string.Concat(@this, string.Concat(values));
     }
-    public static bool IsValidRegex(this string pattern)
-    {
-        if (string.IsNullOrWhiteSpace(pattern)) return false;
-        try
-        {
-            var _ = Regex.Match("", pattern);
-        }
-        catch (ArgumentException)
-        {
-            return false;
-        }
 
-        return true;
-    }
     public static bool Contains(this string @this, string value, StringComparison comparisonType)
     {
         return @this.IndexOf(value, comparisonType) != -1;
@@ -985,6 +935,21 @@ public static class StringExtensions
         return new Regex(_validNumberPattern, RegexOptions.ECMAScript).IsMatch(number);
     }
 
+    public static bool IsValidRegex(this string pattern)
+    {
+        if (string.IsNullOrWhiteSpace(pattern)) return false;
+        try
+        {
+            var _ = Regex.Match("", pattern);
+        }
+        catch (ArgumentException)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
     public static bool IsValidUrl(this string text)
     {
         var rx = new Regex(@"http(s)?://([\w-]+\.)+[\w-]+(/[\w- ./?%&=]*)?");
@@ -1312,6 +1277,28 @@ public static class StringExtensions
     public static string RemoveFirst(this string instr, int number)
     {
         return instr.Substring(number);
+    }
+
+    public static string RemoveFirstAndLast(this string str)
+    {
+        if (string.IsNullOrEmpty(str)) throw new ArgumentException("Value cannot be null or empty.", nameof(str));
+        if (str.Length < 2)
+        {
+            throw new Exception($"Length of {nameof(str)} cannot be less than 2.");
+        }
+
+        return str.Substring(1, str.Length - 2);
+    }
+
+    public static string RemoveFirstAndLastChars(this string str)
+    {
+        if (string.IsNullOrEmpty(str)) throw new ArgumentException("Value cannot be null or empty.", nameof(str));
+        if (str.Length < 2)
+        {
+            throw new Exception($"Length of {nameof(str)} cannot be less than 2.");
+        }
+
+        return str.Substring(1, str.Length - 2);
     }
 
     public static string RemoveFirstCharacter(this string instr)
@@ -1655,6 +1642,27 @@ public static class StringExtensions
     public static string[] Split(this string value, string regexPattern, RegexOptions options)
     {
         return Regex.Split(value, regexPattern, options);
+    }
+
+    public static IEnumerable<string> SplitAndKeepSeparators(this string text, params char[] separator)
+    {
+        if (text == null) throw new ArgumentNullException(nameof(text));
+        if (separator == null) throw new ArgumentNullException(nameof(separator));
+
+        var start = 0;
+        int index;
+        while ((index = text.IndexOfAny(separator, start)) != -1)
+        {
+            if (index - start > 0)
+                yield return text.Substring(start, index - start);
+            yield return text.Substring(index, 1);
+            start = index + 1;
+        }
+
+        if (start < text.Length)
+        {
+            yield return text.Substring(start);
+        }
     }
 
     public static string SplitCamelCase(this string str)

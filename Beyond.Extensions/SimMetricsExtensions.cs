@@ -12,7 +12,8 @@ namespace Beyond.Extensions.SimMetricsExtended;
 
 public static class SimMetricsExtensions
 {
-    public static IEnumerable<string> ContainsFuzzy(this string[] source, string search, double threshold = 0.7, SimMetricType simMetricType = SimMetricType.Levenstein, Func<string, string>? manipulator = null)
+    public static IEnumerable<string> ContainsFuzzy(this string[] source, string search, double threshold = 0.7,
+        SimMetricType simMetricType = SimMetricType.Levenstein, Func<string, string>? manipulator = null)
     {
         foreach (var item in source)
         {
@@ -25,7 +26,9 @@ public static class SimMetricsExtensions
         }
     }
 
-    public static IEnumerable<string> ContainsFuzzy(this IEnumerable<string> source, string search, double threshold = 0.7, SimMetricType simMetricType = SimMetricType.Levenstein, Func<string, string>? manipulator = null)
+    public static IEnumerable<string> ContainsFuzzy(this IEnumerable<string> source, string search,
+        double threshold = 0.7, SimMetricType simMetricType = SimMetricType.Levenstein,
+        Func<string, string>? manipulator = null)
     {
         foreach (var item in source)
         {
@@ -38,7 +41,8 @@ public static class SimMetricsExtensions
         }
     }
 
-    public static bool ContainsFuzzy(this string source, string search, double threshold = 0.7, SimMetricType simMetricType = SimMetricType.Levenstein, Func<string, string>? manipulator = null)
+    public static bool ContainsFuzzy(this string source, string search, double threshold = 0.7,
+        SimMetricType simMetricType = SimMetricType.Levenstein, Func<string, string>? manipulator = null)
     {
         if (source.ContainsIgnoreCase(search)) return true;
 
@@ -47,6 +51,7 @@ public static class SimMetricsExtensions
         {
             words = words.Select(manipulator).ToList();
         }
+
         if (words.ContainsIgnoreCase(search)) return true;
         foreach (var word in words)
         {
@@ -56,10 +61,13 @@ public static class SimMetricsExtensions
                 return true;
             }
         }
+
         return false;
     }
 
-    public static IEnumerable<string> GetMaxSimilarities(this string first, IEnumerable<string> second, SimMetricType simMetricType = SimMetricType.Levenstein, bool convertToPercentage = false, Func<string, string>? manipulator = null)
+    public static IEnumerable<string> GetMaximumSimilarities(this string first, IEnumerable<string> second,
+        SimMetricType simMetricType = SimMetricType.Levenstein, bool convertToPercentage = false,
+        Func<string, string>? manipulator = null)
     {
         var list = new List<SimMetricResult>();
         foreach (var item in second)
@@ -68,13 +76,16 @@ public static class SimMetricsExtensions
             var rank = first.GetSimilarity(data, simMetricType);
             list.Add(new SimMetricResult { Item = item, Score = convertToPercentage.GetPercentageIf(rank) });
         }
+
         var word = list.OrderBy(x => x.Score).Last();
         var result = list.Where(x => x.Score == word.Score).Select(x => x.Item);
 
         return result;
     }
 
-    public static IEnumerable<SimMetricResult> GetMaxSimilaritiesInfo(this string first, IEnumerable<string> second, SimMetricType simMetricType = SimMetricType.Levenstein, bool convertToPercentage = false, Func<string, string>? manipulator = null)
+    public static IEnumerable<SimMetricResult> GetMaximumSimilaritiesInfo(this string first, IEnumerable<string> second,
+        SimMetricType simMetricType = SimMetricType.Levenstein, bool convertToPercentage = false,
+        Func<string, string>? manipulator = null)
     {
         var list = new List<SimMetricResult>();
         foreach (var item in second)
@@ -90,7 +101,9 @@ public static class SimMetricsExtensions
         return result;
     }
 
-    public static string GetMaxSimilarity(this string first, IEnumerable<string> second, SimMetricType simMetricType = SimMetricType.Levenstein, bool convertToPercentage = false, Func<string, string>? manipulator = null)
+    public static string GetMaximumSimilarity(this string first, IEnumerable<string> second,
+        SimMetricType simMetricType = SimMetricType.Levenstein, bool convertToPercentage = false,
+        Func<string, string>? manipulator = null)
     {
         var list = new List<SimMetricResult>();
         foreach (var item in second)
@@ -104,7 +117,9 @@ public static class SimMetricsExtensions
         return result;
     }
 
-    public static SimMetricResult GetMaxSimilarityInfo(this string first, IEnumerable<string> second, SimMetricType simMetricType = SimMetricType.Levenstein, bool convertToPercentage = false, Func<string, string>? manipulator = null)
+    public static SimMetricResult GetMaximumSimilarityInfo(this string first, IEnumerable<string> second,
+        SimMetricType simMetricType = SimMetricType.Levenstein, bool convertToPercentage = false,
+        Func<string, string>? manipulator = null)
     {
         var list = new List<SimMetricResult>();
         foreach (var item in second)
@@ -118,7 +133,9 @@ public static class SimMetricsExtensions
         return result;
     }
 
-    public static IEnumerable<string> GetMinSimilarities(this string first, IEnumerable<string> second, SimMetricType simMetricType = SimMetricType.Levenstein, bool convertToPercentage = false, Func<string, string>? manipulator = null)
+    public static IEnumerable<string> GetMinimumSimilarities(this string first, IEnumerable<string> second,
+        SimMetricType simMetricType = SimMetricType.Levenstein, bool convertToPercentage = false,
+        Func<string, string>? manipulator = null)
     {
         var list = new List<SimMetricResult>();
         foreach (var item in second)
@@ -134,7 +151,9 @@ public static class SimMetricsExtensions
         return result;
     }
 
-    public static IEnumerable<SimMetricResult> GetMinSimilaritiesInfo(this string first, IEnumerable<string> second, SimMetricType simMetricType = SimMetricType.Levenstein, bool convertToPercentage = false, Func<string, string>? manipulator = null)
+    public static IEnumerable<SimMetricResult> GetMinimumSimilaritiesInfo(this string first, IEnumerable<string> second,
+        SimMetricType simMetricType = SimMetricType.Levenstein, bool convertToPercentage = false,
+        Func<string, string>? manipulator = null)
     {
         var list = new List<SimMetricResult>();
         foreach (var item in second)
@@ -150,7 +169,9 @@ public static class SimMetricsExtensions
         return result;
     }
 
-    public static string GetMinSimilarity(this string first, IEnumerable<string> second, SimMetricType simMetricType = SimMetricType.Levenstein, bool convertToPercentage = false, Func<string, string>? manipulator = null)
+    public static string GetMinimumSimilarity(this string first, IEnumerable<string> second,
+        SimMetricType simMetricType = SimMetricType.Levenstein, bool convertToPercentage = false,
+        Func<string, string>? manipulator = null)
     {
         var list = new List<SimMetricResult>();
         foreach (var item in second)
@@ -164,7 +185,9 @@ public static class SimMetricsExtensions
         return result;
     }
 
-    public static SimMetricResult GetMinSimilarityInfo(this string first, IEnumerable<string> second, SimMetricType simMetricType = SimMetricType.Levenstein, bool convertToPercentage = false, Func<string, string>? manipulator = null)
+    public static SimMetricResult GetMinimumSimilarityInfo(this string first, IEnumerable<string> second,
+        SimMetricType simMetricType = SimMetricType.Levenstein, bool convertToPercentage = false,
+        Func<string, string>? manipulator = null)
     {
         var list = new List<SimMetricResult>();
         foreach (var item in second)
@@ -178,7 +201,9 @@ public static class SimMetricsExtensions
         return result;
     }
 
-    public static IEnumerable<SimMetricResult> GetSimilarities(this string first, string[] second, SimMetricType simMetricType = SimMetricType.Levenstein, bool convertToPercentage = false, Func<string, string>? manipulator = null)
+    public static IEnumerable<SimMetricResult> GetSimilarities(this string first, string[] second,
+        SimMetricType simMetricType = SimMetricType.Levenstein, bool convertToPercentage = false,
+        Func<string, string>? manipulator = null)
     {
         var list = new List<SimMetricResult>();
         foreach (var item in second)
@@ -187,10 +212,13 @@ public static class SimMetricsExtensions
             var rank = first.GetSimilarity(data, simMetricType);
             list.Add(new SimMetricResult { Item = item, Score = convertToPercentage.GetPercentageIf(rank) });
         }
+
         return list;
     }
 
-    public static IEnumerable<SimMetricResult> GetSimilarities(this string first, IEnumerable<string> second, SimMetricType simMetricType = SimMetricType.Levenstein, bool convertToPercentage = false, Func<string, string>? manipulator = null)
+    public static IEnumerable<SimMetricResult> GetSimilarities(this string first, IEnumerable<string> second,
+        SimMetricType simMetricType = SimMetricType.Levenstein, bool convertToPercentage = false,
+        Func<string, string>? manipulator = null)
     {
         var list = new List<SimMetricResult>();
         foreach (var item in second)
@@ -199,15 +227,19 @@ public static class SimMetricsExtensions
             var rank = first.GetSimilarity(data, simMetricType);
             list.Add(new SimMetricResult { Item = item, Score = convertToPercentage.GetPercentageIf(rank) });
         }
+
         return list;
     }
 
-    public static double GetSimilarity(this string firstWord, string secondWord, SimMetricType simMetricType = SimMetricType.Levenstein, bool convertToPercentage = false, Func<string, string>? manipulator = null)
+    public static double GetSimilarity(this string firstWord, string secondWord,
+        SimMetricType simMetricType = SimMetricType.Levenstein, bool convertToPercentage = false,
+        Func<string, string>? manipulator = null)
     {
         if (manipulator != null)
         {
             secondWord = manipulator(secondWord);
         }
+
         switch (simMetricType)
         {
             case SimMetricType.Levenstein:
@@ -295,6 +327,7 @@ public static class SimMetricsExtensions
         {
             return rank * 100;
         }
+
         return rank;
     }
 }

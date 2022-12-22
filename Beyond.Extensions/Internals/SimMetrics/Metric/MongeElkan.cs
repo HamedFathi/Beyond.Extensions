@@ -5,10 +5,10 @@ namespace Beyond.Extensions.Internals.SimMetrics.Metric;
 
 internal class MongeElkan : AbstractStringMetric
 {
+    internal ITokeniser tokeniser;
     private const double defaultMismatchScore = 0.0;
     private double estimatedTimingConstant;
     private AbstractStringMetric internalStringMetric;
-    internal ITokeniser tokeniser;
 
     public MongeElkan() : this(new TokeniserWhitespace())
     {
@@ -34,6 +34,10 @@ internal class MongeElkan : AbstractStringMetric
         this.tokeniser = tokeniserToUse;
         this.internalStringMetric = metricToUse;
     }
+
+    public override string LongDescriptionString => "Implements the Monge Elkan algorithm providing an matching style similarity measure between two strings";
+
+    public override string ShortDescriptionString => "MongeElkan";
 
     public override double GetSimilarity(string firstWord, string secondWord)
     {
@@ -82,8 +86,4 @@ internal class MongeElkan : AbstractStringMetric
     {
         return this.GetSimilarity(firstWord, secondWord);
     }
-
-    public override string LongDescriptionString => "Implements the Monge Elkan algorithm providing an matching style similarity measure between two strings";
-
-    public override string ShortDescriptionString => "MongeElkan";
 }

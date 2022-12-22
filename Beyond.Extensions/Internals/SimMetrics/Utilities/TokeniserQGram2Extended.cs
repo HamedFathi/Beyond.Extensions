@@ -2,6 +2,8 @@
 
 internal class TokeniserQGram2Extended : TokeniserQGram2
 {
+    public override string ShortDescriptionString => "TokeniserQGram2Extended";
+
     public override Collection<string> Tokenize(string word)
     {
         return base.Tokenize(word, true, base.QGramLength, base.CharacterCombinationIndex);
@@ -15,6 +17,4 @@ internal class TokeniserQGram2Extended : TokeniserQGram2
         }
         return string.Format("{0} - currently holding : {1}.{2}The method is using a QGram length of {3}.", new object[] { this.ShortDescriptionString, base.SuppliedWord, Environment.NewLine, Convert.ToInt32(base.QGramLength) });
     }
-
-    public override string ShortDescriptionString => "TokeniserQGram2Extended";
 }

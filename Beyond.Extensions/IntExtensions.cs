@@ -14,16 +14,7 @@ public static class IntExtensions
     {
         return Math.Abs(value);
     }
-    public static string ToSequentialLetters(this int value, bool lowercase = false)
-    {
-        var result = string.Empty;
-        while (--value >= 0)
-        {
-            result = (char)('A' + value % 26) + result;
-            value /= 26;
-        }
-        return lowercase ? result.ToLower() : result;
-    }
+
     public static bool Between(this int @this, int minValue, int maxValue)
     {
         return minValue.CompareTo(@this) == -1 && @this.CompareTo(maxValue) == -1;
@@ -443,6 +434,18 @@ public static class IntExtensions
         }
 
         return state;
+    }
+
+    public static string ToSequentialLetters(this int value, bool lowercase = false)
+    {
+        var result = string.Empty;
+        while (--value >= 0)
+        {
+            result = (char)('A' + value % 26) + result;
+            value /= 26;
+        }
+
+        return lowercase ? result.ToLower() : result;
     }
 
     public static TimeSpan Weeks(this int @this)

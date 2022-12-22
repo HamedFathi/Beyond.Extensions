@@ -1,5 +1,6 @@
 ﻿// ReSharper disable CheckNamespace
 // ReSharper disable UnusedMember.Global
+
 namespace Beyond.Extensions.FieldInfoExtended;
 
 public static class FieldInfoExtensions

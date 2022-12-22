@@ -7,6 +7,8 @@ internal class TokeniserSGram2Extended : TokeniserQGram2Extended
         base.CharacterCombinationIndex = 1;
     }
 
+    public override string ShortDescriptionString => "TokeniserSGram2Extended";
+
     public override string ToString()
     {
         if (string.IsNullOrEmpty(base.SuppliedWord))
@@ -19,6 +21,4 @@ internal class TokeniserSGram2Extended : TokeniserQGram2Extended
         }
         return string.Format("{0} - currently holding : {1}.{2}The method is using a character combination index of {3} and {4}a QGram length of {5}.", new object[] { this.ShortDescriptionString, base.SuppliedWord, Environment.NewLine, Convert.ToInt32(base.CharacterCombinationIndex), Environment.NewLine, Convert.ToInt32(base.QGramLength) });
     }
-
-    public override string ShortDescriptionString => "TokeniserSGram2Extended";
 }

@@ -5,10 +5,14 @@ namespace Beyond.Extensions.Internals.SimMetrics.Metric;
 
 internal sealed class Levenstein : AbstractStringMetric
 {
-    private AbstractSubstitutionCost dCostFunction = new SubCostRange0To1();
     private const double defaultMismatchScore = 0.0;
     private const double defaultPerfectMatchScore = 1.0;
+    private AbstractSubstitutionCost dCostFunction = new SubCostRange0To1();
     private double estimatedTimingConstant = 0.00018000000272877514;
+
+    public override string LongDescriptionString => "Implements the basic Levenstein algorithm providing a similarity measure between two strings";
+
+    public override string ShortDescriptionString => "Levenstein";
 
     public override double GetSimilarity(string firstWord, string secondWord)
     {
@@ -84,8 +88,4 @@ internal sealed class Levenstein : AbstractStringMetric
         }
         return numArray[length][index];
     }
-
-    public override string LongDescriptionString => "Implements the basic Levenstein algorithm providing a similarity measure between two strings";
-
-    public override string ShortDescriptionString => "Levenstein";
 }

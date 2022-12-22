@@ -5,29 +5,29 @@ namespace Beyond.Extensions.ConcurrentDictionaryExtended;
 
 public static class ConcurrentDictionaryExtensions
 {
-    public static TValue GetOrAddWithDispose<TKey, TValue>(
-        this ConcurrentDictionary<TKey, TValue> dictionary,
-        [DisallowNull] TKey key,
-        Func<TKey, TValue> valueFactory) where TValue : IDisposable where TKey : notnull
+    public static TValue AddOrUpdate<TKey, TValue>(this ConcurrentDictionary<TKey, Lazy<TValue>> @this, TKey key,
+        Func<TKey, TValue> addValueFactory, Func<TKey, TValue, TValue> updateValueFactory) where TKey : notnull
     {
-        if (dictionary == null) throw new ArgumentNullException(nameof(dictionary));
-        if (key == null) throw new ArgumentNullException(nameof(key));
-        if (valueFactory == null) throw new ArgumentNullException(nameof(valueFactory));
-        while (true)
-        {
-            if (dictionary.TryGetValue(key, out var value))
-            {
-                return value;
-            }
+        return @this.AddOrUpdate(key, new Lazy<TValue>(() => addValueFactory(key), true),
+            (k, v) => new Lazy<TValue>(() => updateValueFactory(k, v.Value), true)).Value;
+    }
 
-            value = valueFactory(key);
-            if (dictionary.TryAdd(key, value))
-            {
-                return value;
-            }
+    public static void AddOrUpdate<TKey, TValue>(this ConcurrentDictionary<TKey, TValue> @this, TKey key, TValue value)
+        where TKey : notnull
+    {
+        @this.AddOrUpdate(key, value, (_, _) => value);
+    }
 
-            value.Dispose();
-        }
+    public static TValue GetOrAdd<TKey, TValue>(this ConcurrentDictionary<TKey, Lazy<TValue>> @this, TKey key,
+        Func<TKey, TValue> valueFactory) where TKey : notnull
+    {
+        return @this.GetOrAdd(key, new Lazy<TValue>(() => valueFactory(key), true)).Value;
+    }
+
+    public static TValue GetOrAdd<TKey, TValue>(this ConcurrentDictionary<TKey, Lazy<TValue>> @this, TKey key,
+        TValue value) where TKey : notnull
+    {
+        return @this.GetOrAdd(key, new Lazy<TValue>(() => value, true)).Value;
     }
 
     public static async Task<TValue> GetOrAddAsync<TKey, TValue>(
@@ -63,29 +63,29 @@ public static class ConcurrentDictionaryExtensions
         }
     }
 
-    public static TValue AddOrUpdate<TKey, TValue>(this ConcurrentDictionary<TKey, Lazy<TValue>> @this, TKey key,
-        Func<TKey, TValue> addValueFactory, Func<TKey, TValue, TValue> updateValueFactory) where TKey : notnull
+    public static TValue GetOrAddWithDispose<TKey, TValue>(
+                            this ConcurrentDictionary<TKey, TValue> dictionary,
+        [DisallowNull] TKey key,
+        Func<TKey, TValue> valueFactory) where TValue : IDisposable where TKey : notnull
     {
-        return @this.AddOrUpdate(key, new Lazy<TValue>(() => addValueFactory(key), true),
-            (k, v) => new Lazy<TValue>(() => updateValueFactory(k, v.Value), true)).Value;
-    }
+        if (dictionary == null) throw new ArgumentNullException(nameof(dictionary));
+        if (key == null) throw new ArgumentNullException(nameof(key));
+        if (valueFactory == null) throw new ArgumentNullException(nameof(valueFactory));
+        while (true)
+        {
+            if (dictionary.TryGetValue(key, out var value))
+            {
+                return value;
+            }
 
-    public static void AddOrUpdate<TKey, TValue>(this ConcurrentDictionary<TKey, TValue> @this, TKey key, TValue value)
-        where TKey : notnull
-    {
-        @this.AddOrUpdate(key, value, (_, _) => value);
-    }
+            value = valueFactory(key);
+            if (dictionary.TryAdd(key, value))
+            {
+                return value;
+            }
 
-    public static TValue GetOrAdd<TKey, TValue>(this ConcurrentDictionary<TKey, Lazy<TValue>> @this, TKey key,
-        Func<TKey, TValue> valueFactory) where TKey : notnull
-    {
-        return @this.GetOrAdd(key, new Lazy<TValue>(() => valueFactory(key), true)).Value;
-    }
-
-    public static TValue GetOrAdd<TKey, TValue>(this ConcurrentDictionary<TKey, Lazy<TValue>> @this, TKey key,
-        TValue value) where TKey : notnull
-    {
-        return @this.GetOrAdd(key, new Lazy<TValue>(() => value, true)).Value;
+            value.Dispose();
+        }
     }
 
     public static Dictionary<TKey, TValue> ToDictionary<TKey, TValue>(this ConcurrentDictionary<TKey, TValue> @this)

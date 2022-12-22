@@ -8,6 +8,10 @@ internal sealed class ChapmanMeanLength : AbstractStringMetric
     private const double defaultMismatchScore = 0.0;
     private const double defaultPerfectScore = 1.0;
 
+    public override string LongDescriptionString => "Implements the Chapman Mean Length algorithm provides a similarity measure between two strings from size of the mean length of the vectors - this approach is suppossed to be used to determine which metrics may be best to apply rather than giveing a valid response itself";
+
+    public override string ShortDescriptionString => "ChapmanMeanLength";
+
     public override double GetSimilarity(string firstWord, string secondWord)
     {
         if ((firstWord == null) || (secondWord == null))
@@ -37,8 +41,4 @@ internal sealed class ChapmanMeanLength : AbstractStringMetric
     {
         return this.GetSimilarity(firstWord, secondWord);
     }
-
-    public override string LongDescriptionString => "Implements the Chapman Mean Length algorithm provides a similarity measure between two strings from size of the mean length of the vectors - this approach is suppossed to be used to determine which metrics may be best to apply rather than giveing a valid response itself";
-
-    public override string ShortDescriptionString => "ChapmanMeanLength";
 }

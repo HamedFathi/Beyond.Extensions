@@ -5,11 +5,11 @@ namespace Beyond.Extensions.Internals.SimMetrics.Metric;
 
 internal sealed class SmithWaterman : AbstractStringMetric
 {
-    private AbstractSubstitutionCost dCostFunction;
     private const double defaultGapCost = 0.5;
     private const double defaultMismatchScore = 0.0;
     private const double defaultPerfectMatchScore = 1.0;
     private const double estimatedTimingConstant = 0.0001610000035725534;
+    private AbstractSubstitutionCost dCostFunction;
     private double gapCost;
 
     public SmithWaterman() : this(0.5, new SubCostRange1ToMinus2())
@@ -29,6 +29,22 @@ internal sealed class SmithWaterman : AbstractStringMetric
         this.gapCost = costG;
         this.dCostFunction = costFunction;
     }
+
+    public AbstractSubstitutionCost DCostFunction
+    {
+        get => this.dCostFunction;
+        set => this.DCostFunction = value;
+    }
+
+    public double GapCost
+    {
+        get => this.gapCost;
+        set => this.gapCost = value;
+    }
+
+    public override string LongDescriptionString => "Implements the Smith-Waterman algorithm providing a similarity measure between two string";
+
+    public override string ShortDescriptionString => "SmithWaterman";
 
     public override double GetSimilarity(string firstWord, string secondWord)
     {
@@ -137,20 +153,4 @@ internal sealed class SmithWaterman : AbstractStringMetric
         }
         return num4;
     }
-
-    public AbstractSubstitutionCost DCostFunction
-    {
-        get => this.dCostFunction;
-        set => this.DCostFunction = value;
-    }
-
-    public double GapCost
-    {
-        get => this.gapCost;
-        set => this.gapCost = value;
-    }
-
-    public override string LongDescriptionString => "Implements the Smith-Waterman algorithm providing a similarity measure between two string";
-
-    public override string ShortDescriptionString => "SmithWaterman";
 }

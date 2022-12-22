@@ -6,6 +6,10 @@ internal abstract class AbstractStringMetric : IStringMetric
     {
     }
 
+    public abstract string LongDescriptionString { get; }
+
+    public abstract string ShortDescriptionString { get; }
+
     public double[] BatchCompareSet(string[] setRenamed, string comparator)
     {
         if ((setRenamed == null) || (comparator == null))
@@ -57,8 +61,4 @@ internal abstract class AbstractStringMetric : IStringMetric
     public abstract double GetSimilarityTimingEstimated(string firstWord, string secondWord);
 
     public abstract double GetUnnormalisedSimilarity(string firstWord, string secondWord);
-
-    public abstract string LongDescriptionString { get; }
-
-    public abstract string ShortDescriptionString { get; }
 }
