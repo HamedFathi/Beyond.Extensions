@@ -212,24 +212,7 @@ public static class TypeExtensions
         }
     }
 
-    public static Type?[] GenericTypeArguments(this Type type)
-    {
-        switch (type)
-        {
-            case { IsArray: true }:
-                return new[] { type.GetElementType() };
-            case { IsGenericType: true } when type.GetGenericTypeDefinition() == typeof(IEnumerable<>):
-                return type.GetGenericArguments();
-            default:
-                {
-                    var enumType = type.GetInterfaces()
-                        .Where(t => t.IsGenericType &&
-                                    t.GetGenericTypeDefinition() == typeof(IEnumerable<>))
-                        .Select(t => t.GenericTypeArguments).FirstOrDefault();
-                    return enumType ?? new[] { type };
-                }
-        }
-    }
+
 
     public static T? GetAttribute<T>(this Type type) where T : Attribute
     {
@@ -266,25 +249,24 @@ public static class TypeExtensions
             : type.AssemblyQualifiedName;
     }
 
-    public static Type? GetGenericTypeArgument(this Type type)
+    public static Type?[] GenericTypeArguments(this Type type)
     {
         switch (type)
         {
             case { IsArray: true }:
-                return type.GetElementType();
+                return new[] { type.GetElementType() };
             case { IsGenericType: true } when type.GetGenericTypeDefinition() == typeof(IEnumerable<>):
-                return type.GetGenericArguments()[0];
+                return type.GetGenericArguments();
             default:
-                {
-                    var enumType = type.GetInterfaces()
-                        .Where(t => t.IsGenericType &&
-                                    t.GetGenericTypeDefinition() == typeof(IEnumerable<>))
-                        .Select(t => t.GenericTypeArguments[0]).FirstOrDefault();
-                    return enumType ?? type;
-                }
+            {
+                var enumType = type.GetInterfaces()
+                    .Where(t => t.IsGenericType &&
+                                t.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+                    .Select(t => t.GenericTypeArguments).FirstOrDefault();
+                return enumType ?? new[] { type };
+            }
         }
     }
-
     public static Type GetInnerTypeFromNullable(this Type nullableType)
     {
         return nullableType.GetGenericArguments()[0];
@@ -455,7 +437,16 @@ public static class TypeExtensions
         return t.IsValueType || t.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
             null, Type.EmptyTypes, null) != null;
     }
+    public static bool IsIEnumerable(this Type type)
+    {
+        return type.GetInterfaces().Any(x => x == typeof(IEnumerable));
+    }
 
+    public static bool IsIEnumerableOfT(this Type type)
+    {
+        return type.GetInterfaces().Any(x => x.IsGenericType
+                                             && x.GetGenericTypeDefinition() == typeof(IEnumerable<>));
+    }
     public static bool HasIEnumerable(this Type type)
     {
         return type.GetInterfaces().Any(x => x == typeof(IEnumerable));
@@ -718,7 +709,6 @@ public static class TypeExtensions
         if (type is not { IsValueType: true }) return false;
         return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
     }
-
     public static bool IsNumeric(this Type type)
     {
         return type.IsFloatingPoint() || type.IsIntegerBased();

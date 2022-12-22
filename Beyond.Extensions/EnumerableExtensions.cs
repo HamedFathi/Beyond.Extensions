@@ -19,7 +19,18 @@ public static class EnumerableExtensions
 
         return Aggregate(enumeration.Select(toString), separator);
     }
-
+    public static int Count(this IEnumerable enumerable, bool excludeNullValues = false)
+    {
+        var list = enumerable.Cast<object?>();
+        if (excludeNullValues) list = list.Where(x => x != null);
+        return Enumerable.Count(list);
+    }
+    public static long LongCount(this IEnumerable enumerable, bool excludeNullValues = false)
+    {
+        var list = enumerable.Cast<object?>();
+        if (excludeNullValues) list = list.Where(x => x != null);
+        return Enumerable.LongCount(list);
+    }
     public static string Aggregate(this IEnumerable<string> enumeration, string separator)
     {
         if (enumeration == null)
@@ -536,9 +547,24 @@ public static class EnumerableExtensions
         return source.OfType<TSource>().FirstOrDefault();
     }
 
-    public static IEnumerable<T> Flatten<T>(this IEnumerable<T> items, Func<T, IEnumerable<T>>? getChildren)
+    public static IEnumerable<T> FlattenByLinq<T>(this IEnumerable<T> items, Func<T, IEnumerable<T>>? getChildren)
     {
-        return items.SelectMany(c => getChildren?.Invoke(c).Flatten(getChildren) ?? Array.Empty<T>()).Concat(items);
+        return items.SelectMany(c => getChildren?.Invoke(c).FlattenByLinq(getChildren) ?? Array.Empty<T>()).Concat(items);
+    }
+
+    public static IEnumerable<T> FlattenRecursively<T>(this IEnumerable<T> items, Func<T, IEnumerable<T>>? getChildren)
+    {
+        foreach (var item in items)
+        {
+            yield return item;
+
+            var children = getChildren?.Invoke(item);
+            if (children == null)
+                continue;
+
+            foreach (var child in children.FlattenRecursively(getChildren))
+                yield return child;
+        }
     }
 
     public static string Flatten(this IEnumerable<string>? strings, string separator, string head, string tail)
@@ -565,7 +591,7 @@ public static class EnumerableExtensions
             .Flatten(string.Empty, head, tail);
     }
 
-    public static IEnumerable<T> FlattenWithQueue<T>(this IEnumerable<T> items, Func<T, IEnumerable<T>>? getChildren)
+    public static IEnumerable<T> FlattenByBfsAndQueue<T>(this IEnumerable<T> items, Func<T, IEnumerable<T>>? getChildren)
     {
         var itemsToYield = new Queue<T>(items);
         while (itemsToYield.Count > 0)
@@ -580,7 +606,7 @@ public static class EnumerableExtensions
         }
     }
 
-    public static IEnumerable<T> FlattenWithStack<T>(this IEnumerable<T> items, Func<T, IEnumerable<T>>? getChildren)
+    public static IEnumerable<T> FlattenByDfsAndStack<T>(this IEnumerable<T> items, Func<T, IEnumerable<T>>? getChildren)
     {
         var stack = new Stack<T>();
         foreach (var item in items)

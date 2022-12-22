@@ -21,7 +21,22 @@ public static class ListExtensions
             if (!list.Contains(item))
                 list.Add(item);
     }
+    public static IEnumerable<T> FastReverse<T>(this IList<T> items)
+    {
+        if (items == null) throw new ArgumentNullException(nameof(items));
 
+        for (var i = items.Count - 1; i >= 0; i--)
+        {
+            yield return items[i];
+        }
+    }
+    public static void ForEachReverse<T>(this IList<T> items, Action<T> action)
+    {
+        for (var i = items.Count - 1; i >= 0; i--)
+        {
+            action(items[i]);
+        }
+    }
     public static void AddRangeUnique<T>(this IList<T> list, IEnumerable<T> items) where T : class
     {
         foreach (var item in items)

@@ -11,6 +11,7 @@ namespace Beyond.Extensions.ObjectExtended;
 
 public static partial class ObjectExtensions
 {
+
     public static bool Any<T>(this T obj, params T[] values)
     {
         return Array.IndexOf(values, obj) != -1;
@@ -520,7 +521,14 @@ public static partial class ObjectExtensions
     {
         return @this == null || @this.IsDBNull();
     }
-
+    public static IEnumerable<object?> ToObjectArray(object? obj)
+    {
+        if (obj is IEnumerable enumerable)
+        {
+            return enumerable.Cast<object?>();
+        }
+        return new[] { obj };
+    }
     public static bool IsNumericType(this object o)
     {
         switch (Type.GetTypeCode(o.GetType()))

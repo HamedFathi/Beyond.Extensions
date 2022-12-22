@@ -12,6 +12,10 @@ namespace Beyond.Extensions.ArrayExtended;
 
 public static class ArrayExtensions
 {
+    public static Array ToArrayObject<T>(this T[] array)
+    {
+        return array as Array;
+    }
     public static bool All<T>(this T[] array, Func<T, bool> predicate)
     {
         if (array == null) throw new ArgumentNullException(nameof(array));

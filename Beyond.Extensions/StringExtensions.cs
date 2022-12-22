@@ -26,6 +26,26 @@ public static class StringExtensions
             throw new ArgumentNullException(nameof(@this), $"{nameof(@this)} path is null or empty");
         return new DirectoryInfo(@this);
     }
+    public static IEnumerable<string> SplitAndKeepSeparators(this string text, params char[] separator)
+    {
+        if (text == null) throw new ArgumentNullException(nameof(text));
+        if (separator == null) throw new ArgumentNullException(nameof(separator));
+
+        var start = 0;
+        int index;
+        while ((index = text.IndexOfAny(separator, start)) != -1)
+        {
+            if (index - start > 0)
+                yield return text.Substring(start, index - start);
+            yield return text.Substring(index, 1);
+            start = index + 1;
+        }
+
+        if (start < text.Length)
+        {
+            yield return text.Substring(start);
+        }
+    }
     public static FileStream AsFileStream(this string @this, FileMode fileMode, FileAccess fileAccess,
         FileShare fileShare, int bufferSize = 8192)
     {
@@ -74,12 +94,33 @@ public static class StringExtensions
 
         return sb.ToString();
     }
-
+    public static string RemoveFirstAndLastChars(this string str)
+    {
+        if (string.IsNullOrEmpty(str)) throw new ArgumentException("Value cannot be null or empty.", nameof(str));
+        if (str.Length < 2)
+        {
+            throw new Exception($"Length of {nameof(str)} cannot be less than 2.");
+        }
+        return str.Substring(1, str.Length - 2);
+    }
     public static string ConcatWith(this string @this, params string[] values)
     {
         return string.Concat(@this, string.Concat(values));
     }
+    public static bool IsValidRegex(this string pattern)
+    {
+        if (string.IsNullOrWhiteSpace(pattern)) return false;
+        try
+        {
+            var _ = Regex.Match("", pattern);
+        }
+        catch (ArgumentException)
+        {
+            return false;
+        }
 
+        return true;
+    }
     public static bool Contains(this string @this, string value, StringComparison comparisonType)
     {
         return @this.IndexOf(value, comparisonType) != -1;

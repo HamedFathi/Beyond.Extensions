@@ -13,4 +13,9 @@ public static class FuncExtensions
     {
         return () => func();
     }
+
+    public static Func<T2, T1, TR> Swap<T1, T2, TR>(this Func<T1, T2, TR> f)
+    {
+        return (t2, t1) => f(t1, t2);
+    }
 }

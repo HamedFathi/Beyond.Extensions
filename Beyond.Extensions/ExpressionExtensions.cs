@@ -22,7 +22,15 @@ public static class ExpressionExtensions
 
         return Expression.Lambda<Func<T, bool>>(Expression.AndAlso(left!, right!), parameter);
     }
+    public static Expression ConvertTypeTo<T>(this Expression expression)
+    {
+        return Expression.Convert(expression, typeof(T));
+    }
 
+    public static Expression ConvertTypeTo(this Expression expression, Type type)
+    {
+        return Expression.Convert(expression, type);
+    }
     public static MemberExpression GetMemberExpression<TSource, TProperty>(
         this Expression<Func<TSource, TProperty>> property)
     {
@@ -38,7 +46,16 @@ public static class ExpressionExtensions
 
         return expr;
     }
-
+    public static MethodInfo GetMethodInfo(this Expression expression)
+    {
+        var methodCallExpr = (MethodCallExpression)expression;
+        return methodCallExpr.Method;
+    }
+    public static MethodInfo GetMethodInfo<T>(this Expression<Action<T>> expression)
+    {
+        var methodCallExpr = (MethodCallExpression)expression.Body;
+        return methodCallExpr.Method;
+    }
     public static string GetPropertyName<TSource, TProperty>(this Expression<Func<TSource, TProperty>> property)
     {
         if (property == null) throw new ArgumentNullException(nameof(property));
@@ -110,11 +127,6 @@ public static class ExpressionExtensions
     {
         return expression.Compile()(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16);
     }
-    public static Expression<Func<T, bool>> Not<T>(this Expression<Func<T, bool>> expr)
-    {
-        if (expr == null) throw new ArgumentNullException(nameof(expr));
-        return Expression.Lambda<Func<T, bool>>(Expression.Not(expr.Body), expr.Parameters[0]);
-    }
 
     public static Expression<Func<T, bool>> OrElse<T>(this Expression<Func<T, bool>> expr1,
         Expression<Func<T, bool>> expr2)
@@ -132,7 +144,59 @@ public static class ExpressionExtensions
 
         return Expression.Lambda<Func<T, bool>>(Expression.OrElse(left!, right!), parameter);
     }
+    public static Expression<Func<T, bool>> And<T>(this Expression<Func<T, bool>> expr1,
+           Expression<Func<T, bool>> expr2)
+    {
+        var invokedExpr = Expression.Invoke(expr2, expr1.Parameters);
+        return Expression.Lambda<Func<T, bool>>
+            (Expression.AndAlso(expr1.Body, invokedExpr), expr1.Parameters);
+    }
 
+    public static Expression<Func<T, bool>> False<T>() { return _ => false; }
+
+    public static Expression<Func<T, bool>> NAnd<T>(this Expression<Func<T, bool>> expr1,
+        Expression<Func<T, bool>> expr2)
+    {
+        var andExpr = expr1.And(expr2);
+        return andExpr.Not();
+    }
+
+    public static Expression<Func<T, bool>> Nor<T>(this Expression<Func<T, bool>> expr1,
+        Expression<Func<T, bool>> expr2)
+    {
+        var orExpr = expr1.Or(expr2);
+        return orExpr.Not();
+    }
+
+    public static Expression<Func<T, bool>> Not<T>(this Expression<Func<T, bool>> expr)
+    {
+        var notExpr = Expression.Not(expr.Body);
+        return Expression.Lambda<Func<T, bool>>(notExpr, expr.Parameters);
+    }
+
+    public static Expression<Func<T, bool>> Or<T>(this Expression<Func<T, bool>> expr1,
+        Expression<Func<T, bool>> expr2)
+    {
+        var invokedExpr = Expression.Invoke(expr2, expr1.Parameters);
+        return Expression.Lambda<Func<T, bool>>
+            (Expression.OrElse(expr1.Body, invokedExpr), expr1.Parameters);
+    }
+
+    public static Expression<Func<T, bool>> True<T>() { return _ => true; }
+    public static Expression<Func<T, bool>> XNor<T>(this Expression<Func<T, bool>> expr1,
+        Expression<Func<T, bool>> expr2)
+    {
+        var xorExpr = expr1.Xor(expr2);
+        return xorExpr.Not();
+    }
+
+    public static Expression<Func<T, bool>> Xor<T>(this Expression<Func<T, bool>> expr1,
+                Expression<Func<T, bool>> expr2)
+    {
+        var invokedExpr = Expression.Invoke(expr2, expr1.Parameters);
+        return Expression.Lambda<Func<T, bool>>
+            (Expression.ExclusiveOr(expr1.Body, invokedExpr), expr1.Parameters);
+    }
     public static Expression<Func<T, TU>> ToExpressionOfFunc<T, TU>(Expression<Action<T>> expr)
     {
         return Expression.Lambda<Func<T, TU>>(expr.Body, expr.Parameters);
