@@ -544,6 +544,44 @@ public static class EnumerableExtensions
         return source.OfType<TSource>().FirstOrDefault();
     }
 
+    public static IEnumerable<T> Flatten<T>(this T source,
+        Func<T, IEnumerable<T>> childrenSelector,
+        Func<T, object> keySelector) where T : class
+    {
+        return Flatten(new[] { source }, childrenSelector, keySelector);
+    }
+
+    public static IEnumerable<T> Flatten<T>(this IEnumerable<T> source,
+        Func<T, IEnumerable<T>?> getChildren,
+        Func<T, object> keySelector) where T : class
+    {
+        if (source == null) throw new ArgumentNullException(nameof(source));
+        if (getChildren == null) throw new ArgumentNullException(nameof(getChildren));
+        if (keySelector == null) throw new ArgumentNullException(nameof(keySelector));
+
+        var stack = new Stack<T>(source);
+        var dictionary = new Dictionary<object, T>();
+        while (stack.Any())
+        {
+            var currentItem = stack.Pop();
+            var currentKey = keySelector(currentItem);
+            if (!dictionary.ContainsKey(currentKey))
+            {
+                dictionary.Add(currentKey, currentItem);
+                var children = getChildren(currentItem);
+                if (children != null)
+                {
+                    foreach (var child in children)
+                    {
+                        stack.Push(child);
+                    }
+                }
+            }
+
+            yield return currentItem;
+        }
+    }
+
     public static string Flatten(this IEnumerable<string>? strings, string separator, string head, string tail)
     {
         if (strings == null || !strings.Any())
@@ -568,7 +606,8 @@ public static class EnumerableExtensions
             .Flatten(string.Empty, head, tail);
     }
 
-    public static IEnumerable<T> FlattenByBfsAndQueue<T>(this IEnumerable<T> items, Func<T, IEnumerable<T>>? getChildren)
+    public static IEnumerable<T> FlattenByBfsAndQueue<T>(this IEnumerable<T> items,
+        Func<T, IEnumerable<T>>? getChildren)
     {
         var itemsToYield = new Queue<T>(items);
         while (itemsToYield.Count > 0)
@@ -583,7 +622,8 @@ public static class EnumerableExtensions
         }
     }
 
-    public static IEnumerable<T> FlattenByDfsAndStack<T>(this IEnumerable<T> items, Func<T, IEnumerable<T>>? getChildren)
+    public static IEnumerable<T> FlattenByDfsAndStack<T>(this IEnumerable<T> items,
+        Func<T, IEnumerable<T>>? getChildren)
     {
         var stack = new Stack<T>();
         foreach (var item in items)
@@ -603,7 +643,32 @@ public static class EnumerableExtensions
 
     public static IEnumerable<T> FlattenByLinq<T>(this IEnumerable<T> items, Func<T, IEnumerable<T>>? getChildren)
     {
-        return items.SelectMany(c => getChildren?.Invoke(c).FlattenByLinq(getChildren) ?? Array.Empty<T>()).Concat(items);
+        return items.SelectMany(c => getChildren?.Invoke(c).FlattenByLinq(getChildren) ?? Array.Empty<T>())
+            .Concat(items);
+    }
+
+    public static IEnumerable<T> FlattenObject<T>(T root, Func<T, IEnumerable<T>?> getChildren)
+    {
+        if (root == null)
+        {
+            yield break;
+        }
+
+        yield return root;
+
+        var children = getChildren(root);
+        if (children == null)
+        {
+            yield break;
+        }
+
+        foreach (var child in children)
+        {
+            foreach (var node in FlattenObject(child, getChildren))
+            {
+                yield return node;
+            }
+        }
     }
 
     public static IEnumerable<T> FlattenRecursively<T>(this IEnumerable<T> items, Func<T, IEnumerable<T>>? getChildren)
@@ -1335,16 +1400,34 @@ public static class EnumerableExtensions
                 yield return item;
     }
 
-    public static IEnumerable<T> SelectManyAllInclusive<T>(this IEnumerable<T> source, Func<T, IEnumerable<T>> selector)
+    public static IEnumerable<T> SelectManyRecursive<T>(this IEnumerable<T> source, Func<T, IEnumerable<T>?> selector)
     {
-        return source.Concat(source.SelectManyRecursive(selector));
+        if (source == null) throw new ArgumentNullException(nameof(source));
+        if (selector == null) throw new ArgumentNullException(nameof(selector));
+
+        return !source.Any()
+            ? source
+            : source.Concat(
+                source
+                    .SelectMany(i => selector(i).EmptyIfNull())
+                    .SelectManyRecursive(selector)
+            );
     }
 
-    public static IEnumerable<T> SelectManyRecursive<T>(this IEnumerable<T> source, Func<T, IEnumerable<T>> selector)
+    public static IEnumerable<TResult> SelectRecursive<TSource, TResult>(this IEnumerable<TSource> source,
+        Func<TSource, IEnumerable<TSource>?>? getChildren, Func<TSource, int, TResult> selector)
     {
-        var result = source.SelectMany(selector).ToList();
-        if (result.Count == 0) return result;
-        return result.Concat(result.SelectManyRecursive(selector));
+        if (source == null) throw new ArgumentNullException(nameof(source));
+        if (selector == null) throw new ArgumentNullException(nameof(selector));
+        if (getChildren == null) return source.Select(s => selector(s, 0));
+        return SelectRecursiveIterator(source, getChildren, selector);
+    }
+
+    public static IEnumerable<T> SelectRecursive<T>(this IEnumerable<T> source, Func<T, IEnumerable<T>>? getChildren)
+    {
+        if (source == null) throw new ArgumentNullException(nameof(source));
+        if (getChildren == null) return source;
+        return SelectRecursiveIterator(source, getChildren, (s, _) => s);
     }
 
     public static bool SequenceEqual<T1, T2>(this IEnumerable<T1> left, IEnumerable<T2> right,
@@ -1969,6 +2052,41 @@ public static class EnumerableExtensions
 
         for (var i = 0; i < subsetSize; i++)
             yield return seqArray[i];
+    }
+
+    private static IEnumerable<TResult> SelectRecursiveIterator<TSource, TResult>(IEnumerable<TSource> source,
+        Func<TSource, IEnumerable<TSource>?> getChildren, Func<TSource, int, TResult> selector)
+    {
+        var stack = new Stack<IEnumerator<TSource>>();
+
+        try
+        {
+            stack.Push(source.GetEnumerator());
+            while (0 != stack.Count)
+            {
+                var iter = stack.Peek();
+                if (iter.MoveNext())
+                {
+                    var current = iter.Current;
+                    yield return selector(current, stack.Count - 1);
+
+                    var children = getChildren(current);
+                    if (children != null) stack.Push(children.GetEnumerator());
+                }
+                else
+                {
+                    iter.Dispose();
+                    stack.Pop();
+                }
+            }
+        }
+        finally
+        {
+            while (0 != stack.Count)
+            {
+                stack.Pop().Dispose();
+            }
+        }
     }
 
     private static IEnumerable<T> ShuffleIterator<T>(this IEnumerable<T> items)
