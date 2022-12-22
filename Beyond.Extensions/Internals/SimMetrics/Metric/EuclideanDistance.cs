@@ -39,7 +39,7 @@ internal sealed class EuclideanDistance : AbstractStringMetric
             }
             num += (num2 - num3) * (num2 - num3);
         }
-        return Math.Sqrt((double) num);
+        return Math.Sqrt((double)num);
     }
 
     public double GetEuclidDistance(string firstWord, string secondWord)
@@ -58,7 +58,7 @@ internal sealed class EuclideanDistance : AbstractStringMetric
         if ((firstWord != null) && (secondWord != null))
         {
             double unnormalisedSimilarity = this.GetUnnormalisedSimilarity(firstWord, secondWord);
-            double num2 = Math.Sqrt((double) (this.tokenUtilities.FirstTokenCount + this.tokenUtilities.SecondTokenCount));
+            double num2 = Math.Sqrt((double)(this.tokenUtilities.FirstTokenCount + this.tokenUtilities.SecondTokenCount));
             return ((num2 - unnormalisedSimilarity) / num2);
         }
         return 0.0;

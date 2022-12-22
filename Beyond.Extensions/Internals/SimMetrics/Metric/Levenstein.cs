@@ -55,11 +55,11 @@ internal sealed class Levenstein : AbstractStringMetric
         int index = secondWord.Length;
         if (length == 0)
         {
-            return (double) index;
+            return (double)index;
         }
         if (index == 0)
         {
-            return (double) length;
+            return (double)length;
         }
         double[][] numArray = new double[length + 1][];
         for (int i = 0; i < (length + 1); i++)
@@ -79,7 +79,7 @@ internal sealed class Levenstein : AbstractStringMetric
             for (int n = 1; n <= index; n++)
             {
                 double num8 = this.dCostFunction.GetCost(firstWord, m - 1, secondWord, n - 1);
-                numArray[m][n] = MathFunctions.MinOf3((double) (numArray[m - 1][n] + 1.0), (double) (numArray[m][n - 1] + 1.0), (double) (numArray[m - 1][n - 1] + num8));
+                numArray[m][n] = MathFunctions.MinOf3((double)(numArray[m - 1][n] + 1.0), (double)(numArray[m][n - 1] + 1.0), (double)(numArray[m - 1][n - 1] + num8));
             }
         }
         return numArray[length][index];

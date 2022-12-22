@@ -98,11 +98,11 @@ internal class SmithWatermanGotohWindowedAffine : AbstractStringMetric
         int num2 = secondWord.Length;
         if (length == 0)
         {
-            return (double) num2;
+            return (double)num2;
         }
         if (num2 == 0)
         {
-            return (double) length;
+            return (double)length;
         }
         double[][] numArray = new double[length][];
         for (int i = 0; i < length; i++)

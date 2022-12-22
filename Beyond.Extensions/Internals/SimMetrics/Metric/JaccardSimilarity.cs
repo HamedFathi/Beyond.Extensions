@@ -28,7 +28,7 @@ internal sealed class JaccardSimilarity : AbstractStringMetric
             Collection<string> collection = this.tokenUtilities.CreateMergedSet(this.tokeniser.Tokenize(firstWord), this.tokeniser.Tokenize(secondWord));
             if (collection.Count > 0)
             {
-                return (((double) this.tokenUtilities.CommonSetTerms()) / ((double) collection.Count));
+                return (((double)this.tokenUtilities.CommonSetTerms()) / ((double)collection.Count));
             }
         }
         return 0.0;

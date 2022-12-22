@@ -19,7 +19,7 @@ public static class RandomExtensions
 
     public static decimal NextDecimal(this Random @this, bool sign)
     {
-        var scale = (byte) @this.Next(29);
+        var scale = (byte)@this.Next(29);
         return new decimal(@this.NextInt32(),
             @this.NextInt32(),
             @this.NextInt32(),
@@ -51,7 +51,7 @@ public static class RandomExtensions
 
         var array = Enum.GetValues(type);
         var index = random.Next(array.GetLowerBound(0), array.GetUpperBound(0) + 1);
-        return (T?) array.GetValue(index);
+        return (T?)array.GetValue(index);
     }
 
     public static int NextInt32(this Random @this)
@@ -63,7 +63,7 @@ public static class RandomExtensions
 
     public static long NextInt64(this Random @this, long maxValue)
     {
-        return (long) (@this.NextNonNegativeLong() / (double) long.MaxValue * maxValue);
+        return (long)(@this.NextNonNegativeLong() / (double)long.MaxValue * maxValue);
     }
 
     public static long NextInt64(this Random @this, long minValue, long maxValue)
@@ -90,7 +90,7 @@ public static class RandomExtensions
         var bytes = new byte[sizeof(long)];
         @this.NextBytes(bytes);
         // strip out the sign bit
-        bytes[7] = (byte) (bytes[7] & 0x7f);
+        bytes[7] = (byte)(bytes[7] & 0x7f);
         return BitConverter.ToInt64(bytes, 0);
     }
 

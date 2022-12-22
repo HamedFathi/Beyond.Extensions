@@ -9,10 +9,27 @@ namespace Beyond.Extensions.ListExtended;
 public static class ListExtensions
 {
     private static readonly Random Rnd = new(Guid.NewGuid().GetHashCode());
+
     public static void AddRange<T>(this IList<T>? container, IEnumerable<T>? rangeToAdd)
     {
         if (container == null || rangeToAdd == null) return;
         foreach (var toAdd in rangeToAdd) container.Add(toAdd);
+    }
+
+    public static IEnumerable<T> FastReverse<T>(this IList<T> items)
+    {
+        for (var i = items.Count - 1; i >= 0; i--)
+        {
+            yield return items[i];
+        }
+    }
+
+    public static void ForEachReverse<T>(this IList<T> items, Action<T> action)
+    {
+        for (var i = items.Count - 1; i >= 0; i--)
+        {
+            action(items[i]);
+        }
     }
 
     public static void AddRangeUnique<T>(this IList<T> list, T[] items) where T : class
@@ -168,6 +185,7 @@ public static class ListExtensions
         @this.RemoveAt(index);
         return result;
     }
+
     public static T GetRandomItem<T>(this List<T> list)
     {
         var count = list.Count;

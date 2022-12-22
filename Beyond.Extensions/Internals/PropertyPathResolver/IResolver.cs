@@ -7,6 +7,7 @@ public interface IResolver
     IList<IPathElementFactory>? PathElementFactories { get; set; }
 
     IList<IPathElement> CreatePath(string path);
+
     /// <summary>
     /// Returns the object defined by the path elements.
     /// Any access exception (e.g. NullReference) is propagated.

@@ -105,7 +105,7 @@ public static class IntExtensions
     {
         if (!enumType.IsEnum) return null;
         var enumValue = Enum.ToObject(enumType, @this);
-        return ((Enum) enumValue).GetDescription(replaceNullWithEnumName);
+        return ((Enum)enumValue).GetDescription(replaceNullWithEnumName);
     }
 
     public static int HostToNetworkOrder(this int host)
@@ -216,12 +216,12 @@ public static class IntExtensions
 
     public static decimal PercentageOf(this int number, float percent)
     {
-        return (decimal) (number * percent / 100);
+        return (decimal)(number * percent / 100);
     }
 
     public static decimal PercentageOf(this int number, double percent)
     {
-        return (decimal) (number * percent / 100);
+        return (decimal)(number * percent / 100);
     }
 
     public static decimal PercentageOf(this int number, decimal percent)
@@ -239,7 +239,7 @@ public static class IntExtensions
     {
         decimal result = 0;
         if (position > 0 && total > 0)
-            result = position / (decimal) total * 100;
+            result = position / (decimal)total * 100;
         return result;
     }
 
@@ -249,7 +249,7 @@ public static class IntExtensions
 
         decimal result = 0;
         if (position > 0 && total > 0)
-            result = (decimal) position / total * 100;
+            result = (decimal)position / total * 100;
         return result;
     }
 
@@ -257,7 +257,7 @@ public static class IntExtensions
     {
         decimal result = 0;
         if (position > 0 && total > 0)
-            result = position / (decimal) total * 100;
+            result = position / (decimal)total * 100;
         return result;
     }
 
@@ -265,7 +265,7 @@ public static class IntExtensions
     {
         decimal result = 0;
         if (position > 0 && total > 0)
-            result = position / (decimal) total * 100;
+            result = position / (decimal)total * 100;
         return result;
     }
 
@@ -281,7 +281,7 @@ public static class IntExtensions
     {
         decimal result = 0;
         if (position > 0 && total > 0)
-            result = position / (decimal) total * 100;
+            result = position / (decimal)total * 100;
         return result;
     }
 

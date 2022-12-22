@@ -191,7 +191,7 @@ public static class TypeExtensions
         var attributes = type.GetTypeInfo().GetCustomAttributes(typeof(T));
         foreach (var attribute in attributes)
         {
-            var att = (T) attribute;
+            var att = (T)attribute;
             action(att);
         }
     }
@@ -202,7 +202,7 @@ public static class TypeExtensions
         var attributes = type.GetTypeInfo().GetCustomAttributes(typeof(T)).ToArray();
         foreach (var attribute in attributes)
         {
-            var att = (T) attribute;
+            var att = (T)attribute;
             action(att);
         }
 
@@ -610,9 +610,20 @@ public static class TypeExtensions
                !exceptions.Any(s => nameToCheck.Name != null && nameToCheck.Name.StartsWith(s));
     }
 
+    public static bool IsGenericType(this Type type)
+    {
+        return type.GetTypeInfo().IsGenericTypeDefinition;
+    }
+
     public static bool IsEnumerable(this Type type)
     {
-        return type.GetInterface("IEnumerable") != null;
+        return type.GetInterfaces().Any(x => x == typeof(IEnumerable));
+    }
+
+    public static bool IsEnumerableOfT(this Type type)
+    {
+        return type.GetInterfaces().Any(x => x.IsGenericType
+                                             && x.GetGenericTypeDefinition() == typeof(IEnumerable<>));
     }
 
     public static bool IsFloatingPoint(this Type type)
@@ -704,6 +715,7 @@ public static class TypeExtensions
         }
         return theType.GetTypeInfo().IsGenericType && theType.GetGenericTypeDefinition() == typeof(Nullable<>);
     }
+
     public static bool IsNullableValueType(this Type type)
     {
         if (type is not { IsValueType: true }) return false;
@@ -730,6 +742,7 @@ public static class TypeExtensions
             case TypeCode.Double:
             case TypeCode.Single:
                 return true;
+
             case TypeCode.Empty:
             case TypeCode.Object:
             case TypeCode.DBNull:
@@ -821,10 +834,12 @@ public static class TypeExtensions
         return theType == otherType ||
                (theType.IsNullableOfT() && theType.GetGenericArguments()[0] == otherType);
     }
+
     public static string PrettyPrint(this Type type)
     {
         return type.PrettyPrint(t => t.Name);
     }
+
     public static string PrettyPrint(this Type type, Func<Type, string> selector)
     {
         var typeName = selector(type);
@@ -842,10 +857,12 @@ public static class TypeExtensions
         }
         return $"{typeName}<{genericTypeList}>";
     }
+
     public static bool PropertyMatches(this PropertyInfo prop1, PropertyInfo prop2)
     {
         return prop1.DeclaringType == prop2.DeclaringType && prop1.Name == prop2.Name;
     }
+
     public static DbType ToDbType(this Type type)
     {
         var typeMap = new Dictionary<Type, DbType>

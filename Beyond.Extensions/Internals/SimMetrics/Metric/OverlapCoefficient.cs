@@ -26,7 +26,7 @@ internal sealed class OverlapCoefficient : AbstractStringMetric
         if ((firstWord != null) && (secondWord != null))
         {
             this.tokenUtilities.CreateMergedSet(this.tokeniser.Tokenize(firstWord), this.tokeniser.Tokenize(secondWord));
-            return (((double) this.tokenUtilities.CommonSetTerms()) / ((double) Math.Min(this.tokenUtilities.FirstSetTokenCount, this.tokenUtilities.SecondSetTokenCount)));
+            return (((double)this.tokenUtilities.CommonSetTerms()) / ((double)Math.Min(this.tokenUtilities.FirstSetTokenCount, this.tokenUtilities.SecondSetTokenCount)));
         }
         return 0.0;
     }

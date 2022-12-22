@@ -24,7 +24,7 @@ internal sealed class DiceSimilarity : AbstractStringMetric
     {
         if (((firstWord != null) && (secondWord != null)) && (this.tokenUtilities.CreateMergedSet(this.tokeniser.Tokenize(firstWord), this.tokeniser.Tokenize(secondWord)).Count > 0))
         {
-            return ((2.0 * this.tokenUtilities.CommonSetTerms()) / ((double) (this.tokenUtilities.FirstSetTokenCount + this.tokenUtilities.SecondSetTokenCount)));
+            return ((2.0 * this.tokenUtilities.CommonSetTerms()) / ((double)(this.tokenUtilities.FirstSetTokenCount + this.tokenUtilities.SecondSetTokenCount)));
         }
         return 0.0;
     }
