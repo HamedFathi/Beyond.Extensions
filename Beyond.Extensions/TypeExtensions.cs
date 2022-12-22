@@ -192,6 +192,20 @@ public static class TypeExtensions
             : typeInfo.BaseType?.FindInterfaceThatCloses(openType);
     }
 
+    public static IEnumerable<MethodInfo> FindMethodInfo(this Type source, string methodName, int parametersLength, BindingFlags bindingFlags)
+    {
+        return source.GetMethods(bindingFlags)
+                .Where(x => string.Equals(x.Name, methodName, StringComparison.Ordinal) &&
+                            x.GetParameters().Length == parametersLength);
+    }
+
+    public static IEnumerable<MethodInfo> FindMethodInfo(this Type source, string methodName, int parametersLength)
+    {
+        return source.GetMethods()
+                .Where(x => string.Equals(x.Name, methodName, StringComparison.Ordinal) &&
+                            x.GetParameters().Length == parametersLength);
+    }
+
     public static Type? FindParameterTypeTo(this Type type, Type openType)
     {
         var interfaceType = type.FindInterfaceThatCloses(openType);
@@ -363,6 +377,16 @@ public static class TypeExtensions
 
         var lst = list.Distinct().ToList();
         return SortInnerTypes(lst, simpleTypes);
+    }
+
+    public static MethodInfo? GetMethodInfo(this Type source, string methodName, BindingFlags bindingFlags, params Type[] parametersTypes)
+    {
+        return source.GetMethod(methodName, bindingFlags, parametersTypes);
+    }
+
+    public static MethodInfo? GetMethodInfo(this Type source, string methodName, params Type[] parametersTypes)
+    {
+        return source.GetMethod(methodName, parametersTypes);
     }
 
     public static string GetName(this Type type)
@@ -952,7 +976,6 @@ public static class TypeExtensions
         foreach (var i in interfaces) GetAllInterfaces(i, types);
         return types;
     }
-
     private static bool IsOneOfAttributes(Type attribute, object[] objects)
     {
         foreach (var attr in objects)
