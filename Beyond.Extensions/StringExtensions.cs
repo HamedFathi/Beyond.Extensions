@@ -28,7 +28,6 @@ public static class StringExtensions
             throw new ArgumentNullException(nameof(@this), $"{nameof(@this)} path is null or empty");
         return new DirectoryInfo(@this);
     }
-
     public static FileStream AsFileStream(this string @this, FileMode fileMode, FileAccess fileAccess,
         FileShare fileShare, int bufferSize = 8192)
     {
@@ -505,6 +504,16 @@ public static class StringExtensions
         return new Position(text[position].ToString(), line, col - 1, position);
     }
 
+    public static string GetRegexGroupValue(this string text, string regex, string groupName)
+    {
+        var match = new Regex(regex).Match(text);
+        return match.Success ? match.Groups[groupName].Value : string.Empty;
+    }
+    public static string GetRegexGroupValue(this string text, Regex regex, string groupName)
+    {
+        var match = regex.Match(text);
+        return match.Success ? match.Groups[groupName].Value : string.Empty;
+    }
     public static string? GetValueOrDefault(this string? input, string? defaultValue = default,
         bool whitespaceAsEmpty = true)
     {
