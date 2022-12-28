@@ -28,6 +28,7 @@ public static class StringExtensions
             throw new ArgumentNullException(nameof(@this), $"{nameof(@this)} path is null or empty");
         return new DirectoryInfo(@this);
     }
+
     public static FileStream AsFileStream(this string @this, FileMode fileMode, FileAccess fileAccess,
         FileShare fileShare, int bufferSize = 8192)
     {
@@ -509,11 +510,13 @@ public static class StringExtensions
         var match = new Regex(regex).Match(text);
         return match.Success ? match.Groups[groupName].Value : string.Empty;
     }
+
     public static string GetRegexGroupValue(this string text, Regex regex, string groupName)
     {
         var match = regex.Match(text);
         return match.Success ? match.Groups[groupName].Value : string.Empty;
     }
+
     public static string? GetValueOrDefault(this string? input, string? defaultValue = default,
         bool whitespaceAsEmpty = true)
     {
@@ -725,6 +728,44 @@ public static class StringExtensions
         return string.IsInterned(str);
     }
 
+    public static bool IsIpAddress(this string ip, out IPAddress? ipAddress)
+    {
+        if (IPAddress.TryParse(ip, out var address))
+        {
+            switch (address.AddressFamily)
+            {
+                case AddressFamily.InterNetwork:
+                case AddressFamily.InterNetworkV6:
+                    ipAddress = address;
+                    return true;
+            }
+        }
+        ipAddress = null;
+        return false;
+    }
+
+    public static bool IsIpAddressV4(this string ipAddress)
+    {
+        if (!IPAddress.TryParse(ipAddress, out var address)) return false;
+
+        return address.AddressFamily switch
+        {
+            AddressFamily.InterNetwork => true,
+            _ => false
+        };
+    }
+
+    public static bool IsIpAddressV6(this string ipAddress)
+    {
+        if (!IPAddress.TryParse(ipAddress, out var address)) return false;
+
+        return address.AddressFamily switch
+        {
+            AddressFamily.InterNetworkV6 => true,
+            _ => false
+        };
+    }
+
     public static bool IsLetter(this string s, int index)
     {
         return char.IsLetter(s, index);
@@ -909,22 +950,22 @@ public static class StringExtensions
         }
     }
 
-    public static bool IsValidEmail(this string obj)
+    public static bool IsValidEmail(this string email)
     {
-        return Regex.IsMatch(obj,
-            @"^([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z0-9]{1,30})(\]?)$");
-    }
-
-    public static bool IsValidEmailAddress(this string email)
-    {
-        var regex = new Regex(@"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$");
-        return regex.IsMatch(email);
-    }
-
-    public static bool IsValidIp(this string obj)
-    {
-        return Regex.IsMatch(obj,
-            @"^(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9])\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[0-9])$");
+        var trimmedEmail = email.Trim();
+        if (trimmedEmail.EndsWith("."))
+        {
+            return false;
+        }
+        try
+        {
+            var address = new System.Net.Mail.MailAddress(email);
+            return address.Address == trimmedEmail;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     public static bool IsValidNumber(this string number)
@@ -1105,6 +1146,18 @@ public static class StringExtensions
         if (diff == 0 || (diff < 0 && !truncate)) return value;
         if (diff < 0) return value.Substring(0, width);
         return value.PadLeft(width - diff / 2, padChar).PadRight(width, padChar);
+    }
+
+    public static Uri ParseAsUri(this string uri)
+    {
+        try
+        {
+            return new Uri(uri);
+        }
+        catch (Exception e)
+        {
+            throw new Exception(e.Message);
+        }
     }
 
     public static DateTime ParseAsUtc(this string str)
@@ -2269,6 +2322,19 @@ public static class StringExtensions
         return original.Substring(0, length) + suffix;
     }
 
+    public static bool TryParseAsUri(this string uriString, out Uri? uri)
+    {
+        try
+        {
+            uri = new Uri(uriString);
+            return true;
+        }
+        catch
+        {
+            uri = null;
+            return false;
+        }
+    }
     public static bool TryParseEnum<T>(this string name, out T result, bool ignoreCase = false)
         where T : struct, Enum
     {
