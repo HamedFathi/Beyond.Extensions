@@ -976,6 +976,7 @@ public static class TypeExtensions
         foreach (var i in interfaces) GetAllInterfaces(i, types);
         return types;
     }
+
     private static bool IsOneOfAttributes(Type attribute, object[] objects)
     {
         foreach (var attr in objects)

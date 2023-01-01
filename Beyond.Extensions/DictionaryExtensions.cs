@@ -107,6 +107,15 @@ public static class DictionaryExtensions
         }
     }
 
+    public static void AddRangeNewOnly<TKey, TValue>(this IDictionary<TKey, TValue> dic, IDictionary<TKey, TValue> dicToAdd)
+    {
+        foreach (var x in dicToAdd)
+        {
+            if (!dic.ContainsKey(x.Key))
+                dic.Add(x.Key, x.Value);
+        }
+    }
+
     public static void AddRangeUnique<TKey, TValue>(this IDictionary<TKey, TValue> source,
         IDictionary<TKey, TValue> dictionary)
     {
@@ -460,5 +469,12 @@ public static class DictionaryExtensions
         if (self is null) throw new ArgumentNullException(nameof(self));
 
         return self.TryGetValue(key, out value) && self.Remove(key);
+    }
+
+    private static bool ContainsAllKeys<TKey, TValue>(this IDictionary<TKey, TValue> dic, IEnumerable<TKey> keys)
+    {
+        var result = false;
+        keys.ForEachOrBreak((x) => { result = dic.ContainsKey(x); return result; });
+        return result;
     }
 }

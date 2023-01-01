@@ -16,6 +16,8 @@ public static partial class ObjectExtensions
         return Array.IndexOf(values, obj) != -1;
     }
 
+    public static T? As<T>(this object o) where T : class => o as T;
+
     [SuppressMessage("Roslynator", "RCS1175:Unused 'this' parameter.", Justification = "<Pending>")]
     [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "<Pending>")]
     public static Lazy<T> AsLazy<T>(this T obj)
@@ -93,6 +95,8 @@ public static partial class ObjectExtensions
             return defaultValueFactory(@this);
         }
     }
+
+    public static T CastTo<T>(this object o) => (T)o;
 
     public static object ChangeType(this object value, TypeCode typeCode)
     {
@@ -887,5 +891,10 @@ public static partial class ObjectExtensions
         }
 
         return false;
+    }
+
+    public static IEnumerable<T> Yield<T>(this T item)
+    {
+        yield return item;
     }
 }

@@ -606,9 +606,16 @@ public static class EnumerableExtensions
             .Flatten(string.Empty, head, tail);
     }
 
-    public static IEnumerable<T> FlattenByBfsAndQueue<T>(this IEnumerable<T> items,
+    public static IEnumerable<T> FlattenByLinq<T>(this IEnumerable<T> items, Func<T, IEnumerable<T>?>? getChildren)
+    {
+        return items.SelectMany(c => (getChildren?.Invoke(c) ?? Array.Empty<T>()).FlattenByLinq(getChildren))
+            .Concat(items);
+    }
+
+    public static IEnumerable<T> FlattenByQueue<T>(this IEnumerable<T> items,
         Func<T, IEnumerable<T>?>? getChildren)
     {
+        // Queue => BFS (Breadth First Search)
         var itemsToYield = new Queue<T>(items);
         while (itemsToYield.Count > 0)
         {
@@ -625,9 +632,10 @@ public static class EnumerableExtensions
         }
     }
 
-    public static IEnumerable<T> FlattenByDfsAndStack<T>(this IEnumerable<T> items,
+    public static IEnumerable<T> FlattenByStack<T>(this IEnumerable<T> items,
         Func<T, IEnumerable<T>?>? getChildren)
     {
+        // Stack => DFS (Depth First Search)
         var stack = new Stack<T>();
         foreach (var item in items)
             stack.Push(item);
@@ -644,14 +652,7 @@ public static class EnumerableExtensions
                     if (child != null)
                         stack.Push(child);
                 }
-
         }
-    }
-
-    public static IEnumerable<T> FlattenByLinq<T>(this IEnumerable<T> items, Func<T, IEnumerable<T>?>? getChildren)
-    {
-        return items.SelectMany(c => (getChildren?.Invoke(c) ?? Array.Empty<T>()).FlattenByLinq(getChildren))
-            .Concat(items);
     }
 
     public static IEnumerable<T> FlattenObject<T>(T root, Func<T, IEnumerable<T>?>? getChildren)
@@ -748,6 +749,15 @@ public static class EnumerableExtensions
         var array = @this.ToArray();
         for (var i = 0; i < array.Length; i++)
             action(array[i], i);
+    }
+
+    public static void ForEachOrBreak<T>(this IEnumerable<T> source, Func<T, bool> breakFunc)
+    {
+        foreach (var item in source)
+        {
+            var result = breakFunc(item);
+            if (result) break;
+        }
     }
 
     public static void ForEachReverse<T>(this IEnumerable<T> source, Action<T> action)

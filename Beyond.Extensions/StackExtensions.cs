@@ -17,6 +17,7 @@ public static class StackExtensions
             action(l);
         }
     }
+
     public static IEnumerable<T> PopAll<T>(this Stack<T> stack)
     {
         if (stack == null) throw new ArgumentNullException(nameof(stack));
@@ -114,6 +115,7 @@ public static class StackExtensions
         while (temp.Count > 0)
             stack.Push(temp.Pop());
     }
+
     public static void Update<T>(this Stack<T> stack, T value, out T oldValue)
     {
         if (stack == null) throw new ArgumentNullException(nameof(stack));

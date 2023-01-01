@@ -743,6 +743,10 @@ public static class StringExtensions
         ipAddress = null;
         return false;
     }
+    public static bool IsIpAddress(this string ipAddress)
+    {
+        return ipAddress.IsIpAddressV4() || ipAddress.IsIpAddressV6();
+    }
 
     public static bool IsIpAddressV4(this string ipAddress)
     {
@@ -967,7 +971,6 @@ public static class StringExtensions
             return false;
         }
     }
-
     public static bool IsValidNumber(this string number)
     {
         return IsValidNumber(number, CultureInfo.CurrentCulture);
@@ -1432,9 +1435,9 @@ public static class StringExtensions
         return new string(@this.ToCharArray().Where(x => !predicate(x)).ToArray());
     }
 
-    public static string RemoveWhiteSpaces(this string input)
+    public static string RemoveWhiteSpaces(this string text)
     {
-        return Regex.Replace(input, @"\s+", "");
+        return string.IsNullOrEmpty(text) ? text : Regex.Replace(text, @"\s+", string.Empty).Trim();
     }
 
     public static string Repeat(this string @this, int repeatCount)
@@ -1447,6 +1450,11 @@ public static class StringExtensions
         return sb.ToString();
     }
 
+    public static string Replace(this string text, int startIndex, int length, string replacement)
+    {
+        return text.Remove(startIndex, length).Insert(startIndex, replacement);
+    }
+
     public static string Replace(this string @this, string regexPattren, string replacement)
     {
         return Regex.Replace(@this, regexPattren, replacement, RegexOptions.Compiled);
@@ -1455,13 +1463,6 @@ public static class StringExtensions
     public static string Replace(this string @this, string regexPattren, string replacement, RegexOptions regexOptions)
     {
         return Regex.Replace(@this, regexPattren, replacement, regexOptions);
-    }
-
-    public static string Replace(this string @this, int startIndex, int length, string value)
-    {
-        @this = @this.Remove(startIndex, length).Insert(startIndex, value);
-
-        return @this;
     }
 
     public static string Replace(this string @this, string pattern, MatchEvaluator evaluator)
@@ -1607,6 +1608,12 @@ public static class StringExtensions
         return string.Join(oldValue, listStart) +
                (old > 0 ? oldValue : "") +
                string.Join(newValue, listEnd);
+    }
+
+    public static string ReplaceRegex(this string value, string regexPattern, string replaceValue,
+        RegexOptions options)
+    {
+        return Regex.Replace(value, regexPattern, replaceValue, options);
     }
 
     public static string ReplaceWhenEquals(this string @this, string oldValue, string newValue)
@@ -2335,6 +2342,7 @@ public static class StringExtensions
             return false;
         }
     }
+
     public static bool TryParseEnum<T>(this string name, out T result, bool ignoreCase = false)
         where T : struct, Enum
     {
