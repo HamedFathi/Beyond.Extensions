@@ -675,6 +675,20 @@ public static class StringExtensions
         return s.ToCharArray().All(char.IsLetterOrDigit);
     }
 
+    public static bool IsBase64(this string base64)
+    {
+        try
+        {
+            var _ = Convert.FromBase64String(base64);
+            return true;
+        }
+        catch (Exception)
+        {
+            // ignored
+        }
+        return false;
+    }
+
     public static bool IsControl(this string s, int index)
     {
         return char.IsControl(s, index);
@@ -2342,7 +2356,6 @@ public static class StringExtensions
             return false;
         }
     }
-
     public static bool TryParseEnum<T>(this string name, out T result, bool ignoreCase = false)
         where T : struct, Enum
     {
