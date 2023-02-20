@@ -5,7 +5,10 @@
 // ReSharper disable UnusedType.Global
 
 using Beyond.Extensions.ByteArrayExtended;
+using Beyond.Extensions.Enums;
 using Beyond.Extensions.StreamExtended;
+using Beyond.Extensions.StringExtended;
+using Beyond.Extensions.Types;
 
 namespace Beyond.Extensions.JsonExtended;
 
@@ -31,13 +34,13 @@ public static class JsonExtensions
         return string.IsNullOrEmpty(jsonText) ? null : jsonText.ToJsonNode()?[propertyName]?.AsValue().ToString();
     }
 
-    public static IEnumerable<string> GetKeys(this JsonDocument jsonDocument)
+    public static IEnumerable<string> GetKeys(this JsonDocument jsonDocument, string separator = ".")
     {
         var jsonElement = jsonDocument.RootElement;
-        return jsonElement.GetKeys();
+        return jsonElement.GetKeys(separator);
     }
 
-    public static IEnumerable<string> GetKeys(this JsonElement jsonElement)
+    public static IEnumerable<string> GetKeys(this JsonElement jsonElement, string separator = ".")
     {
         var queue = new Queue<(string ParentPath, JsonElement element)>();
         queue.Enqueue(("", jsonElement));
@@ -48,46 +51,132 @@ public static class JsonExtensions
             {
                 case JsonValueKind.Object:
                     parentPath = parentPath == ""
-                        ? "$."
-                        : parentPath + ".";
+                        ? "$" + separator
+                        : parentPath + separator;
                     foreach (var nextEl in element.EnumerateObject())
+                    {
                         queue.Enqueue(($"{parentPath}{nextEl.Name}", nextEl.Value));
+                    }
+                    yield return parentPath.Trim(separator) + "-object";
+                    break;
+                case JsonValueKind.Array:
+                    foreach (var (nextEl, i) in element.EnumerateArray().Select((js, i) => (js, i)))
+                    {
+                        if (string.IsNullOrEmpty(parentPath))
+                            parentPath = "$" + separator;
+                        queue.Enqueue(($"{parentPath}[{i}]", nextEl));
+                    }
+                    yield return parentPath.Trim(separator) + "-array";
+                    break;
+                case JsonValueKind.String:
+                    var isDate = DateTime.TryParse(element.ToString(), out _);
+                    var type = isDate ? "-date" : "-string";
+                    yield return parentPath.Trim(separator) + type;
+                    break;
+                case JsonValueKind.Number:
+                    yield return parentPath.Trim(separator) + "-number";
+                    break;
+                case JsonValueKind.Undefined:
+                    yield return parentPath.Trim(separator) + "-undefined";
+                    break;
+                case JsonValueKind.Null:
+                    yield return parentPath.Trim(separator) + "-null";
+                    break;
+                case JsonValueKind.True:
+                case JsonValueKind.False:
+                    yield return parentPath.Trim(separator) + "-boolean";
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+    }
 
-                    yield return parentPath.Trim('.') + "-object";
+    public static void Walk(this JsonElement jsonElement, Action<JsonData> action, string separator = ".")
+    {
+        var queue = new Queue<(string ParentPath, JsonElement element)>();
+        queue.Enqueue(("", jsonElement));
+        while (queue.Any())
+        {
+            var (parentPath, element) = queue.Dequeue();
+            switch (element.ValueKind)
+            {
+                case JsonValueKind.Object:
+                    parentPath = parentPath == ""
+                        ? "$" + separator
+                        : parentPath + separator;
+                    foreach (var nextEl in element.EnumerateObject())
+                    {
+                        queue.Enqueue(($"{parentPath}{nextEl.Name}", nextEl.Value));
+                    }
+                    action(new JsonData()
+                    {
+                        Key = parentPath.Trim(separator),
+                        Kind = JsonDataValueKind.Object,
+                        Value = element
+                    });
                     break;
 
                 case JsonValueKind.Array:
                     foreach (var (nextEl, i) in element.EnumerateArray().Select((js, i) => (js, i)))
                     {
                         if (string.IsNullOrEmpty(parentPath))
-                            parentPath = "$.";
+                            parentPath = "$" + separator;
                         queue.Enqueue(($"{parentPath}[{i}]", nextEl));
                     }
-
-                    yield return parentPath.Trim('.') + "-array";
+                    action(new JsonData()
+                    {
+                        Key = parentPath.Trim(separator),
+                        Kind = JsonDataValueKind.Array,
+                        Value = element
+                    });
                     break;
 
                 case JsonValueKind.String:
-                    var isDate = DateTime.TryParse(element.ToString(), out _);
-                    var type = isDate ? "-date" : "-string";
-                    yield return parentPath.Trim('.') + type;
+                    var isDate = DateTime.TryParse(element.GetString(), out _);
+                    action(new JsonData()
+                    {
+                        Key = parentPath.Trim(separator),
+                        Kind = isDate ? JsonDataValueKind.DateTime : JsonDataValueKind.String,
+                        Value = element
+                    });
                     break;
 
                 case JsonValueKind.Number:
-                    yield return parentPath.Trim('.') + "-number";
+                    action(new JsonData()
+                    {
+                        Key = parentPath.Trim(separator),
+                        Kind = JsonDataValueKind.Number,
+                        Value = element.GetDouble()
+                    });
                     break;
 
                 case JsonValueKind.Undefined:
-                    yield return parentPath.Trim('.') + "-undefined";
+                    action(new JsonData()
+                    {
+                        Key = parentPath.Trim(separator),
+                        Kind = JsonDataValueKind.Undefined,
+                        Value = element
+                    });
                     break;
 
                 case JsonValueKind.Null:
-                    yield return parentPath.Trim('.') + "-null";
+                    action(new JsonData()
+                    {
+                        Key = parentPath.Trim(separator),
+                        Kind = JsonDataValueKind.Null,
+                        Value = element
+                    });
                     break;
 
                 case JsonValueKind.True:
                 case JsonValueKind.False:
-                    yield return parentPath.Trim('.') + "-boolean";
+                    action(new JsonData()
+                    {
+                        Key = parentPath.Trim(separator),
+                        Kind = JsonDataValueKind.Boolean,
+                        Value = element.GetBoolean()
+                    });
                     break;
 
                 default:
@@ -95,16 +184,15 @@ public static class JsonExtensions
             }
         }
     }
-
-    public static IEnumerable<string> GetPaths(this JsonDocument jsonDocument)
+    public static IEnumerable<string> GetPaths(this JsonDocument jsonDocument, string separator = ".")
     {
         var jsonElement = jsonDocument.RootElement;
-        return jsonElement.GetKeys().Select(x => x.Substring(0, x.LastIndexOfAny(new[] { '-' })));
+        return jsonElement.GetKeys(separator).Select(x => x.Substring(0, x.LastIndexOfAny(new[] { '-' })));
     }
 
-    public static IEnumerable<string> GetPaths(this JsonElement jsonElement)
+    public static IEnumerable<string> GetPaths(this JsonElement jsonElement, string separator = ".")
     {
-        return jsonElement.GetKeys().Select(x => x.Substring(0, x.LastIndexOfAny(new[] { '-' })));
+        return jsonElement.GetKeys(separator).Select(x => x.Substring(0, x.LastIndexOfAny(new[] { '-' })));
     }
 
     public static bool? IsOpenApiDocument(string swaggerJsonText)
