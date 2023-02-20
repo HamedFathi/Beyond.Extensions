@@ -88,8 +88,20 @@ public static partial class TaskExtensions
         return (await source).DequeueAsEnumerable();
     }
 
+    public static async Task Finally(this Task task, Func<Task> finallyAction)
+    {
+        try
+        {
+            await task;
+        }
+        finally
+        {
+            await finallyAction();
+        }
+    }
+
     public static async Task<IEnumerable<T>?> ForEachAsync<T>(this IEnumerable<T>? source, Func<T, Task> action,
-        CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken = default)
     {
         if (source is null) return source;
 
@@ -213,7 +225,6 @@ public static partial class TaskExtensions
     {
         return m.ContinueWith(task => k(task.Result)).Unwrap();
     }
-
     public static Task<T> TaskUnit<T>(this T value)
     {
         return Task.Factory.StartNew(() => value);
@@ -380,6 +391,19 @@ public static partial class TaskExtensions
         return task.ConfigureAwait(true);
     }
 
+    public static T WaitAndUnwrapException<T>(this Task<T> task)
+    {
+        try
+        {
+            task.Wait();
+            return task.Result;
+        }
+        catch (AggregateException ex)
+        {
+            if (ex.InnerException != null) throw ex.InnerException;
+            throw;
+        }
+    }
     public static async Task WaitAsync(this Task task, TimeSpan timeout)
     {
         using var timeoutCancellationTokenSource = new CancellationTokenSource();

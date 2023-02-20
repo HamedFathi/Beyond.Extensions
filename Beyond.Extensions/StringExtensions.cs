@@ -1017,6 +1017,11 @@ public static class StringExtensions
         return true;
     }
 
+    public static bool IsValidUri(this string uri)
+    {
+        return Uri.TryCreate(uri, UriKind.Absolute, out var result) && (result.Scheme == Uri.UriSchemeHttp || result.Scheme == Uri.UriSchemeHttps);
+    }
+
     public static bool IsValidUrl(this string text)
     {
         var rx = new Regex(@"http(s)?://([\w-]+\.)+[\w-]+(/[\w- ./?%&=]*)?");

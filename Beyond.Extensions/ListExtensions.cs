@@ -10,10 +10,11 @@ public static class ListExtensions
 {
     private static readonly Random Rnd = new(Guid.NewGuid().GetHashCode());
 
-    public static void AddRange<T>(this IList<T>? container, IEnumerable<T>? rangeToAdd)
+    public static void AddRange<T>(this IList<T> list, IEnumerable<T> items)
     {
-        if (container == null || rangeToAdd == null) return;
-        foreach (var toAdd in rangeToAdd) container.Add(toAdd);
+        if (list == null) throw new ArgumentNullException(nameof(list));
+        if (items == null) throw new ArgumentNullException(nameof(items));
+        foreach (var item in items) list.Add(item);
     }
 
     public static void AddRangeUnique<T>(this IList<T> list, T[] items) where T : class
