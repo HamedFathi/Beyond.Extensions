@@ -7,6 +7,7 @@ using Beyond.Extensions.CharExtended;
 using Beyond.Extensions.Enums;
 using Beyond.Extensions.Internals.Base62;
 using Beyond.Extensions.Internals.Pluralizer;
+using Beyond.Extensions.Internals.Trie;
 using Beyond.Extensions.Types;
 
 // ReSharper disable InconsistentNaming
@@ -1240,6 +1241,16 @@ public static class StringExtensions
     public static string Pluralize(this string word)
     {
         return PluralizeHelper.Pluralize(word);
+    }
+
+    public static bool QuickContains(this string text, string word, bool ignorecase = false)
+    {
+        var trie = new Trie();
+        foreach (var w in text.Split(' '))
+        {
+            trie.AddWord(w);
+        }
+        return trie.Search(word, ignorecase);
     }
 
     public static void ReadLines(this string text, Action<string> callback)
