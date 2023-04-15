@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Beyond.Extensions.Types;
+﻿namespace Beyond.Extensions.Types;
 
 public interface IPagedList<T>
 {
@@ -13,11 +7,11 @@ public interface IPagedList<T>
     bool HasPreviousPage { get; }
     bool IsFirstPage { get; }
     bool IsLastPage { get; }
+    IList<T> Items { get; }
     int LastItemOnPage { get; }
     int PageCount { get; }
     int PageNumber { get; }
     int PageSize { get; }
     int TotalCount { get; }
     T this[int index] { get; }
-    IList<T> Items { get; }
 }

@@ -995,6 +995,7 @@ public static class TypeExtensions
 
         return $"{prefixName}{type.Name}";
     }
+
     private static bool IsOneOfAttributes(Type attribute, object[] objects)
     {
         foreach (var attr in objects)

@@ -11,6 +11,29 @@ public class PagedList<T> : IPagedList<T>
         PageCount = (int)Math.Ceiling(TotalCount / (double)PageSize);
         Items = source.Skip((PageNumber - 1) * PageSize).Take(PageSize).ToList();
     }
+
+    public int FirstItemOnPage => (PageNumber - 1) * PageSize + 1;
+
+    public bool HasNextPage => PageNumber < PageCount;
+
+    public bool HasPreviousPage => PageNumber > 1;
+
+    public bool IsFirstPage => PageNumber == 1;
+
+    public bool IsLastPage => PageNumber == PageCount;
+
+    public IList<T> Items { get; }
+
+    public int LastItemOnPage => FirstItemOnPage + Items.Count - 1;
+
+    public int PageCount { get; }
+
+    public int PageNumber { get; }
+
+    public int PageSize { get; }
+
+    public int TotalCount { get; }
+
     public T this[int index]
     {
         get
@@ -22,15 +45,4 @@ public class PagedList<T> : IPagedList<T>
             return Items[index];
         }
     }
-    public int FirstItemOnPage => (PageNumber - 1) * PageSize + 1;
-    public bool HasNextPage => PageNumber < PageCount;
-    public bool HasPreviousPage => PageNumber > 1;
-    public bool IsFirstPage => PageNumber == 1;
-    public bool IsLastPage => PageNumber == PageCount;
-    public int LastItemOnPage => FirstItemOnPage + Items.Count - 1;
-    public int PageCount { get; }
-    public int PageNumber { get; }
-    public int PageSize { get; }
-    public int TotalCount { get; }
-    public IList<T> Items { get; }
 }

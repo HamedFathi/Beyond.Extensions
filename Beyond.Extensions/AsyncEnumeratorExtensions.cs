@@ -7,33 +7,6 @@ namespace Beyond.Extensions;
 
 public static class AsyncEnumeratorExtensions
 {
-    public static async Task<IList<TSource>> ToListAsync<TSource>(this IAsyncEnumerable<TSource> source,
-        CancellationToken cancellationToken = default)
-    {
-        if (source == null) throw new ArgumentNullException(nameof(source));
-        var list = new List<TSource>();
-        await foreach (var item in source.WithCancellation(cancellationToken).ConfigureAwait(false))
-            list.Add(item);
-
-        return list;
-    }
-
-    public static async ValueTask<IList<TSource>> ToValueTaskListAsync<TSource>(
-        this IAsyncEnumerable<TSource> source,
-        CancellationToken cancellationToken = default)
-    {
-        if (source == null) throw new ArgumentNullException(nameof(source));
-        var list = new List<TSource>();
-        await foreach (var item in source.WithCancellation(cancellationToken).ConfigureAwait(false))
-            list.Add(item);
-
-        return list;
-    }
-
-    public static IPagedList<T> ToAsyncPagedList<T>(this IAsyncEnumerable<T> source, int pageNumber, int pageSize)
-    {
-        return new AsyncPagedList<T>(source, pageNumber, pageSize);
-    }
     public static async Task<int> CountAsync<T>(this IAsyncEnumerable<T> source)
     {
         int count = 0;
@@ -43,6 +16,7 @@ public static class AsyncEnumeratorExtensions
         }
         return count;
     }
+
     public static async IAsyncEnumerable<T> SkipAsync<T>(this IAsyncEnumerable<T> source, int count)
     {
         int skipped = 0;
@@ -52,6 +26,7 @@ public static class AsyncEnumeratorExtensions
             yield return item;
         }
     }
+
     public static async IAsyncEnumerable<T> TakeAsync<T>(this IAsyncEnumerable<T> source, int count)
     {
         int taken = 0;
@@ -61,6 +36,23 @@ public static class AsyncEnumeratorExtensions
             yield return item;
         }
     }
+
+    public static IPagedList<T> ToAsyncPagedList<T>(this IAsyncEnumerable<T> source, int pageNumber, int pageSize)
+    {
+        return new AsyncPagedList<T>(source, pageNumber, pageSize);
+    }
+
+    public static async Task<IList<TSource>> ToListAsync<TSource>(this IAsyncEnumerable<TSource> source,
+                        CancellationToken cancellationToken = default)
+    {
+        if (source == null) throw new ArgumentNullException(nameof(source));
+        var list = new List<TSource>();
+        await foreach (var item in source.WithCancellation(cancellationToken).ConfigureAwait(false))
+            list.Add(item);
+
+        return list;
+    }
+
     public static async Task<List<T>> ToListAsync<T>(this IAsyncEnumerable<T> source)
     {
         var list = new List<T>();
@@ -68,6 +60,18 @@ public static class AsyncEnumeratorExtensions
         {
             list.Add(item);
         }
+        return list;
+    }
+
+    public static async ValueTask<IList<TSource>> ToValueTaskListAsync<TSource>(
+            this IAsyncEnumerable<TSource> source,
+        CancellationToken cancellationToken = default)
+    {
+        if (source == null) throw new ArgumentNullException(nameof(source));
+        var list = new List<TSource>();
+        await foreach (var item in source.WithCancellation(cancellationToken).ConfigureAwait(false))
+            list.Add(item);
+
         return list;
     }
 }

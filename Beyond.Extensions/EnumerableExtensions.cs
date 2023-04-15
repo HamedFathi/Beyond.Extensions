@@ -1896,10 +1896,12 @@ public static class EnumerableExtensions
                 .Take(pageSize)
             ;
     }
+
     public static IPagedList<T> ToPagedList<T>(this IEnumerable<T> source, int pageNumber, int pageSize)
     {
         return new PagedList<T>(source.AsQueryable(), pageNumber, pageSize);
     }
+
     public static IReadOnlyCollection<TDestination> ToReadOnlyCollection<TDestination>(
         this IEnumerable<TDestination>? source)
     {

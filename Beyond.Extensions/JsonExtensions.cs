@@ -31,6 +31,7 @@ public static class JsonExtensions
         json.FlattenJsonElement(string.Empty, flattenedJson);
         return JsonSerializer.Serialize(flattenedJson);
     }
+
     public static T? FromJson<T>(this string jsonText, JsonSerializerOptions? options = null)
     {
         return JsonSerializer.Deserialize<T>(jsonText, options);
@@ -99,6 +100,7 @@ public static class JsonExtensions
                 case JsonValueKind.False:
                     yield return parentPath.Trim(separator) + "-boolean";
                     break;
+
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -327,6 +329,7 @@ public static class JsonExtensions
                 case JsonValueKind.Object:
                     FlattenJsonElement(property.Value, key, flattenedJson);
                     break;
+
                 default:
                     flattenedJson[key] = property.Value.ToString();
                     break;
