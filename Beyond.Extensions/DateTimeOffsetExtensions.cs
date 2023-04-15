@@ -24,6 +24,19 @@ public static class DateTimeOffsetExtensions
         return TimeZoneInfo.ConvertTimeBySystemTimeZoneId(dateTimeOffset, destinationTimeZoneId);
     }
 
+    [SuppressMessage("Roslynator", "RCS1175:Unused 'this' parameter.", Justification = "<Pending>")]
+    [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "<Pending>")]
+    public static string GetTimeStamp(this DateTimeOffset datetime)
+    {
+        return DateTimeOffset.Now.ToString("yyyyMMddHHmmssfffffff");
+    }
+
+    [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "<Pending>")]
+    public static string GetUtcTimeStamp(this DateTimeOffset datetime)
+    {
+        return DateTimeOffset.UtcNow.ToString("yyyyMMddHHmmssfffffff");
+    }
+
     public static bool In(this DateTimeOffset @this, params DateTimeOffset[] values)
     {
         return Array.IndexOf(values, @this) != -1;

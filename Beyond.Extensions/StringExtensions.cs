@@ -758,6 +758,7 @@ public static class StringExtensions
         ipAddress = null;
         return false;
     }
+
     public static bool IsIpAddress(this string ipAddress)
     {
         return ipAddress.IsIpAddressV4() || ipAddress.IsIpAddressV6();
@@ -986,6 +987,7 @@ public static class StringExtensions
             return false;
         }
     }
+
     public static bool IsValidNumber(this string number)
     {
         return IsValidNumber(number, CultureInfo.CurrentCulture);
@@ -2372,6 +2374,7 @@ public static class StringExtensions
             return false;
         }
     }
+
     public static bool TryParseEnum<T>(this string name, out T result, bool ignoreCase = false)
         where T : struct, Enum
     {

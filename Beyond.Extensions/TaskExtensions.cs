@@ -225,6 +225,7 @@ public static partial class TaskExtensions
     {
         return m.ContinueWith(task => k(task.Result)).Unwrap();
     }
+
     public static Task<T> TaskUnit<T>(this T value)
     {
         return Task.Factory.StartNew(() => value);
@@ -404,6 +405,7 @@ public static partial class TaskExtensions
             throw;
         }
     }
+
     public static async Task WaitAsync(this Task task, TimeSpan timeout)
     {
         using var timeoutCancellationTokenSource = new CancellationTokenSource();

@@ -971,6 +971,18 @@ public static class DateTimeExtensions
         return (long)dateTime.MillisecondsSince1970();
     }
 
+    public static long ToUnixTimestamp(this DateTime date)
+    {
+        long unixTimestamp = date.Ticks - new DateTime(1970, 1, 1).Ticks;
+        unixTimestamp /= TimeSpan.TicksPerSecond;
+        return unixTimestamp;
+    }
+
+    public static long ToUnixTimestamp(long ticks)
+    {
+        return new DateTime(ticks).ToUnixTimestamp();
+    }
+
     public static string ToUtcFormatString(this DateTime date)
     {
         return date.ToUniversalTime().ToString(UtcDateFormat);
@@ -1009,6 +1021,17 @@ public static class DateTimeExtensions
     public static DateTime TruncateToSeconds(this DateTime date)
     {
         return new DateTime(date.Year, date.Month, date.Day, date.Hour, date.Minute, date.Second, 0);
+    }
+
+    public static DateTime UnixTimestampToDateTime(this long unixTimestamp)
+    {
+        DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        return epoch.AddSeconds(unixTimestamp);
+    }
+
+    public static long UnixTimestampToDateTimeTicks(this long unixTimestamp)
+    {
+        return unixTimestamp.UnixTimestampToDateTime().Ticks;
     }
 
     public static string UtcTimeStamp(this DateTime @this)

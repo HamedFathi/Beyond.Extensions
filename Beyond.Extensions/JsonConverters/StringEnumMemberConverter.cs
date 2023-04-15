@@ -4,8 +4,8 @@ namespace Beyond.Extensions.JsonConverters;
 
 public class StringEnumMemberConverter : JsonConverterFactory
 {
-    private readonly JsonNamingPolicy namingPolicy;
     private readonly bool allowIntegerValues;
+    private readonly JsonNamingPolicy namingPolicy;
 
     public StringEnumMemberConverter()
         : this(namingPolicy: null, allowIntegerValues: true)
@@ -44,22 +44,12 @@ public class StringEnumMemberConverter : JsonConverterFactory
         private const BindingFlags enumBindings = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static;
 
         private readonly bool allowIntegerValues;
-        private readonly Type underlyingType;
         private readonly Type enumType;
         private readonly TypeCode enumTypeCode;
         private readonly bool isFlags;
         private readonly Dictionary<ulong, EnumInfo> rawToTransformed;
         private readonly Dictionary<string, EnumInfo> transformedToRaw;
-
-        private class EnumInfo
-        {
-            public string Name;
-            public Enum EnumValue;
-            public ulong RawValue;
-
-            public EnumInfo(string name, Enum enumValue, ulong rawValue)
-                => (Name, EnumValue, RawValue) = (name, enumValue, rawValue);
-        }
+        private readonly Type underlyingType;
 
         public StringGenericEnumMemberConverter(JsonNamingPolicy namingPolicy, bool allowIntegerValues, Type underlyingType)
         {
@@ -175,7 +165,8 @@ public class StringEnumMemberConverter : JsonConverterFactory
 
         public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options)
         {
-            // Note: There is no check for value == null because Json serializer won't call the converter in that case.
+            // Note: There is no check for value == null because Json serializer won't call the
+            // converter in that case.
             var rawValue = GetEnumValue(value!);
 
             if (rawToTransformed.TryGetValue(rawValue, out var enumInfo))
@@ -273,5 +264,15 @@ public class StringEnumMemberConverter : JsonConverterFactory
                 TypeCode.UInt16 => (ushort)value,
                 _ => throw new JsonException(),
             };
+
+        private class EnumInfo
+        {
+            public Enum EnumValue;
+            public string Name;
+            public ulong RawValue;
+
+            public EnumInfo(string name, Enum enumValue, ulong rawValue)
+                => (Name, EnumValue, RawValue) = (name, enumValue, rawValue);
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿namespace Beyond.Extensions.Internals.Trie;
+
 internal class Trie
 {
     private readonly TrieNode _root = new TrieNode();
