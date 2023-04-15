@@ -81,6 +81,11 @@ public static class QueryableExtensions
         return query.Skip((pageIndex - 1) * pageSize).Take(pageSize);
     }
 
+    public static IPagedList<T> ToPagedList<T>(this IQueryable<T> source, int pageNumber, int pageSize)
+    {
+        return new PagedList<T>(source, pageNumber, pageSize);
+    }
+
     public static IReadOnlyCollection<T> ToReadOnlyCollection<T>(this IQueryable<T> queryable)
     {
         return queryable.AsEnumerable().ToReadOnlyCollection();

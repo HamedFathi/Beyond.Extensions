@@ -407,19 +407,9 @@ public static class TypeExtensions
         return GetAllInterfaces(type);
     }
 
-    public static string GetPrettyName(this Type t)
+    public static string GetPrettyName(this Type type)
     {
-        if (!t.GetTypeInfo().IsGenericType)
-        {
-            return t.Name;
-        }
-
-        var sb = new StringBuilder();
-        sb.Append(t.Name.Substring(0, t.Name.LastIndexOf("`", StringComparison.Ordinal)));
-        sb.Append(t.GetGenericArguments().Aggregate("<",
-            (aggregate, type) => aggregate + (aggregate == "<" ? "" : ",") + GetPrettyName(type)));
-        sb.Append('>');
-        return sb.ToString();
+        return GetPrettyNameOf(type, new List<Type>());
     }
 
     public static bool HasAttribute<T>(this Type type) where T : Attribute
@@ -977,6 +967,34 @@ public static class TypeExtensions
         return types;
     }
 
+    private static string GetPrettyNameOf(this Type type, List<Type> travesed)
+    {
+        travesed.Add(type);
+
+        var prefixName = string.Empty;
+        if (type.DeclaringType != null)
+        {
+            if (!travesed.Contains(type.DeclaringType))
+                prefixName = GetPrettyNameOf(type.DeclaringType, travesed) + ".";
+        }
+        else if (!string.IsNullOrEmpty(type.Namespace))
+            prefixName = type.Namespace + ".";
+
+        if (type.IsGenericType)
+        {
+            var genargNames = type.GetGenericArguments().Select(type1 => GetPrettyNameOf(type1, new List<Type>()));
+            var idx = type.Name.IndexOf('`');
+            var typename = idx > 0 ? type.Name.Substring(0, idx) : type.Name;
+            return $"{prefixName}{typename}<{string.Join(", ", genargNames.ToArray())}>";
+        }
+
+        if (type.IsArray)
+        {
+            return $"{GetPrettyName(type.GetElementType())}[{new string(Enumerable.Repeat(',', type.GetArrayRank() - 1).ToArray())}]";
+        }
+
+        return $"{prefixName}{type.Name}";
+    }
     private static bool IsOneOfAttributes(Type attribute, object[] objects)
     {
         foreach (var attr in objects)
