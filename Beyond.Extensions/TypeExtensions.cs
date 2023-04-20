@@ -383,6 +383,43 @@ public static class TypeExtensions
         return Nullable.GetUnderlyingType(input);
     }
 
+    public static IEnumerable<string> GetEnumNames(this Type enumType)
+    {
+        if (!enumType.IsEnum)
+        {
+            throw new ArgumentException("Type must be an enumeration.");
+        }
+        Array enumValues = Enum.GetValues(enumType);
+        foreach (var val in enumValues)
+        {
+            yield return val.ToString();
+        }
+    }
+
+    public static string GetEnumNamesAsString(this Type enumType, string separator = ", ")
+    {
+        return string.Join(separator, enumType.GetEnumNames());
+    }
+
+    public static IEnumerable<long> GetEnumValues(this Type enumType)
+    {
+        if (!enumType.IsEnum)
+        {
+            throw new ArgumentException("Type must be an enumeration.");
+        }
+
+        Array enumValues = Enum.GetValues(enumType);
+
+        foreach (var val in enumValues)
+        {
+            yield return Convert.ToInt64(val);
+        }
+    }
+    public static string GetEnumValuesAsString(this Type enumType, string separator = ", ")
+    {
+        return string.Join(separator, enumType.GetEnumValues());
+
+    }
     public static string? GetFullName(this Type type)
     {
         var typeInfo = type.GetTypeInfo();
