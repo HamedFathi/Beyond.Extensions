@@ -2,6 +2,10 @@
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 
+using Beyond.Extensions.Enums;
+using Beyond.Extensions.ObjectExtended;
+using Beyond.Extensions.StringExtended;
+
 namespace Beyond.Extensions.TypeExtended;
 
 public static class TypeExtensions
@@ -259,9 +263,115 @@ public static class TypeExtensions
         }
     }
 
+    public static IEnumerable<AccessModifierKind> GetAccessModifiers(this Type type)
+    {
+        var accessModifiers = new List<AccessModifierKind>();
+
+        if (type.IsPublic)
+        {
+            accessModifiers.Add(AccessModifierKind.Public);
+        }
+        else if (type.IsNotPublic)
+        {
+            accessModifiers.Add(AccessModifierKind.Private);
+        }
+        else if (type.IsNestedFamily)
+        {
+            accessModifiers.Add(AccessModifierKind.Protected);
+        }
+        else if (type.IsNestedAssembly)
+        {
+            accessModifiers.Add(AccessModifierKind.Internal);
+        }
+        return accessModifiers;
+    }
+
+    public static IEnumerable<Type> GetAllInterfaces(this Type type)
+    {
+        if (type == null)
+        {
+            throw new ArgumentNullException(nameof(type));
+        }
+
+        var interfaces = type.GetInterfaces();
+
+        var baseType = type.BaseType;
+        while (baseType != null)
+        {
+            interfaces = interfaces.Concat(baseType.GetInterfaces()).ToArray();
+            baseType = baseType.BaseType;
+        }
+
+        interfaces = interfaces.SelectMany(i => i.GetAllInterfaces()).Concat(interfaces).ToArray();
+
+        return interfaces.Distinct();
+    }
+
     public static T? GetAttribute<T>(this Type type) where T : Attribute
     {
         return type.GetTypeInfo().GetCustomAttributes<T>().FirstOrDefault();
+    }
+
+    public static string GetCleanName(this Type typeRef, GenericPresentationMode genericMode = GenericPresentationMode.Normal, bool fullName = false)
+    {
+        var name = GetCleanedName(typeRef, fullName);
+
+        return genericMode switch
+        {
+            GenericPresentationMode.Cleaned => Regex.Replace(name, "<.+>", "", RegexOptions.Compiled),
+            GenericPresentationMode.Simplified => SimplifyGenerics(name),
+            GenericPresentationMode.Normal => name,
+            _ => throw new ArgumentOutOfRangeException(nameof(genericMode), genericMode, null)
+        };
+
+        static string GetCleanedName(Type typeRef, bool fullName = false)
+        {
+            var rootType = typeRef.IsGenericType
+                ? typeRef.GetGenericTypeDefinition()
+                : typeRef;
+
+            var cleanedName = rootType.IsPrimitive
+                ? rootType.Name
+                : rootType.ToString();
+
+            if (!fullName && typeRef.Namespace != null && cleanedName.StartsWith(typeRef.Namespace))
+                cleanedName = cleanedName.Substring(typeRef.Namespace.Length + 1);
+
+            if (!typeRef.IsGenericType)
+                return cleanedName;
+            return cleanedName
+                       .Substring(0, cleanedName.LastIndexOf('`'))
+                   + typeRef.GetGenericArguments()
+                       .Aggregate("<", (r, i) => r + (r != "<" ? ", " : null) + GetCleanedName(i, fullName)) + ">";
+        }
+        static string SimplifyGenerics(string text)
+        {
+            if (!text.Contains('<'))
+            {
+                return text;
+            }
+            if (!text.Contains(','))
+            {
+                text = Regex.Replace(text, "<.+>", "<>", RegexOptions.Compiled);
+            }
+            else
+            {
+                while (true)
+                {
+                    var isMatch1 = Regex.IsMatch(text, "<[^<>,]+?,", RegexOptions.Compiled);
+                    var isMatch2 = Regex.IsMatch(text, ",[^<>,]+>", RegexOptions.Compiled);
+                    var isMatch3 = Regex.IsMatch(text, ",[^<>,]+?,", RegexOptions.Compiled);
+
+                    if (!isMatch1 && !isMatch2 && !isMatch3) break;
+
+                    text = Regex.Replace(text, "<[^<>,]+?,", "<,", RegexOptions.Compiled);
+                    text = Regex.Replace(text, ",[^<>,]+>", ",>", RegexOptions.Compiled);
+                    text = Regex.Replace(text, ",[^<>,]+?,", ",,", RegexOptions.Compiled);
+                }
+            }
+
+            return text.RemoveWhiteSpaces();
+        }
     }
 
     public static Type? GetCoreType(this Type input)
@@ -293,6 +403,31 @@ public static class TypeExtensions
         return type.Assembly.GetName().GetPublicKeyToken()?.Length <= 0
             ? $"{type.FullName}, {type.Assembly.GetName().Name}"
             : type.AssemblyQualifiedName;
+    }
+
+    public static Dictionary<string, List<string>> GetGenericConstraints(this Type type)
+    {
+        var result = new Dictionary<string, List<string>>();
+
+        foreach (var genericArgument in type.GetGenericArguments())
+        {
+            var gpa = genericArgument.GenericParameterAttributes;
+            var constraints = genericArgument.GetGenericParameterConstraints().Select(constraintType => constraintType.Name).ToList();
+
+            if ((gpa & GenericParameterAttributes.DefaultConstructorConstraint) != 0)
+            {
+                constraints.Add("new()");
+            }
+
+            if ((gpa & GenericParameterAttributes.NotNullableValueTypeConstraint) != 0)
+            {
+                constraints.Add("notnull");
+            }
+
+            result.Add(genericArgument.Name, constraints);
+        }
+
+        return result;
     }
 
     public static Type GetInnerTypeFromNullable(this Type nullableType)
@@ -377,6 +512,28 @@ public static class TypeExtensions
 
         var lst = list.Distinct().ToList();
         return SortInnerTypes(lst, simpleTypes);
+    }
+
+    public static ReflectionTypeKind GetKind(this Type type)
+    {
+        if (type.IsClass)
+        {
+            return ReflectionTypeKind.Class;
+        }
+
+        if (type.IsInterface)
+        {
+            return ReflectionTypeKind.Interface;
+        }
+        if (type.IsEnum)
+        {
+            return ReflectionTypeKind.Enum;
+        }
+        if (type.IsValueType)
+        {
+            return ReflectionTypeKind.ValueType;
+        }
+        throw new ArgumentException("Invalid type");
     }
 
     public static MethodInfo? GetMethodInfo(this Type source, string methodName, BindingFlags bindingFlags, params Type[] parametersTypes)
@@ -572,6 +729,20 @@ public static class TypeExtensions
         return typeToCheck == typeof(bool) || typeToCheck == typeof(bool?);
     }
 
+    public static bool IsClosedTypeOf(this Type @this, Type openGeneric)
+    {
+        return TypesAssignableFrom(@this).Any(t =>
+        {
+            if (!t.GetTypeInfo().IsGenericType || @this.GetTypeInfo().ContainsGenericParameters) return false;
+            return t.GetGenericTypeDefinition() == openGeneric;
+        });
+        static IEnumerable<Type> TypesAssignableFrom(Type candidateType)
+        {
+            return candidateType.GetTypeInfo().ImplementedInterfaces
+                .Concat(candidateType.Across(t => t.GetTypeInfo().BaseType));
+        }
+    }
+
     public static bool IsCollection(this Type type)
     {
         return type.GetInterface("ICollection") != null;
@@ -638,8 +809,12 @@ public static class TypeExtensions
                !exceptions.Any(s => nameToCheck.Name != null && nameToCheck.Name.StartsWith(s));
     }
 
-    public static bool IsEnumerable(this Type type)
+    public static bool IsEnumerable(this Type type, bool excludeString = true)
     {
+        if (excludeString && type == typeof(string))
+        {
+            return false;
+        }
         return type.GetInterfaces().Any(x => x == typeof(IEnumerable));
     }
 
@@ -758,6 +933,11 @@ public static class TypeExtensions
         return theType.GetTypeInfo().IsGenericType && theType.GetGenericTypeDefinition() == typeof(Nullable<>);
     }
 
+    public static bool IsNullableType(this Type type)
+    {
+        return Nullable.GetUnderlyingType(type) != null;
+    }
+
     public static bool IsNullableValueType(this Type type)
     {
         if (type is not { IsValueType: true }) return false;
@@ -841,6 +1021,11 @@ public static class TypeExtensions
     {
         var typeInfo = type.GetTypeInfo();
         return typeInfo.IsPrimitive || IsString(type) || typeInfo.IsEnum;
+    }
+
+    public static bool IsStatic(this Type type)
+    {
+        return type is { IsAbstract: true, IsSealed: true };
     }
 
     public static bool IsString(this Type type)

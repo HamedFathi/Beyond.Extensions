@@ -11,6 +11,15 @@ namespace Beyond.Extensions.ObjectExtended;
 
 public static partial class ObjectExtensions
 {
+    public static IEnumerable<T> Across<T>(this T first, Func<T, T?> next) where T : class
+    {
+        if (first == null) throw new ArgumentNullException(nameof(first));
+        if (next == null) throw new ArgumentNullException(nameof(next));
+
+        for (var item = first; item != null; item = next(item))
+            yield return item;
+    }
+
     public static bool Any<T>(this T obj, params T[] values)
     {
         return Array.IndexOf(values, obj) != -1;

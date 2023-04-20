@@ -844,12 +844,28 @@ public static class EnumerableExtensions
         if (current != 0) yield return array;
     }
 
+    public static IEnumerable<T> If<T>(
+                                                                                                                                                                                                                                                                                                                                                                                                    this IEnumerable<T> query,
+        bool should,
+        params Func<IEnumerable<T>, IEnumerable<T>>[] transforms)
+    {
+        return should
+            ? transforms.Aggregate(query,
+                (current, transform) => transform.Invoke(current))
+            : query;
+    }
+
     public static IEnumerable<T> IgnoreNulls<T>(this IEnumerable<T> target)
     {
         if (ReferenceEquals(target, null))
             yield break;
         foreach (var item in target.Where(item => !ReferenceEquals(item, null)))
             yield return item;
+    }
+
+    public static IEnumerable<string> Indent(this IEnumerable<string> texts, bool useTabs = true, int? count = 0)
+    {
+        return texts.Select(t => t.Indent(useTabs, count));
     }
 
     public static int Index<T>(this IEnumerable<T> list, Func<T, bool> predicate)
@@ -1083,6 +1099,11 @@ public static class EnumerableExtensions
                     Right = c
                 }) ?? Array.Empty<JoinResult<TLeft, TRight>>())
             .Select(resultSelector);
+    }
+
+    public static string LineByLine(this IEnumerable<string> lines, string separator = "")
+    {
+        return string.Join(separator + Environment.NewLine, lines);
     }
 
     public static long LongCount(this IEnumerable enumerable, bool excludeNullValues = false)

@@ -33,6 +33,17 @@ public static class QueryableExtensions
         return leftOuterJoinResult.Union(rightOuterJoinResult);
     }
 
+    public static IQueryable<T> If<T>(
+            this IQueryable<T> query,
+        bool should,
+        params Func<IQueryable<T>, IQueryable<T>>[] transforms)
+    {
+        return should
+            ? transforms.Aggregate(query,
+                (current, transform) => transform.Invoke(current))
+            : query;
+    }
+
     public static IQueryable<TResult> LeftOuterJoin<TLeft, TRight, TKey, TResult>(
         this IQueryable<TLeft> left,
         IEnumerable<TRight> right,

@@ -649,6 +649,18 @@ public static class StringExtensions
         return Array.IndexOf(values, @this) != -1;
     }
 
+    public static string Indent(this string text, bool useTabs = true, int? count = 0)
+    {
+        return Indentation(useTabs, count) + text;
+        static string Indentation(bool useTabs, int? count)
+        {
+            var indent = useTabs ? "\t" : " ";
+            count ??= 0;
+            if (count < 0) count = 0;
+            return indent.Repeat((int)count);
+        }
+    }
+
     public static IEnumerable<int> IndicesOf(this string text, string searchFor)
     {
         if (string.IsNullOrEmpty(searchFor)) yield break;
@@ -1123,6 +1135,11 @@ public static class StringExtensions
         var tokens = text.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)
             .Select(s => s.Trim().ToLower());
         return tokens.Any(t => word.Trim().ToLower().Contains(t.Trim()));
+    }
+
+    public static string NormalizeNewLine(this string text)
+    {
+        return Regex.Replace(text, @"\r?\n", Environment.NewLine);
     }
 
     public static bool NotIn(this string @this, params string[] values)
@@ -2140,6 +2157,11 @@ public static class StringExtensions
         return new FileInfo(@this);
     }
 
+    public static string ToKebabCase(this string text)
+    {
+        return Regex.Replace(text, "(?<![A-Z]|^)([A-Z])", "-$1").ToLowerInvariant();
+    }
+
     public static IEnumerable<string> ToLines(this string str,
         StringSplitOptions stringSplitOptions = StringSplitOptions.RemoveEmptyEntries)
     {
@@ -2288,6 +2310,26 @@ public static class StringExtensions
         var doc = new XmlDocument();
         doc.LoadXml(xml);
         return doc.DocumentElement;
+    }
+
+    public static string TransformIf(this string text, Func<bool> condition, Func<string, string> transformation)
+    {
+        return condition() ? transformation(text) : text;
+    }
+
+    public static string TransformIf(this string text, bool condition, Func<string, string> transformation)
+    {
+        return condition ? transformation(text) : text;
+    }
+
+    public static string TransformIfElse(this string text, Func<bool> condition, Func<string, string> transformationIf, Func<string, string> transformationElse)
+    {
+        return condition() ? transformationIf(text) : transformationElse(text);
+    }
+
+    public static string TransformIfElse(this string text, bool condition, Func<string, string> transformationIf, Func<string, string> transformationElse)
+    {
+        return condition ? transformationIf(text) : transformationElse(text);
     }
 
     public static string Trim(this string s, string sub, StringComparison comparison = StringComparison.Ordinal)
