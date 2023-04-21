@@ -286,27 +286,6 @@ public static class TypeExtensions
         return accessModifiers;
     }
 
-    public static IEnumerable<Type> GetAllInterfaces(this Type type)
-    {
-        if (type == null)
-        {
-            throw new ArgumentNullException(nameof(type));
-        }
-
-        var interfaces = type.GetInterfaces();
-
-        var baseType = type.BaseType;
-        while (baseType != null)
-        {
-            interfaces = interfaces.Concat(baseType.GetInterfaces()).ToArray();
-            baseType = baseType.BaseType;
-        }
-
-        interfaces = interfaces.SelectMany(i => i.GetAllInterfaces()).Concat(interfaces).ToArray();
-
-        return interfaces.Distinct();
-    }
-
     public static T? GetAttribute<T>(this Type type) where T : Attribute
     {
         return type.GetTypeInfo().GetCustomAttributes<T>().FirstOrDefault();
@@ -415,11 +394,13 @@ public static class TypeExtensions
             yield return Convert.ToInt64(val);
         }
     }
+
     public static string GetEnumValuesAsString(this Type enumType, string separator = ", ")
     {
         return string.Join(separator, enumType.GetEnumValues());
 
     }
+
     public static string? GetFullName(this Type type)
     {
         var typeInfo = type.GetTypeInfo();
@@ -598,9 +579,24 @@ public static class TypeExtensions
 
     public static IEnumerable<Type> GetNestedInterfaces(this Type type)
     {
-        return GetAllInterfaces(type);
-    }
+        if (type == null)
+        {
+            throw new ArgumentNullException(nameof(type));
+        }
 
+        var interfaces = type.GetInterfaces();
+
+        var baseType = type.BaseType;
+        while (baseType != null)
+        {
+            interfaces = interfaces.Concat(baseType.GetInterfaces()).ToArray();
+            baseType = baseType.BaseType;
+        }
+
+        interfaces = interfaces.SelectMany(i => i.GetNestedInterfaces()).Concat(interfaces).ToArray();
+
+        return interfaces.Distinct();
+    }
     public static string GetPrettyName(this Type type)
     {
         return GetPrettyNameOf(type, new List<Type>());
@@ -1085,8 +1081,16 @@ public static class TypeExtensions
 
     public static bool IsTuple(this Type type)
     {
-        if (type == null) throw new ArgumentNullException(nameof(type));
-        return type.FullName != null && type.FullName.StartsWith("System.Tuple`", StringComparison.Ordinal);
+        if (!type.IsGenericType) return false;
+        var genericTypeDefinition = type.GetGenericTypeDefinition();
+        return genericTypeDefinition == typeof(Tuple<>) ||
+               genericTypeDefinition == typeof(Tuple<,>) ||
+               genericTypeDefinition == typeof(Tuple<,,>) ||
+               genericTypeDefinition == typeof(Tuple<,,,>) ||
+               genericTypeDefinition == typeof(Tuple<,,,,>) ||
+               genericTypeDefinition == typeof(Tuple<,,,,,>) ||
+               genericTypeDefinition == typeof(Tuple<,,,,,,>) ||
+               genericTypeDefinition == typeof(Tuple<,,,,,,,>);
     }
 
     public static bool IsTypeOf<T>(this object obj)
@@ -1101,11 +1105,25 @@ public static class TypeExtensions
                (theType.IsNullableOfT() && theType.GetGenericArguments()[0] == otherType);
     }
 
+    public static bool IsValueTuple(Type tuple)
+    {
+        if (!tuple.IsGenericType)
+            return false;
+        var openType = tuple.GetGenericTypeDefinition();
+        return openType == typeof(ValueTuple<>)
+               || openType == typeof(ValueTuple<,>)
+               || openType == typeof(ValueTuple<,,>)
+               || openType == typeof(ValueTuple<,,,>)
+               || openType == typeof(ValueTuple<,,,,>)
+               || openType == typeof(ValueTuple<,,,,,>)
+               || openType == typeof(ValueTuple<,,,,,,>)
+               || (openType == typeof(ValueTuple<,,,,,,,>) && IsTuple(tuple.GetGenericArguments()[7]));
+    }
+
     public static string PrettyPrint(this Type type)
     {
         return type.PrettyPrint(t => t.Name);
     }
-
     public static string PrettyPrint(this Type type, Func<Type, string> selector)
     {
         var typeName = selector(type);
@@ -1178,15 +1196,6 @@ public static class TypeExtensions
     public static T? ToNullable<T>(this T value) where T : struct
     {
         return value.Equals(default(T)) ? null : value;
-    }
-
-    private static IEnumerable<Type> GetAllInterfaces(Type type, HashSet<Type>? types = null)
-    {
-        types ??= new HashSet<Type>();
-        var interfaces = type.GetInterfaces();
-        foreach (var it in interfaces) types.Add(it);
-        foreach (var i in interfaces) GetAllInterfaces(i, types);
-        return types;
     }
 
     private static string GetPrettyNameOf(this Type type, List<Type> travesed)
