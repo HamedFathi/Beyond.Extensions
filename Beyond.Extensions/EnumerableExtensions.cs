@@ -452,6 +452,53 @@ public static class EnumerableExtensions
         return list.Index(predicate) > -1;
     }
 
+    public static IEnumerable<TSource> FallbackIfEmpty<TSource>(this IEnumerable<TSource> source, IEnumerable<TSource> fallback)
+    {
+        if (source == null)
+        {
+            throw new ArgumentNullException(nameof(source));
+        }
+
+        if (fallback == null)
+        {
+            throw new ArgumentNullException(nameof(fallback));
+        }
+
+        return source.Any() ? source : fallback;
+    }
+
+    public static IEnumerable<TSource> FallbackIfEmpty<TSource>(this IEnumerable<TSource> source, params TSource[] fallback)
+    {
+        if (source == null)
+        {
+            throw new ArgumentNullException(nameof(source));
+        }
+
+        return source.Any() ? source : fallback;
+    }
+
+    public static IEnumerable<TSource> FallbackIfNull<TSource>(this IEnumerable<TSource> source, IEnumerable<TSource> fallback)
+    {
+        if (fallback == null)
+        {
+            throw new ArgumentNullException(nameof(fallback));
+        }
+
+        return source ?? fallback;
+    }
+    public static IEnumerable<TSource> FallbackIfNull<TSource>(this IEnumerable<TSource> source, params TSource[] fallback)
+    {
+        return source ?? fallback;
+    }
+
+    public static IEnumerable<TSource> FallbackIfNullOrEmpty<TSource>(this IEnumerable<TSource> source, IEnumerable<TSource> fallback)
+    {
+        return source.FallbackIfNull(fallback).FallbackIfEmpty(fallback);
+    }
+    public static IEnumerable<TSource> FallbackIfNullOrEmpty<TSource>(this IEnumerable<TSource> source, params TSource[] fallback)
+    {
+        return source.FallbackIfNull(fallback).FallbackIfEmpty(fallback);
+    }
     public static List<T> FindAll<T>(this IEnumerable<T> list, Func<T, bool> predicate)
     {
         if (predicate == null) throw new ArgumentNullException(nameof(predicate));

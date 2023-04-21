@@ -10,6 +10,77 @@ namespace Beyond.Extensions.QueryableExtended;
 
 public static class QueryableExtensions
 {
+    public static IQueryable<TSource> FallbackIfEmpty<TSource>(this IQueryable<TSource> source, IQueryable<TSource> fallback)
+    {
+        if (source == null)
+        {
+            throw new ArgumentNullException(nameof(source));
+        }
+
+        if (fallback == null)
+        {
+            throw new ArgumentNullException(nameof(fallback));
+        }
+
+        return source.Any() ? source : fallback;
+    }
+
+    public static IQueryable<TSource> FallbackIfEmpty<TSource>(this IQueryable<TSource> source, IEnumerable<TSource> fallback)
+    {
+        if (source == null)
+        {
+            throw new ArgumentNullException(nameof(source));
+        }
+
+        if (fallback == null)
+        {
+            throw new ArgumentNullException(nameof(fallback));
+        }
+
+        return source.Any() ? source : fallback.AsQueryable();
+    }
+
+    public static IQueryable<TSource> FallbackIfEmpty<TSource>(this IQueryable<TSource> source, params TSource[] fallback)
+    {
+        return source.FallbackIfEmpty((IEnumerable<TSource>)fallback);
+    }
+
+    public static IQueryable<TSource> FallbackIfNull<TSource>(this IQueryable<TSource> source, IQueryable<TSource> fallback)
+    {
+        if (fallback == null)
+        {
+            throw new ArgumentNullException(nameof(fallback));
+        }
+
+        return source ?? fallback;
+    }
+    public static IQueryable<TSource> FallbackIfNull<TSource>(this IQueryable<TSource> source, IEnumerable<TSource> fallback)
+    {
+        if (fallback == null)
+        {
+            throw new ArgumentNullException(nameof(fallback));
+        }
+
+        return source ?? fallback.AsQueryable();
+    }
+
+    public static IQueryable<TSource> FallbackIfNull<TSource>(this IQueryable<TSource> source, params TSource[] fallback)
+    {
+        return source.FallbackIfNull((IEnumerable<TSource>)fallback);
+    }
+
+    public static IQueryable<TSource> FallbackIfNullOrEmpty<TSource>(this IQueryable<TSource> source, IQueryable<TSource> fallback)
+    {
+        return source.FallbackIfNull(fallback).FallbackIfEmpty(fallback);
+    }
+    public static IQueryable<TSource> FallbackIfNullOrEmpty<TSource>(this IQueryable<TSource> source, IEnumerable<TSource> fallback)
+    {
+        return source.FallbackIfNull(fallback).FallbackIfEmpty(fallback);
+    }
+    public static IQueryable<TSource> FallbackIfNullOrEmpty<TSource>(this IQueryable<TSource> source, params TSource[] fallback)
+    {
+        return source.FallbackIfNullOrEmpty((IEnumerable<TSource>)fallback);
+    }
     public static IQueryable<TResult> FullOuterJoin<TLeft, TRight, TKey, TResult>(
         this IQueryable<TLeft> left,
         IQueryable<TRight> right,
