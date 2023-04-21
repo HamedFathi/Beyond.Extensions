@@ -5,6 +5,7 @@
 using Beyond.Extensions.Enums;
 using Beyond.Extensions.ObjectExtended;
 using Beyond.Extensions.StringExtended;
+using Beyond.Extensions.Types;
 
 namespace Beyond.Extensions.TypeExtended;
 
@@ -453,83 +454,127 @@ public static class TypeExtensions
         return nullableType.GetGenericArguments()[0];
     }
 
-    public static IEnumerable<Type> GetInternalTypes(this Type type, params Type[] simpleTypes)
+    public static List<Type> GetInnerTypes(this Type type, bool distinct = false)
     {
-        var isPrimitive = type.IsPrimitive;
-        var status = type.FullName != null
-                     && type.FullName.StartsWith("System.", StringComparison.Ordinal)
-                     && !type.IsDictionary()
-                     && !type.IsEnumerable()
-                     && !type.IsCollection()
-                     && !type.IsTuple()
-                     && !type.IsArray
-            ;
-        if (isPrimitive
-            || status
-            || type == typeof(string)
-            || type.IsEnum
-            || type.IsValueType
-            || simpleTypes.Contains(type))
-            return new List<Type> { type };
+        var innerTypes = new List<Type>();
 
-        var list = new List<Type>();
         if (type.IsGenericType)
         {
-            if (type.IsDictionary())
+            innerTypes.Add(type);
+            innerTypes.Add(type.GetGenericTypeDefinition());
+            foreach (var argument in type.GetGenericArguments())
             {
-                var keyType = type.GetGenericArguments()[0];
-                list.Add(keyType);
-                var valueType = type.GetGenericArguments()[1];
-                list.Add(valueType);
-                list.AddRange(GetInternalTypes(keyType));
-                list.AddRange(GetInternalTypes(valueType));
+                innerTypes.AddRange(argument.GetInnerTypes(distinct));
             }
-
-            if (type.IsEnumerable() || type.IsCollection())
+        }
+        else if (type.IsArray)
+        {
+            innerTypes.Add(type);
+            var innerElementType = type.GetElementType()?.GetInnerTypes(distinct);
+            if (innerElementType != null) innerTypes.AddRange(innerElementType);
+        }
+        else if (type.IsTuple())
+        {
+            innerTypes.Add(type);
+            foreach (var argument in type.GetGenericArguments())
             {
-                var itemType = type.GetGenericArguments()[0];
-                list.Add(itemType);
-                list.AddRange(GetInternalTypes(itemType));
+                innerTypes.AddRange(argument.GetInnerTypes(distinct));
             }
-
-            if (type.IsTuple())
+        }
+        else if ((type.IsValueType || type.IsClass) && type is { IsPrimitive: false, IsInterface: false })
+        {
+            if ((type.Namespace != null && !type.Namespace.StartsWith("System.")) || type.Namespace == null)
             {
-                var args = type.GetGenericArguments();
-                foreach (var arg in args)
+                innerTypes.Add(type);
+                foreach (var property in type.GetProperties())
                 {
-                    list.Add(arg);
-                    list.AddRange(GetInternalTypes(arg));
+                    innerTypes.AddRange(property.PropertyType.GetInnerTypes(distinct));
                 }
+            }
+        }
+        else if (type.IsEnum)
+        {
+            innerTypes.Add(type);
+        }
+        else if (type.IsInterface)
+        {
+            innerTypes.Add(type);
+            foreach (var interfaceType in type.GetInterfaces())
+            {
+                innerTypes.AddRange(interfaceType.GetInnerTypes());
+            }
+            foreach (var property in type.GetProperties())
+            {
+                innerTypes.AddRange(property.PropertyType.GetInnerTypes(distinct));
             }
         }
         else
         {
-            if (type.IsArray)
+            innerTypes.Add(type);
+        }
+
+        return distinct ? innerTypes.Distinct().ToList() : innerTypes.ToList();
+    }
+
+    public static TypeNode GetInnerTypesAsTree(this Type type)
+    {
+        return GetStructuredInnerTypes(type, null);
+
+        static TypeNode GetStructuredInnerTypes(Type type, TypeNode? parent)
+        {
+            var typeNode = new TypeNode(type);
+
+            parent?.Children.Add(typeNode);
+
+            if (type.IsGenericType)
             {
-                var t = type.GetElementType();
-                if (t != null)
+                typeNode.Children.Add(new TypeNode(type.GetGenericTypeDefinition()));
+                foreach (var argument in type.GetGenericArguments())
                 {
-                    list.Add(t);
-                    list.AddRange(GetInternalTypes(t));
+                    GetStructuredInnerTypes(argument, typeNode);
+                }
+            }
+            else if (type.IsArray)
+            {
+                var elementType = type.GetElementType();
+                if (elementType != null)
+                    GetStructuredInnerTypes(elementType, typeNode);
+            }
+            else if (type.IsTuple())
+            {
+                foreach (var argument in type.GetGenericArguments())
+                {
+                    GetStructuredInnerTypes(argument, typeNode);
+                }
+            }
+            else if ((type.IsValueType || type.IsClass) && type is { IsPrimitive: false, IsInterface: false })
+            {
+                if ((type.Namespace != null && !type.Namespace.StartsWith("System.")) || type.Namespace == null)
+                {
+                    foreach (var property in type.GetProperties())
+                    {
+                        GetStructuredInnerTypes(property.PropertyType, typeNode);
+                    }
+                }
+            }
+            else if (type.IsEnum)
+            {
+                typeNode.Children.Add(new TypeNode(type));
+            }
+            else if (type.IsInterface)
+            {
+                foreach (var interfaceType in type.GetInterfaces())
+                {
+                    GetStructuredInnerTypes(interfaceType, typeNode);
+                }
+                foreach (var property in type.GetProperties())
+                {
+                    GetStructuredInnerTypes(property.PropertyType, typeNode);
                 }
             }
 
-            if (type.IsInterface)
-            {
-                // TODO
-            }
-
-            if (type.IsClass)
-            {
-                var tsList = type.GetProperties().Select(x => x.PropertyType).ToList();
-                list.AddRange(tsList);
-                foreach (var ts in tsList)
-                    list.AddRange(GetInternalTypes(ts));
-            }
+            return typeNode;
         }
-
-        var lst = list.Distinct().ToList();
-        return SortInnerTypes(lst, simpleTypes);
     }
 
     public static ReflectionTypeKind GetKind(this Type type)
@@ -1237,62 +1282,5 @@ public static class TypeExtensions
         }
 
         return false;
-    }
-
-    private static List<Type> SortInnerTypes(List<Type> types, params Type[] simpleTypes)
-    {
-        var primitives = new List<Type>();
-        var systems = new List<Type>();
-        var enums = new List<Type>();
-        var str = new List<Type>();
-        var simple = new List<Type>();
-        var classes = new List<Type>();
-        var dictionaries = new List<Type>();
-        var enumerable = new List<Type>();
-        var tuples = new List<Type>();
-        var arrays = new List<Type>();
-        var valueTypes = new List<Type>();
-
-        foreach (var item in types)
-        {
-            if (item.IsPrimitive)
-                primitives.Add(item);
-            if (item.FullName != null && item.FullName.StartsWith("System.", StringComparison.Ordinal))
-                systems.Add(item);
-            if (item.IsValueType)
-                valueTypes.Add(item);
-            if (item.IsEnum)
-                enums.Add(item);
-            if (item == typeof(string))
-                str.Add(item);
-            if (simpleTypes.Contains(item))
-                simple.Add(item);
-            if (item.IsClass)
-                classes.Add(item);
-            if (item.IsDictionary())
-                dictionaries.Add(item);
-            if (item.IsEnumerable() || item.IsCollection())
-                enumerable.Add(item);
-            if (item.IsTuple())
-                tuples.Add(item);
-            if (item.IsArray)
-                arrays.Add(item);
-        }
-
-        var final = new List<Type>();
-
-        final.AddRange(primitives);
-        final.AddRange(valueTypes);
-        final.AddRange(enums);
-        final.AddRange(str);
-        final.AddRange(simple);
-        final.AddRange(classes);
-        final.AddRange(systems);
-        final.AddRange(arrays);
-        final.AddRange(tuples);
-        final.AddRange(dictionaries);
-        final.AddRange(enumerable);
-
-        return final;
     }
 }
