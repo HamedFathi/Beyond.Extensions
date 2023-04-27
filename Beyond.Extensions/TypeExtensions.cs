@@ -30,7 +30,6 @@ public static class TypeExtensions
         typeof(uint?),
         typeof(ulong?)
     };
-
     public static bool CanBeCastTo<T>(this Type? type)
     {
         if (type == null)
@@ -292,6 +291,14 @@ public static class TypeExtensions
         return type.GetTypeInfo().GetCustomAttributes<T>().FirstOrDefault();
     }
 
+    public static TValue? GetAttributeValue<TAttribute, TValue>(this Type type, string memberName, Func<TAttribute, TValue> valueSelector, bool inherit = false) where TAttribute : Attribute
+    {
+        if (type.GetMember(memberName).FirstOrDefault()?.GetCustomAttributes(typeof(TAttribute), inherit).FirstOrDefault() is TAttribute att)
+        {
+            return valueSelector(att);
+        }
+        return default;
+    }
     public static string GetCleanName(this Type typeRef, GenericPresentationMode genericMode = GenericPresentationMode.Normal, bool fullName = false)
     {
         var name = GetCleanedName(typeRef, fullName);
