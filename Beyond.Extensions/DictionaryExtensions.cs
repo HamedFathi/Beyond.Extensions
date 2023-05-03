@@ -183,6 +183,13 @@ public static class DictionaryExtensions
         return true;
     }
 
+    public static bool ContainsAllKeys<TKey, TValue>(this IDictionary<TKey, TValue> dic, IEnumerable<TKey> keys)
+    {
+        var result = false;
+        keys.ForEachOrBreak(x => { result = dic.ContainsKey(x); return result; });
+        return result;
+    }
+
     public static bool ContainsAnyKey<TKey, TValue>(this IDictionary<TKey, TValue> @this, params TKey[] keys)
     {
         foreach (var value in keys)
@@ -268,6 +275,30 @@ public static class DictionaryExtensions
         return values.Any(@this.ContainsValue);
     }
 
+    public static Dictionary<string, object> Flatten(this Dictionary<string, object> dictionary, string prefix = "", string delimiter = ".")
+    {
+        var flattened = new Dictionary<string, object>();
+
+        foreach (var item in dictionary)
+        {
+            var key = string.IsNullOrEmpty(prefix) ? item.Key : $"{prefix}{delimiter}{item.Key}";
+
+            if (item.Value is Dictionary<string, object> nestedDictionary)
+            {
+                var nestedFlattened = Flatten(nestedDictionary, key, delimiter);
+                foreach (var nestedItem in nestedFlattened)
+                {
+                    flattened[nestedItem.Key] = nestedItem.Value;
+                }
+            }
+            else
+            {
+                flattened[key] = item.Value;
+            }
+        }
+
+        return flattened;
+    }
     public static IEnumerable<TKey> GetAllKeys<TKey, TValue>(this IDictionary<TKey, TValue> dictionary)
     {
         if (dictionary is null) throw new ArgumentNullException(nameof(dictionary));
@@ -419,7 +450,7 @@ public static class DictionaryExtensions
     {
         if (@this == null) throw new ArgumentNullException(nameof(@this));
         var expando = new ExpandoObject();
-        var expandoDict = (IDictionary<string, object>)expando;
+        var expandoDict = expando as IDictionary<string, object>;
         foreach (var item in @this)
             if (item.Value is IDictionary<string, object> d)
                 expandoDict.Add(item.Key, d.ToExpando());
@@ -469,12 +500,5 @@ public static class DictionaryExtensions
         if (self is null) throw new ArgumentNullException(nameof(self));
 
         return self.TryGetValue(key, out value) && self.Remove(key);
-    }
-
-    private static bool ContainsAllKeys<TKey, TValue>(this IDictionary<TKey, TValue> dic, IEnumerable<TKey> keys)
-    {
-        var result = false;
-        keys.ForEachOrBreak((x) => { result = dic.ContainsKey(x); return result; });
-        return result;
     }
 }
