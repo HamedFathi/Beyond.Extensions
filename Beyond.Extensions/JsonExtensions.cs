@@ -3,6 +3,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable UnusedType.Global
+// ReSharper disable MemberCanBePrivate.Global
 
 using Beyond.Extensions.ByteArrayExtended;
 using Beyond.Extensions.Enums;
@@ -24,12 +25,39 @@ public static class JsonExtensions
         return JsonSerializer.Deserialize<T>(stream.ToText(), options);
     }
 
-    public static string FlattenJson(this string jsonString)
+    public static IEnumerable<FlattenJsonDetail> FlattenJson(this string jsonString, string separator = ".",
+        string prefix = "")
     {
-        var json = JsonSerializer.Deserialize<JsonElement>(jsonString);
-        var flattenedJson = new Dictionary<string, object>();
-        json.FlattenJsonElement(string.Empty, flattenedJson);
-        return JsonSerializer.Serialize(flattenedJson);
+        var json = JsonSerializer.Deserialize<JsonElement>(jsonString).FlattenJsonElement(separator, prefix);
+        var result = json.Select(item => new FlattenJsonDetail()
+        {
+            Key = item.Key,
+            Value = item.Value.ToString(),
+            ValueKind = item.Kind,
+            CSharpKind = item.Kind.ToCSharpType(),
+            TypeScriptKind = item.Kind.ToTypeScriptType()
+        });
+        return result;
+    }
+
+    public static string FlattenJsonAsString(this string jsonString, string separator = ".",
+        string prefix = "")
+    {
+        var json = JsonSerializer.Deserialize<JsonElement>(jsonString).FlattenJsonElement(separator, prefix);
+        var sb = new StringBuilder();
+        foreach (var item in json)
+        {
+            if (item.Kind == JsonValueKind.String)
+            {
+                sb.AppendLine($"{item.Key}:\"{item.Value.ToString()}\",");
+            }
+            else
+            {
+                sb.AppendLine($"{item.Key}:{item.Value.ToString()},");
+            }
+        }
+
+        return sb.ToString().ToIndentedJson();
     }
 
     public static T? FromJson<T>(this string jsonText, JsonSerializerOptions? options = null)
@@ -65,6 +93,7 @@ public static class JsonExtensions
                     {
                         queue.Enqueue(($"{parentPath}{nextEl.Name}", nextEl.Value));
                     }
+
                     yield return parentPath.Trim(separator) + "-object";
                     break;
 
@@ -75,6 +104,7 @@ public static class JsonExtensions
                             parentPath = "$" + separator;
                         queue.Enqueue(($"{parentPath}[{i}]", nextEl));
                     }
+
                     yield return parentPath.Trim(separator) + "-array";
                     break;
 
@@ -242,6 +272,7 @@ public static class JsonExtensions
                     {
                         queue.Enqueue(($"{parentPath}{nextEl.Name}", nextEl.Value));
                     }
+
                     action(new JsonData()
                     {
                         Key = parentPath.Trim(separator),
@@ -257,6 +288,7 @@ public static class JsonExtensions
                             parentPath = "$" + separator;
                         queue.Enqueue(($"{parentPath}[{i}]", nextEl));
                     }
+
                     action(new JsonData()
                     {
                         Key = parentPath.Trim(separator),
@@ -318,22 +350,94 @@ public static class JsonExtensions
         }
     }
 
-    private static void FlattenJsonElement(this JsonElement json, string parentKey, Dictionary<string, object> flattenedJson)
+    public static IEnumerable<FlattenJson> FlattenJsonElement(
+        this JsonElement jsonElement,
+        string separator = ".",
+        string prefix = "")
     {
-        foreach (JsonProperty property in json.EnumerateObject())
+        switch (jsonElement.ValueKind)
         {
-            string key = string.IsNullOrEmpty(parentKey) ? property.Name : $"{parentKey}.{property.Name}";
+            case JsonValueKind.Object:
+                foreach (var property in jsonElement.EnumerateObject())
+                {
+                    var key = string.IsNullOrEmpty(prefix) ? property.Name : $"{prefix}{separator}{property.Name}";
+                    switch (property.Value.ValueKind)
+                    {
+                        case JsonValueKind.Object:
+                        case JsonValueKind.Array:
+                            foreach (var nested in FlattenJsonElement(property.Value, separator, key))
+                            {
+                                yield return nested;
+                            }
 
-            switch (property.Value.ValueKind)
-            {
-                case JsonValueKind.Object:
-                    FlattenJsonElement(property.Value, key, flattenedJson);
-                    break;
+                            break;
+                        default:
+                            yield return new FlattenJson()
+                                { Key = key, Value = property.Value, Kind = property.Value.ValueKind };
+                            break;
+                    }
+                }
 
-                default:
-                    flattenedJson[key] = property.Value.ToString();
-                    break;
-            }
+                break;
+            case JsonValueKind.Array:
+                var index = 0;
+                foreach (var item in jsonElement.EnumerateArray())
+                {
+                    var key = $"{prefix}{separator}{index}";
+                    switch (item.ValueKind)
+                    {
+                        case JsonValueKind.Object:
+                        case JsonValueKind.Array:
+                            foreach (var nested in FlattenJsonElement(item, separator, key))
+                            {
+                                yield return nested;
+                            }
+
+                            break;
+                        default:
+                            yield return new FlattenJson() { Key = key, Value = item, Kind = item.ValueKind };
+                            break;
+                    }
+
+                    index++;
+                }
+
+                break;
+            default:
+                yield return new FlattenJson() { Key = prefix, Value = jsonElement, Kind = jsonElement.ValueKind };
+                break;
         }
+    }
+
+    public static string ToTypeScriptType(this JsonValueKind kind)
+    {
+        return kind switch
+        {
+            JsonValueKind.Undefined => "any",
+            JsonValueKind.Object => "{ [key: string]: any }",
+            JsonValueKind.Array => "any[]",
+            JsonValueKind.String => "string",
+            JsonValueKind.Number => "number",
+            JsonValueKind.True => "boolean",
+            JsonValueKind.False => "boolean",
+            JsonValueKind.Null => "null",
+            _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, null)
+        };
+    }
+
+    public static string ToCSharpType(this JsonValueKind kind)
+    {
+        return kind switch
+        {
+            JsonValueKind.Undefined => "object",
+            JsonValueKind.Object => "Dictionary<string, object>",
+            JsonValueKind.Array => "List<object>",
+            JsonValueKind.String => "string",
+            JsonValueKind.Number => "double", // or "decimal"
+            JsonValueKind.True => "bool",
+            JsonValueKind.False => "bool",
+            JsonValueKind.Null => "object",
+            _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, null)
+        };
     }
 }

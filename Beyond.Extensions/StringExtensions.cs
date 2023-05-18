@@ -1420,6 +1420,36 @@ public static class StringExtensions
         return instr.Substring(1);
     }
 
+    public static string RemoveDuplicateMatches(this string input, string pattern, bool keepFirst = true) 
+    { 
+        if (input == null) 
+            throw new ArgumentNullException(nameof(input)); 
+             
+        if (pattern == null) 
+            throw new ArgumentNullException(nameof(pattern)); 
+ 
+        var matches = Regex.Matches(input, pattern) 
+            .Select(m => m.Value) 
+            .ToList(); 
+ 
+        var duplicates = matches.GroupBy(x => x) 
+            .Where(g => g.Count() > 1) 
+            .Select(g => g.Key) 
+            .ToList(); 
+ 
+        foreach (var duplicate in duplicates) 
+        { 
+            var matchIndex = 0; 
+            while ((matchIndex = input.IndexOf(duplicate, matchIndex, StringComparison.Ordinal)) != -1)
+            {
+                input = keepFirst ? input.Remove(matchIndex + duplicate.Length, duplicate.Length) : input.Remove(matchIndex, duplicate.Length);
+                matchIndex += duplicate.Length;
+            } 
+        } 
+ 
+        return input; 
+    }
+
     public static string RemoveHtmlTags(this string htmlString)
     {
         return Regex.Replace(htmlString, @"<[^>]*(>|$)|&nbsp;|&zwnj;|&raquo;|&laquo;", string.Empty).Trim();
