@@ -19,6 +19,6 @@ internal sealed class AffineGapRange5To0Multiplier1 : AbstractAffineGapCost
         {
             return 0.0;
         }
-        return (double)(5 + ((stringIndexEndGap - 1) - stringIndexStartGap));
+        return 5 + ((stringIndexEndGap - 1) - stringIndexStartGap);
     }
 }

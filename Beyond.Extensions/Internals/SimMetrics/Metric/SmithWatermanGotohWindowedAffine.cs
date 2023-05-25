@@ -43,22 +43,22 @@ internal class SmithWatermanGotohWindowedAffine : AbstractStringMetric
 
     public SmithWatermanGotohWindowedAffine(AbstractAffineGapCost gapCostFunction, AbstractSubstitutionCost costFunction, int affineGapWindowSize)
     {
-        this.estimatedTimingConstant = 4.5000000682193786E-05;
-        this.gGapFunction = gapCostFunction;
-        this.dCostFunction = costFunction;
-        this.windowSize = affineGapWindowSize;
+        estimatedTimingConstant = 4.5000000682193786E-05;
+        gGapFunction = gapCostFunction;
+        dCostFunction = costFunction;
+        windowSize = affineGapWindowSize;
     }
 
     public AbstractSubstitutionCost DCostFunction
     {
-        get => this.dCostFunction;
-        set => this.dCostFunction = value;
+        get => dCostFunction;
+        set => dCostFunction = value;
     }
 
     public AbstractAffineGapCost GGapFunction
     {
-        get => this.gGapFunction;
-        set => this.gGapFunction = value;
+        get => gGapFunction;
+        set => gGapFunction = value;
     }
 
     public override string LongDescriptionString => "Implements the Smith-Waterman-Gotoh algorithm with a windowed affine gap providing a similarity measure between two string";
@@ -71,15 +71,15 @@ internal class SmithWatermanGotohWindowedAffine : AbstractStringMetric
         {
             return 0.0;
         }
-        double unnormalisedSimilarity = this.GetUnnormalisedSimilarity(firstWord, secondWord);
+        var unnormalisedSimilarity = GetUnnormalisedSimilarity(firstWord, secondWord);
         double num2 = Math.Min(firstWord.Length, secondWord.Length);
-        if (this.dCostFunction.MaxCost > -this.gGapFunction.MaxCost)
+        if (dCostFunction.MaxCost > -gGapFunction.MaxCost)
         {
-            num2 *= this.dCostFunction.MaxCost;
+            num2 *= dCostFunction.MaxCost;
         }
         else
         {
-            num2 *= -this.gGapFunction.MaxCost;
+            num2 *= -gGapFunction.MaxCost;
         }
         if (num2 == 0.0)
         {
@@ -99,7 +99,7 @@ internal class SmithWatermanGotohWindowedAffine : AbstractStringMetric
         {
             double length = firstWord.Length;
             double num2 = secondWord.Length;
-            return ((((length * num2) * this.windowSize) + ((length * num2) * this.windowSize)) * this.estimatedTimingConstant);
+            return ((((length * num2) * windowSize) + ((length * num2) * windowSize)) * estimatedTimingConstant);
         }
         return 0.0;
     }
@@ -110,40 +110,40 @@ internal class SmithWatermanGotohWindowedAffine : AbstractStringMetric
         {
             return 0.0;
         }
-        int length = firstWord.Length;
-        int num2 = secondWord.Length;
+        var length = firstWord.Length;
+        var num2 = secondWord.Length;
         if (length == 0)
         {
-            return (double)num2;
+            return num2;
         }
         if (num2 == 0)
         {
-            return (double)length;
+            return length;
         }
         double[][] numArray = new double[length][];
-        for (int i = 0; i < length; i++)
+        for (var i = 0; i < length; i++)
         {
             numArray[i] = new double[num2];
         }
-        double num4 = 0.0;
-        for (int j = 0; j < length; j++)
+        var num4 = 0.0;
+        for (var j = 0; j < length; j++)
         {
-            double num6 = this.dCostFunction.GetCost(firstWord, j, secondWord, 0);
+            var num6 = dCostFunction.GetCost(firstWord, j, secondWord, 0);
             if (j == 0)
             {
                 numArray[0][0] = Math.Max(0.0, num6);
             }
             else
             {
-                double num7 = 0.0;
-                int num8 = j - this.windowSize;
+                var num7 = 0.0;
+                var num8 = j - windowSize;
                 if (num8 < 1)
                 {
                     num8 = 1;
                 }
-                for (int n = num8; n < j; n++)
+                for (var n = num8; n < j; n++)
                 {
-                    num7 = Math.Max(num7, numArray[j - n][0] - this.gGapFunction.GetCost(firstWord, j - n, j));
+                    num7 = Math.Max(num7, numArray[j - n][0] - gGapFunction.GetCost(firstWord, j - n, j));
                 }
                 numArray[j][0] = MathFunctions.MaxOf3(0.0, num7, num6);
             }
@@ -152,24 +152,24 @@ internal class SmithWatermanGotohWindowedAffine : AbstractStringMetric
                 num4 = numArray[j][0];
             }
         }
-        for (int k = 0; k < num2; k++)
+        for (var k = 0; k < num2; k++)
         {
-            double num11 = this.dCostFunction.GetCost(firstWord, 0, secondWord, k);
+            var num11 = dCostFunction.GetCost(firstWord, 0, secondWord, k);
             if (k == 0)
             {
                 numArray[0][0] = Math.Max(0.0, num11);
             }
             else
             {
-                double num12 = 0.0;
-                int num13 = k - this.windowSize;
+                var num12 = 0.0;
+                var num13 = k - windowSize;
                 if (num13 < 1)
                 {
                     num13 = 1;
                 }
-                for (int num14 = num13; num14 < k; num14++)
+                for (var num14 = num13; num14 < k; num14++)
                 {
-                    num12 = Math.Max(num12, numArray[0][k - num14] - this.gGapFunction.GetCost(secondWord, k - num14, k));
+                    num12 = Math.Max(num12, numArray[0][k - num14] - gGapFunction.GetCost(secondWord, k - num14, k));
                 }
                 numArray[0][k] = MathFunctions.MaxOf3(0.0, num12, num11);
             }
@@ -178,30 +178,30 @@ internal class SmithWatermanGotohWindowedAffine : AbstractStringMetric
                 num4 = numArray[0][k];
             }
         }
-        for (int m = 1; m < length; m++)
+        for (var m = 1; m < length; m++)
         {
-            for (int num16 = 1; num16 < num2; num16++)
+            for (var num16 = 1; num16 < num2; num16++)
             {
-                double num17 = this.dCostFunction.GetCost(firstWord, m, secondWord, num16);
-                double num18 = 0.0;
-                double num19 = 0.0;
-                int num20 = m - this.windowSize;
+                var num17 = dCostFunction.GetCost(firstWord, m, secondWord, num16);
+                var num18 = 0.0;
+                var num19 = 0.0;
+                var num20 = m - windowSize;
                 if (num20 < 1)
                 {
                     num20 = 1;
                 }
-                for (int num21 = num20; num21 < m; num21++)
+                for (var num21 = num20; num21 < m; num21++)
                 {
-                    num18 = Math.Max(num18, numArray[m - num21][num16] - this.gGapFunction.GetCost(firstWord, m - num21, m));
+                    num18 = Math.Max(num18, numArray[m - num21][num16] - gGapFunction.GetCost(firstWord, m - num21, m));
                 }
-                num20 = num16 - this.windowSize;
+                num20 = num16 - windowSize;
                 if (num20 < 1)
                 {
                     num20 = 1;
                 }
-                for (int num22 = num20; num22 < num16; num22++)
+                for (var num22 = num20; num22 < num16; num22++)
                 {
-                    num19 = Math.Max(num19, numArray[m][num16 - num22] - this.gGapFunction.GetCost(secondWord, num16 - num22, num16));
+                    num19 = Math.Max(num19, numArray[m][num16 - num22] - gGapFunction.GetCost(secondWord, num16 - num22, num16));
                 }
                 numArray[m][num16] = MathFunctions.MaxOf4(0.0, num18, num19, numArray[m - 1][num16 - 1] + num17);
                 if (numArray[m][num16] > num4)

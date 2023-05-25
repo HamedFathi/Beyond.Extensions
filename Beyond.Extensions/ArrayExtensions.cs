@@ -718,7 +718,7 @@ public static class ArrayExtensions
 
     public static Array ToArrayObject<T>(this T[] array)
     {
-        return array as Array;
+        return array;
     }
 
     public static DataTable ToDataTable<T>(this T[] @this)

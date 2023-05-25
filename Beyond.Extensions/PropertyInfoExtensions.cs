@@ -17,6 +17,18 @@ public static class PropertyInfoExtensions
         return lambda.Compile();
     }
 
+    public static bool IsReadOnly(this PropertyInfo prop)
+    {
+        if (!prop.CanWrite)
+        {
+            return true;
+        }
+
+        var setMethod = prop.GetSetMethod(true);
+
+        return setMethod == null || setMethod.IsPrivate;
+    }
+
     public static Action<TTarget, TProperty>? SetProperty<TTarget, TProperty>(this PropertyInfo property)
     {
         var target = Expression.Parameter(property.DeclaringType!, "target");

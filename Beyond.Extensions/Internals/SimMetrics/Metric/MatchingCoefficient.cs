@@ -16,9 +16,9 @@ internal sealed class MatchingCoefficient : AbstractStringMetric
 
     public MatchingCoefficient(ITokeniser tokeniserToUse)
     {
-        this.estimatedTimingConstant = 0.00019999999494757503;
-        this.tokeniser = tokeniserToUse;
-        this.tokenUtilities = new TokeniserUtilities<string>();
+        estimatedTimingConstant = 0.00019999999494757503;
+        tokeniser = tokeniserToUse;
+        tokenUtilities = new TokeniserUtilities<string>();
     }
 
     public override string LongDescriptionString => "Implements the Matching Coefficient algorithm providing a similarity measure between two strings";
@@ -29,9 +29,9 @@ internal sealed class MatchingCoefficient : AbstractStringMetric
     {
         if ((firstWord != null) && (secondWord != null))
         {
-            double unnormalisedSimilarity = this.GetUnnormalisedSimilarity(firstWord, secondWord);
-            int num2 = Math.Max(this.tokenUtilities.FirstTokenCount, this.tokenUtilities.SecondTokenCount);
-            return (unnormalisedSimilarity / ((double)num2));
+            var unnormalisedSimilarity = GetUnnormalisedSimilarity(firstWord, secondWord);
+            var num2 = Math.Max(tokenUtilities.FirstTokenCount, tokenUtilities.SecondTokenCount);
+            return (unnormalisedSimilarity / num2);
         }
         return 0.0;
     }
@@ -45,31 +45,31 @@ internal sealed class MatchingCoefficient : AbstractStringMetric
     {
         if ((firstWord != null) && (secondWord != null))
         {
-            double count = this.tokeniser.Tokenize(firstWord).Count;
-            double num2 = this.tokeniser.Tokenize(secondWord).Count;
-            return ((num2 * count) * this.estimatedTimingConstant);
+            double count = tokeniser.Tokenize(firstWord).Count;
+            double num2 = tokeniser.Tokenize(secondWord).Count;
+            return ((num2 * count) * estimatedTimingConstant);
         }
         return 0.0;
     }
 
     public override double GetUnnormalisedSimilarity(string firstWord, string secondWord)
     {
-        Collection<string> firstTokens = this.tokeniser.Tokenize(firstWord);
-        Collection<string> secondTokens = this.tokeniser.Tokenize(secondWord);
-        return this.GetActualSimilarity(firstTokens, secondTokens);
+        Collection<string> firstTokens = tokeniser.Tokenize(firstWord);
+        Collection<string> secondTokens = tokeniser.Tokenize(secondWord);
+        return GetActualSimilarity(firstTokens, secondTokens);
     }
 
     private double GetActualSimilarity(Collection<string> firstTokens, Collection<string> secondTokens)
     {
-        this.tokenUtilities.CreateMergedList(firstTokens, secondTokens);
-        int num = 0;
-        foreach (string str in firstTokens)
+        tokenUtilities.CreateMergedList(firstTokens, secondTokens);
+        var num = 0;
+        foreach (var str in firstTokens)
         {
             if (secondTokens.Contains(str))
             {
                 num++;
             }
         }
-        return (double)num;
+        return num;
     }
 }

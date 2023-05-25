@@ -17,8 +17,8 @@ internal sealed class JaroWinkler : AbstractStringMetric
     {
         if ((firstWord != null) && (secondWord != null))
         {
-            double similarity = this.jaroStringMetric.GetSimilarity(firstWord, secondWord);
-            int prefixLength = GetPrefixLength(firstWord, secondWord);
+            var similarity = jaroStringMetric.GetSimilarity(firstWord, secondWord);
+            var prefixLength = GetPrefixLength(firstWord, secondWord);
             return (similarity + ((prefixLength * 0.10000000149011612) * (1.0 - similarity)));
         }
         return 0.0;
@@ -35,14 +35,14 @@ internal sealed class JaroWinkler : AbstractStringMetric
         {
             double length = firstWord.Length;
             double num2 = secondWord.Length;
-            return ((length * num2) * this.estimatedTimingConstant);
+            return ((length * num2) * estimatedTimingConstant);
         }
         return 0.0;
     }
 
     public override double GetUnnormalisedSimilarity(string firstWord, string secondWord)
     {
-        return this.GetSimilarity(firstWord, secondWord);
+        return GetSimilarity(firstWord, secondWord);
     }
 
     private static int GetPrefixLength(string firstWord, string secondWord)
@@ -51,8 +51,8 @@ internal sealed class JaroWinkler : AbstractStringMetric
         {
             return 4;
         }
-        int num = MathFunctions.MinOf3(4, firstWord.Length, secondWord.Length);
-        for (int i = 0; i < num; i++)
+        var num = MathFunctions.MinOf3(4, firstWord.Length, secondWord.Length);
+        for (var i = 0; i < num; i++)
         {
             if (firstWord[i] != secondWord[i])
             {

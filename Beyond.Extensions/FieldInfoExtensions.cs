@@ -15,6 +15,11 @@ public static class FieldInfoExtensions
         return lambda.Compile();
     }
 
+    public static bool IsReadOnly(this FieldInfo field)
+    {
+        return field.IsInitOnly || field.IsLiteral;
+    }
+
     public static Action<TTarget, TField> SetField<TTarget, TField>(this FieldInfo field)
     {
         var target = Expression.Parameter(typeof(TTarget), "target");

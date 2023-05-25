@@ -8,14 +8,14 @@ internal sealed class TokeniserWhitespace : ITokeniser
     private ITermHandler stopWordHandler = new DummyStopTermHandler();
     private TokeniserUtilities<string> tokenUtilities = new TokeniserUtilities<string>();
 
-    public string Delimiters => this.delimiters;
+    public string Delimiters => delimiters;
 
     public string ShortDescriptionString => "TokeniserWhitespace";
 
     public ITermHandler StopWordHandler
     {
-        get => this.stopWordHandler;
-        set => this.stopWordHandler = value;
+        get => stopWordHandler;
+        set => stopWordHandler = value;
     }
 
     public Collection<string> Tokenize(string word)
@@ -24,24 +24,24 @@ internal sealed class TokeniserWhitespace : ITokeniser
         if (word != null)
         {
             int length;
-            for (int i = 0; i < word.Length; i = length)
+            for (var i = 0; i < word.Length; i = length)
             {
-                char c = word[i];
+                var c = word[i];
                 if (char.IsWhiteSpace(c))
                 {
                     i++;
                 }
                 length = word.Length;
-                for (int j = 0; j < this.delimiters.Length; j++)
+                for (var j = 0; j < delimiters.Length; j++)
                 {
-                    int index = word.IndexOf(this.delimiters[j], i);
+                    var index = word.IndexOf(delimiters[j], i);
                     if ((index < length) && (index != -1))
                     {
                         length = index;
                     }
                 }
-                string termToTest = word.Substring(i, length - i);
-                if (!this.stopWordHandler.IsWord(termToTest))
+                var termToTest = word.Substring(i, length - i);
+                if (!stopWordHandler.IsWord(termToTest))
                 {
                     collection.Add(termToTest);
                 }
@@ -54,7 +54,7 @@ internal sealed class TokeniserWhitespace : ITokeniser
     {
         if (word != null)
         {
-            return this.tokenUtilities.CreateSet(this.Tokenize(word));
+            return tokenUtilities.CreateSet(Tokenize(word));
         }
         return null;
     }

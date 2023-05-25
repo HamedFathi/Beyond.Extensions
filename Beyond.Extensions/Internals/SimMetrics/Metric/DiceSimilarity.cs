@@ -15,9 +15,9 @@ internal sealed class DiceSimilarity : AbstractStringMetric
 
     public DiceSimilarity(ITokeniser tokeniserToUse)
     {
-        this.estimatedTimingConstant = 3.4457139008736704E-07;
-        this.tokeniser = tokeniserToUse;
-        this.tokenUtilities = new TokeniserUtilities<string>();
+        estimatedTimingConstant = 3.4457139008736704E-07;
+        tokeniser = tokeniserToUse;
+        tokenUtilities = new TokeniserUtilities<string>();
     }
 
     public override string LongDescriptionString => "Implements the DiceSimilarity algorithm providing a similarity measure between two strings using the vector space of present terms";
@@ -26,9 +26,9 @@ internal sealed class DiceSimilarity : AbstractStringMetric
 
     public override double GetSimilarity(string firstWord, string secondWord)
     {
-        if (((firstWord != null) && (secondWord != null)) && (this.tokenUtilities.CreateMergedSet(this.tokeniser.Tokenize(firstWord), this.tokeniser.Tokenize(secondWord)).Count > 0))
+        if (((firstWord != null) && (secondWord != null)) && (tokenUtilities.CreateMergedSet(tokeniser.Tokenize(firstWord), tokeniser.Tokenize(secondWord)).Count > 0))
         {
-            return ((2.0 * this.tokenUtilities.CommonSetTerms()) / ((double)(this.tokenUtilities.FirstSetTokenCount + this.tokenUtilities.SecondSetTokenCount)));
+            return ((2.0 * tokenUtilities.CommonSetTerms()) / (tokenUtilities.FirstSetTokenCount + tokenUtilities.SecondSetTokenCount));
         }
         return 0.0;
     }
@@ -44,13 +44,13 @@ internal sealed class DiceSimilarity : AbstractStringMetric
         {
             double length = firstWord.Length;
             double num2 = secondWord.Length;
-            return ((length + num2) * ((length + num2) * this.estimatedTimingConstant));
+            return ((length + num2) * ((length + num2) * estimatedTimingConstant));
         }
         return 0.0;
     }
 
     public override double GetUnnormalisedSimilarity(string firstWord, string secondWord)
     {
-        return this.GetSimilarity(firstWord, secondWord);
+        return GetSimilarity(firstWord, secondWord);
     }
 }

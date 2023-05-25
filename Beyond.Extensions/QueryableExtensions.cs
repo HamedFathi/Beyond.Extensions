@@ -54,6 +54,7 @@ public static class QueryableExtensions
 
         return source ?? fallback;
     }
+
     public static IQueryable<TSource> FallbackIfNull<TSource>(this IQueryable<TSource> source, IEnumerable<TSource> fallback)
     {
         if (fallback == null)
@@ -73,14 +74,17 @@ public static class QueryableExtensions
     {
         return source.FallbackIfNull(fallback).FallbackIfEmpty(fallback);
     }
+
     public static IQueryable<TSource> FallbackIfNullOrEmpty<TSource>(this IQueryable<TSource> source, IEnumerable<TSource> fallback)
     {
         return source.FallbackIfNull(fallback).FallbackIfEmpty(fallback);
     }
+
     public static IQueryable<TSource> FallbackIfNullOrEmpty<TSource>(this IQueryable<TSource> source, params TSource[] fallback)
     {
         return source.FallbackIfNullOrEmpty((IEnumerable<TSource>)fallback);
     }
+
     public static IQueryable<TResult> FullOuterJoin<TLeft, TRight, TKey, TResult>(
         this IQueryable<TLeft> left,
         IQueryable<TRight> right,

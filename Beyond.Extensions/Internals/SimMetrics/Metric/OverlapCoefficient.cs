@@ -16,9 +16,9 @@ internal sealed class OverlapCoefficient : AbstractStringMetric
 
     public OverlapCoefficient(ITokeniser tokeniserToUse)
     {
-        this.estimatedTimingConstant = 0.00014000000373926014;
-        this.tokeniser = tokeniserToUse;
-        this.tokenUtilities = new TokeniserUtilities<string>();
+        estimatedTimingConstant = 0.00014000000373926014;
+        tokeniser = tokeniserToUse;
+        tokenUtilities = new TokeniserUtilities<string>();
     }
 
     public override string LongDescriptionString => "Implements the Overlap Coefficient algorithm providing a similarity measure between two string where it is determined to what degree a string is a subset of another";
@@ -29,8 +29,8 @@ internal sealed class OverlapCoefficient : AbstractStringMetric
     {
         if ((firstWord != null) && (secondWord != null))
         {
-            this.tokenUtilities.CreateMergedSet(this.tokeniser.Tokenize(firstWord), this.tokeniser.Tokenize(secondWord));
-            return (((double)this.tokenUtilities.CommonSetTerms()) / ((double)Math.Min(this.tokenUtilities.FirstSetTokenCount, this.tokenUtilities.SecondSetTokenCount)));
+            tokenUtilities.CreateMergedSet(tokeniser.Tokenize(firstWord), tokeniser.Tokenize(secondWord));
+            return (tokenUtilities.CommonSetTerms() / ((double)Math.Min(tokenUtilities.FirstSetTokenCount, tokenUtilities.SecondSetTokenCount)));
         }
         return 0.0;
     }
@@ -44,15 +44,15 @@ internal sealed class OverlapCoefficient : AbstractStringMetric
     {
         if ((firstWord != null) && (secondWord != null))
         {
-            double count = this.tokeniser.Tokenize(firstWord).Count;
-            double num2 = this.tokeniser.Tokenize(secondWord).Count;
-            return ((count * num2) * this.estimatedTimingConstant);
+            double count = tokeniser.Tokenize(firstWord).Count;
+            double num2 = tokeniser.Tokenize(secondWord).Count;
+            return ((count * num2) * estimatedTimingConstant);
         }
         return 0.0;
     }
 
     public override double GetUnnormalisedSimilarity(string firstWord, string secondWord)
     {
-        return this.GetSimilarity(firstWord, secondWord);
+        return GetSimilarity(firstWord, secondWord);
     }
 }

@@ -3,6 +3,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
 
+using System.Net.Mail;
 using Beyond.Extensions.CharExtended;
 using Beyond.Extensions.Enums;
 using Beyond.Extensions.Internals.Base62;
@@ -991,7 +992,7 @@ public static class StringExtensions
         }
         try
         {
-            var address = new System.Net.Mail.MailAddress(email);
+            var address = new MailAddress(email);
             return address.Address == trimmedEmail;
         }
         catch
@@ -1007,7 +1008,7 @@ public static class StringExtensions
 
     public static bool IsValidNumber(this string number, CultureInfo culture)
     {
-        string _validNumberPattern =
+        var _validNumberPattern =
             @"^-?(?:\d+|\d{1,3}(?:"
             + culture.NumberFormat.NumberGroupSeparator +
             @"\d{3})+)?(?:\"
@@ -1236,7 +1237,7 @@ public static class StringExtensions
         var rootParts = root.GetPathParts().ToList();
 
         var length = pathParts.Count > rootParts.Count ? rootParts.Count : pathParts.Count;
-        for (int i = 0; i < length; i++)
+        for (var i = 0; i < length; i++)
         {
             if (pathParts.First() == rootParts.First())
             {
@@ -1249,7 +1250,7 @@ public static class StringExtensions
             }
         }
 
-        for (int i = 0; i < rootParts.Count; i++)
+        for (var i = 0; i < rootParts.Count; i++)
         {
             pathParts.Insert(0, "..");
         }
@@ -1369,6 +1370,36 @@ public static class StringExtensions
         return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
     }
 
+    public static string RemoveDuplicateMatches(this string input, string pattern, bool keepFirst = true)
+    {
+        if (input == null)
+            throw new ArgumentNullException(nameof(input));
+
+        if (pattern == null)
+            throw new ArgumentNullException(nameof(pattern));
+
+        var matches = Regex.Matches(input, pattern)
+            .Select(m => m.Value)
+            .ToList();
+
+        var duplicates = matches.GroupBy(x => x)
+            .Where(g => g.Count() > 1)
+            .Select(g => g.Key)
+            .ToList();
+
+        foreach (var duplicate in duplicates)
+        {
+            var matchIndex = 0;
+            while ((matchIndex = input.IndexOf(duplicate, matchIndex, StringComparison.Ordinal)) != -1)
+            {
+                input = keepFirst ? input.Remove(matchIndex + duplicate.Length, duplicate.Length) : input.Remove(matchIndex, duplicate.Length);
+                matchIndex += duplicate.Length;
+            }
+        }
+
+        return input;
+    }
+
     public static string RemoveEmptyLines(this string text)
     {
         return Regex.Replace(text, @"^\s*$\n|\r", string.Empty, RegexOptions.Multiline).TrimEnd();
@@ -1418,36 +1449,6 @@ public static class StringExtensions
     public static string RemoveFirstCharacter(this string instr)
     {
         return instr.Substring(1);
-    }
-
-    public static string RemoveDuplicateMatches(this string input, string pattern, bool keepFirst = true) 
-    { 
-        if (input == null) 
-            throw new ArgumentNullException(nameof(input)); 
-             
-        if (pattern == null) 
-            throw new ArgumentNullException(nameof(pattern)); 
- 
-        var matches = Regex.Matches(input, pattern) 
-            .Select(m => m.Value) 
-            .ToList(); 
- 
-        var duplicates = matches.GroupBy(x => x) 
-            .Where(g => g.Count() > 1) 
-            .Select(g => g.Key) 
-            .ToList(); 
- 
-        foreach (var duplicate in duplicates) 
-        { 
-            var matchIndex = 0; 
-            while ((matchIndex = input.IndexOf(duplicate, matchIndex, StringComparison.Ordinal)) != -1)
-            {
-                input = keepFirst ? input.Remove(matchIndex + duplicate.Length, duplicate.Length) : input.Remove(matchIndex, duplicate.Length);
-                matchIndex += duplicate.Length;
-            } 
-        } 
- 
-        return input; 
     }
 
     public static string RemoveHtmlTags(this string htmlString)

@@ -2,10 +2,6 @@
 
 internal abstract class AbstractStringMetric : IStringMetric
 {
-    protected AbstractStringMetric()
-    {
-    }
-
     public abstract string LongDescriptionString { get; }
 
     public abstract string ShortDescriptionString { get; }
@@ -16,10 +12,10 @@ internal abstract class AbstractStringMetric : IStringMetric
         {
             return null;
         }
-        double[] numArray = new double[setRenamed.Length];
-        for (int i = 0; i < setRenamed.Length; i++)
+        var numArray = new double[setRenamed.Length];
+        for (var i = 0; i < setRenamed.Length; i++)
         {
-            numArray[i] = this.GetSimilarity(setRenamed[i], comparator);
+            numArray[i] = GetSimilarity(setRenamed[i], comparator);
         }
         return numArray;
     }
@@ -39,9 +35,9 @@ internal abstract class AbstractStringMetric : IStringMetric
         {
             numArray = new double[secondSet.Length];
         }
-        for (int i = 0; i < numArray.Length; i++)
+        for (var i = 0; i < numArray.Length; i++)
         {
-            numArray[i] = this.GetSimilarity(firstSet[i], secondSet[i]);
+            numArray[i] = GetSimilarity(firstSet[i], secondSet[i]);
         }
         return numArray;
     }
@@ -52,9 +48,9 @@ internal abstract class AbstractStringMetric : IStringMetric
 
     public long GetSimilarityTimingActual(string firstWord, string secondWord)
     {
-        long num = (DateTime.Now.Ticks - 0x89f7ff5f7b58000L) / 0x2710L;
-        this.GetSimilarity(firstWord, secondWord);
-        long num2 = (DateTime.Now.Ticks - 0x89f7ff5f7b58000L) / 0x2710L;
+        var num = (DateTime.Now.Ticks - 0x89f7ff5f7b58000L) / 0x2710L;
+        GetSimilarity(firstWord, secondWord);
+        var num2 = (DateTime.Now.Ticks - 0x89f7ff5f7b58000L) / 0x2710L;
         return (num2 - num);
     }
 

@@ -973,7 +973,7 @@ public static class DateTimeExtensions
 
     public static long ToUnixTimestamp(this DateTime date)
     {
-        long unixTimestamp = date.Ticks - new DateTime(1970, 1, 1).Ticks;
+        var unixTimestamp = date.Ticks - new DateTime(1970, 1, 1).Ticks;
         unixTimestamp /= TimeSpan.TicksPerSecond;
         return unixTimestamp;
     }
@@ -1025,7 +1025,7 @@ public static class DateTimeExtensions
 
     public static DateTime UnixTimestampToDateTime(this long unixTimestamp)
     {
-        DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         return epoch.AddSeconds(unixTimestamp);
     }
 

@@ -35,6 +35,6 @@ internal sealed class ChapmanLengthDeviation : AbstractStringMetric
 
     public override double GetUnnormalisedSimilarity(string firstWord, string secondWord)
     {
-        return this.GetSimilarity(firstWord, secondWord);
+        return GetSimilarity(firstWord, secondWord);
     }
 }

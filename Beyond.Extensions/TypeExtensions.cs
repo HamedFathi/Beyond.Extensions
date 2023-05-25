@@ -30,6 +30,7 @@ public static class TypeExtensions
         typeof(uint?),
         typeof(ulong?)
     };
+
     public static bool CanBeCastTo<T>(this Type? type)
     {
         if (type == null)
@@ -291,6 +292,25 @@ public static class TypeExtensions
         return type.GetTypeInfo().GetCustomAttributes<T>().FirstOrDefault();
     }
 
+    public static AttributeTargets GetAttributeTargets(this Type attributeType)
+    {
+        if (!typeof(Attribute).IsAssignableFrom(attributeType))
+        {
+            throw new ArgumentException("Specified type must be an Attribute.", nameof(attributeType));
+        }
+        var attributeUsage = attributeType.GetCustomAttribute<AttributeUsageAttribute>();
+        if (attributeUsage == null)
+        {
+            throw new InvalidOperationException($"{attributeType.FullName} does not have an AttributeUsageAttribute.");
+        }
+        return attributeUsage.ValidOn;
+    }
+
+    public static string[] GetAttributeTargetsAsString(this Type attributeType)
+    {
+        return attributeType.GetAttributeTargets().ToString().Split(',').Select(x => x.Trim()).ToArray();
+    }
+
     public static TValue? GetAttributeValue<TAttribute, TValue>(this Type type, string memberName, Func<TAttribute, TValue> valueSelector, bool inherit = false) where TAttribute : Attribute
     {
         if (type.GetMember(memberName).FirstOrDefault()?.GetCustomAttributes(typeof(TAttribute), inherit).FirstOrDefault() is TAttribute att)
@@ -299,6 +319,7 @@ public static class TypeExtensions
         }
         return default;
     }
+
     public static string GetCleanName(this Type typeRef, GenericPresentationMode genericMode = GenericPresentationMode.Normal, bool fullName = false)
     {
         var name = GetCleanedName(typeRef, fullName);
@@ -376,7 +397,7 @@ public static class TypeExtensions
         {
             throw new ArgumentException("Type must be an enumeration.");
         }
-        Array enumValues = Enum.GetValues(enumType);
+        var enumValues = Enum.GetValues(enumType);
         foreach (var val in enumValues)
         {
             yield return val.ToString();
@@ -395,7 +416,7 @@ public static class TypeExtensions
             throw new ArgumentException("Type must be an enumeration.");
         }
 
-        Array enumValues = Enum.GetValues(enumType);
+        var enumValues = Enum.GetValues(enumType);
 
         foreach (var val in enumValues)
         {
@@ -406,7 +427,6 @@ public static class TypeExtensions
     public static string GetEnumValuesAsString(this Type enumType, string separator = ", ")
     {
         return string.Join(separator, enumType.GetEnumValues());
-
     }
 
     public static string? GetFullName(this Type type)
@@ -584,28 +604,6 @@ public static class TypeExtensions
         }
     }
 
-    public static ReflectionTypeKind GetKind(this Type type)
-    {
-        if (type.IsClass)
-        {
-            return ReflectionTypeKind.Class;
-        }
-
-        if (type.IsInterface)
-        {
-            return ReflectionTypeKind.Interface;
-        }
-        if (type.IsEnum)
-        {
-            return ReflectionTypeKind.Enum;
-        }
-        if (type.IsValueType)
-        {
-            return ReflectionTypeKind.ValueType;
-        }
-        throw new ArgumentException("Invalid type");
-    }
-
     public static MethodInfo? GetMethodInfo(this Type source, string methodName, BindingFlags bindingFlags, params Type[] parametersTypes)
     {
         return source.GetMethod(methodName, bindingFlags, parametersTypes);
@@ -649,9 +647,32 @@ public static class TypeExtensions
 
         return interfaces.Distinct();
     }
+
     public static string GetPrettyName(this Type type)
     {
         return GetPrettyNameOf(type, new List<Type>());
+    }
+
+    public static ReflectionTypeKind GetReflectionTypeKind(this Type type)
+    {
+        if (type.IsClass)
+        {
+            return ReflectionTypeKind.Class;
+        }
+
+        if (type.IsInterface)
+        {
+            return ReflectionTypeKind.Interface;
+        }
+        if (type.IsEnum)
+        {
+            return ReflectionTypeKind.Enum;
+        }
+        if (type.IsValueType)
+        {
+            return ReflectionTypeKind.ValueType;
+        }
+        throw new ArgumentException("Invalid type");
     }
 
     public static bool HasAttribute<T>(this Type type) where T : Attribute
@@ -1176,6 +1197,7 @@ public static class TypeExtensions
     {
         return type.PrettyPrint(t => t.Name);
     }
+
     public static string PrettyPrint(this Type type, Func<Type, string> selector)
     {
         var typeName = selector(type);

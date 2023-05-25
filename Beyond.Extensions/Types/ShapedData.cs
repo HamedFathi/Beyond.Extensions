@@ -1,5 +1,6 @@
 ﻿namespace Beyond.Extensions.Types;
 
+[Serializable]
 public class ShapedData
 {
     public ShapedData()

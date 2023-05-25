@@ -17,20 +17,20 @@ internal sealed class Jaro : AbstractStringMetric
         {
             return 0.0;
         }
-        int distanceSep = (Math.Min(firstWord.Length, secondWord.Length) / 2) + 1;
-        StringBuilder builder = GetCommonCharacters(firstWord, secondWord, distanceSep);
-        int length = builder.Length;
+        var distanceSep = (Math.Min(firstWord.Length, secondWord.Length) / 2) + 1;
+        var builder = GetCommonCharacters(firstWord, secondWord, distanceSep);
+        var length = builder.Length;
         if (length == 0)
         {
             return 0.0;
         }
-        StringBuilder builder2 = GetCommonCharacters(secondWord, firstWord, distanceSep);
+        var builder2 = GetCommonCharacters(secondWord, firstWord, distanceSep);
         if (length != builder2.Length)
         {
             return 0.0;
         }
-        int num3 = 0;
-        for (int i = 0; i < length; i++)
+        var num3 = 0;
+        for (var i = 0; i < length; i++)
         {
             if (builder[i] != builder2[i])
             {
@@ -38,7 +38,7 @@ internal sealed class Jaro : AbstractStringMetric
             }
         }
         num3 /= 2;
-        return (((((double)length) / (3.0 * firstWord.Length)) + (((double)length) / (3.0 * secondWord.Length))) + (((double)(length - num3)) / (3.0 * length)));
+        return (((length / (3.0 * firstWord.Length)) + (length / (3.0 * secondWord.Length))) + ((length - num3) / (3.0 * length)));
     }
 
     public override string GetSimilarityExplained(string firstWord, string secondWord)
@@ -52,14 +52,14 @@ internal sealed class Jaro : AbstractStringMetric
         {
             double length = firstWord.Length;
             double num2 = secondWord.Length;
-            return ((length * num2) * this.estimatedTimingConstant);
+            return ((length * num2) * estimatedTimingConstant);
         }
         return 0.0;
     }
 
     public override double GetUnnormalisedSimilarity(string firstWord, string secondWord)
     {
-        return this.GetSimilarity(firstWord, secondWord);
+        return GetSimilarity(firstWord, secondWord);
     }
 
     private static StringBuilder GetCommonCharacters(string firstWord, string secondWord, int distanceSep)
@@ -68,13 +68,13 @@ internal sealed class Jaro : AbstractStringMetric
         {
             return null;
         }
-        StringBuilder builder = new StringBuilder();
-        StringBuilder builder2 = new StringBuilder(secondWord);
-        for (int i = 0; i < firstWord.Length; i++)
+        var builder = new StringBuilder();
+        var builder2 = new StringBuilder(secondWord);
+        for (var i = 0; i < firstWord.Length; i++)
         {
-            char ch = firstWord[i];
-            bool flag = false;
-            for (int j = Math.Max(0, i - distanceSep); !flag && (j < Math.Min(i + distanceSep, secondWord.Length)); j++)
+            var ch = firstWord[i];
+            var flag = false;
+            for (var j = Math.Max(0, i - distanceSep); !flag && (j < Math.Min(i + distanceSep, secondWord.Length)); j++)
             {
                 if (builder2[j] == ch)
                 {

@@ -26,20 +26,20 @@ internal sealed class SmithWaterman : AbstractStringMetric
 
     public SmithWaterman(double costG, AbstractSubstitutionCost costFunction)
     {
-        this.gapCost = costG;
-        this.dCostFunction = costFunction;
+        gapCost = costG;
+        dCostFunction = costFunction;
     }
 
     public AbstractSubstitutionCost DCostFunction
     {
-        get => this.dCostFunction;
-        set => this.DCostFunction = value;
+        get => dCostFunction;
+        set => DCostFunction = value;
     }
 
     public double GapCost
     {
-        get => this.gapCost;
-        set => this.gapCost = value;
+        get => gapCost;
+        set => gapCost = value;
     }
 
     public override string LongDescriptionString => "Implements the Smith-Waterman algorithm providing a similarity measure between two string";
@@ -52,15 +52,15 @@ internal sealed class SmithWaterman : AbstractStringMetric
         {
             return 0.0;
         }
-        double unnormalisedSimilarity = this.GetUnnormalisedSimilarity(firstWord, secondWord);
+        var unnormalisedSimilarity = GetUnnormalisedSimilarity(firstWord, secondWord);
         double num2 = Math.Min(firstWord.Length, secondWord.Length);
-        if (this.dCostFunction.MaxCost > -this.gapCost)
+        if (dCostFunction.MaxCost > -gapCost)
         {
-            num2 *= this.dCostFunction.MaxCost;
+            num2 *= dCostFunction.MaxCost;
         }
         else
         {
-            num2 *= -this.gapCost;
+            num2 *= -gapCost;
         }
         if (num2 == 0.0)
         {
@@ -91,60 +91,60 @@ internal sealed class SmithWaterman : AbstractStringMetric
         {
             return 0.0;
         }
-        int length = firstWord.Length;
-        int num2 = secondWord.Length;
+        var length = firstWord.Length;
+        var num2 = secondWord.Length;
         if (length == 0)
         {
-            return (double)num2;
+            return num2;
         }
         if (num2 == 0)
         {
-            return (double)length;
+            return length;
         }
         double[][] numArray = new double[length][];
-        for (int i = 0; i < length; i++)
+        for (var i = 0; i < length; i++)
         {
             numArray[i] = new double[num2];
         }
-        double num4 = 0.0;
-        for (int j = 0; j < length; j++)
+        var num4 = 0.0;
+        for (var j = 0; j < length; j++)
         {
-            double thirdNumber = this.dCostFunction.GetCost(firstWord, j, secondWord, 0);
+            var thirdNumber = dCostFunction.GetCost(firstWord, j, secondWord, 0);
             if (j == 0)
             {
-                numArray[0][0] = MathFunctions.MaxOf3(0.0, -this.gapCost, thirdNumber);
+                numArray[0][0] = MathFunctions.MaxOf3(0.0, -gapCost, thirdNumber);
             }
             else
             {
-                numArray[j][0] = MathFunctions.MaxOf3(0.0, numArray[j - 1][0] - this.gapCost, thirdNumber);
+                numArray[j][0] = MathFunctions.MaxOf3(0.0, numArray[j - 1][0] - gapCost, thirdNumber);
             }
             if (numArray[j][0] > num4)
             {
                 num4 = numArray[j][0];
             }
         }
-        for (int k = 0; k < num2; k++)
+        for (var k = 0; k < num2; k++)
         {
-            double num8 = this.dCostFunction.GetCost(firstWord, 0, secondWord, k);
+            var num8 = dCostFunction.GetCost(firstWord, 0, secondWord, k);
             if (k == 0)
             {
-                numArray[0][0] = MathFunctions.MaxOf3(0.0, -this.gapCost, num8);
+                numArray[0][0] = MathFunctions.MaxOf3(0.0, -gapCost, num8);
             }
             else
             {
-                numArray[0][k] = MathFunctions.MaxOf3(0.0, numArray[0][k - 1] - this.gapCost, num8);
+                numArray[0][k] = MathFunctions.MaxOf3(0.0, numArray[0][k - 1] - gapCost, num8);
             }
             if (numArray[0][k] > num4)
             {
                 num4 = numArray[0][k];
             }
         }
-        for (int m = 1; m < length; m++)
+        for (var m = 1; m < length; m++)
         {
-            for (int n = 1; n < num2; n++)
+            for (var n = 1; n < num2; n++)
             {
-                double num11 = this.dCostFunction.GetCost(firstWord, m, secondWord, n);
-                numArray[m][n] = MathFunctions.MaxOf4(0.0, numArray[m - 1][n] - this.gapCost, numArray[m][n - 1] - this.gapCost, numArray[m - 1][n - 1] + num11);
+                var num11 = dCostFunction.GetCost(firstWord, m, secondWord, n);
+                numArray[m][n] = MathFunctions.MaxOf4(0.0, numArray[m - 1][n] - gapCost, numArray[m][n - 1] - gapCost, numArray[m - 1][n - 1] + num11);
                 if (numArray[m][n] > num4)
                 {
                     num4 = numArray[m][n];

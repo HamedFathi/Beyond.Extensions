@@ -27,6 +27,6 @@ internal sealed class SubCostRange1ToMinus2 : AbstractSubstitutionCost
         {
             return -2.0;
         }
-        return ((firstWord[firstWordIndex] != secondWord[secondWordIndex]) ? ((double)(-2)) : ((double)1));
+        return ((firstWord[firstWordIndex] != secondWord[secondWordIndex]) ? -2 : ((double)1));
     }
 }

@@ -486,6 +486,7 @@ public static class EnumerableExtensions
 
         return source ?? fallback;
     }
+
     public static IEnumerable<TSource> FallbackIfNull<TSource>(this IEnumerable<TSource> source, params TSource[] fallback)
     {
         return source ?? fallback;
@@ -495,10 +496,12 @@ public static class EnumerableExtensions
     {
         return source.FallbackIfNull(fallback).FallbackIfEmpty(fallback);
     }
+
     public static IEnumerable<TSource> FallbackIfNullOrEmpty<TSource>(this IEnumerable<TSource> source, params TSource[] fallback)
     {
         return source.FallbackIfNull(fallback).FallbackIfEmpty(fallback);
     }
+
     public static List<T> FindAll<T>(this IEnumerable<T> list, Func<T, bool> predicate)
     {
         if (predicate == null) throw new ArgumentNullException(nameof(predicate));

@@ -5,6 +5,7 @@
 using Beyond.Extensions.ObjectExtended;
 using Beyond.Extensions.StringExtended;
 using Beyond.Extensions.TypeExtended;
+using DataTableExtensions = Beyond.Extensions.DataTableExtended.DataTableExtensions;
 
 namespace Beyond.Extensions.DataRowExtended;
 
@@ -213,7 +214,7 @@ public static class DataRowExtensions
         if (columnName.IsNullOrEmpty()) throw new ArgumentNullException(nameof(columnName));
         if (!@this.HasColumn(columnName)) throw new ArgumentException("column not exist", nameof(columnName));
         if (typeof(T) == null) throw new ArgumentNullException(nameof(T));
-        if (typeof(T).NotIn(DataTableExtended.DataTableExtensions.SupportedDataTypes))
+        if (typeof(T).NotIn(DataTableExtensions.SupportedDataTypes))
             throw new ArgumentException("type not supported", nameof(T));
         try
         {

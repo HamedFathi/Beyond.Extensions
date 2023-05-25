@@ -15,9 +15,9 @@ internal sealed class CosineSimilarity : AbstractStringMetric
 
     public CosineSimilarity(ITokeniser tokeniserToUse)
     {
-        this.estimatedTimingConstant = 3.8337140040312079E-07;
-        this.tokeniser = tokeniserToUse;
-        this.tokenUtilities = new TokeniserUtilities<string>();
+        estimatedTimingConstant = 3.8337140040312079E-07;
+        tokeniser = tokeniserToUse;
+        tokenUtilities = new TokeniserUtilities<string>();
     }
 
     public override string LongDescriptionString => "Implements the Cosine Similarity algorithm providing a similarity measure between two strings from the angular divergence within term based vector space";
@@ -26,9 +26,9 @@ internal sealed class CosineSimilarity : AbstractStringMetric
 
     public override double GetSimilarity(string firstWord, string secondWord)
     {
-        if (((firstWord != null) && (secondWord != null)) && (this.tokenUtilities.CreateMergedSet(this.tokeniser.Tokenize(firstWord), this.tokeniser.Tokenize(secondWord)).Count > 0))
+        if (((firstWord != null) && (secondWord != null)) && (tokenUtilities.CreateMergedSet(tokeniser.Tokenize(firstWord), tokeniser.Tokenize(secondWord)).Count > 0))
         {
-            return (((double)this.tokenUtilities.CommonSetTerms()) / (Math.Pow((double)this.tokenUtilities.FirstSetTokenCount, 0.5) * Math.Pow((double)this.tokenUtilities.SecondSetTokenCount, 0.5)));
+            return (tokenUtilities.CommonSetTerms() / (Math.Pow(tokenUtilities.FirstSetTokenCount, 0.5) * Math.Pow(tokenUtilities.SecondSetTokenCount, 0.5)));
         }
         return 0.0;
     }
@@ -44,13 +44,13 @@ internal sealed class CosineSimilarity : AbstractStringMetric
         {
             double length = firstWord.Length;
             double num2 = secondWord.Length;
-            return ((length + num2) * ((length + num2) * this.estimatedTimingConstant));
+            return ((length + num2) * ((length + num2) * estimatedTimingConstant));
         }
         return 0.0;
     }
 
     public override double GetUnnormalisedSimilarity(string firstWord, string secondWord)
     {
-        return this.GetSimilarity(firstWord, secondWord);
+        return GetSimilarity(firstWord, secondWord);
     }
 }

@@ -16,23 +16,23 @@ internal class MongeElkan : AbstractStringMetric
 
     public MongeElkan(AbstractStringMetric metricToUse)
     {
-        this.estimatedTimingConstant = 0.034400001168251038;
-        this.tokeniser = new TokeniserWhitespace();
-        this.internalStringMetric = metricToUse;
+        estimatedTimingConstant = 0.034400001168251038;
+        tokeniser = new TokeniserWhitespace();
+        internalStringMetric = metricToUse;
     }
 
     public MongeElkan(ITokeniser tokeniserToUse)
     {
-        this.estimatedTimingConstant = 0.034400001168251038;
-        this.tokeniser = tokeniserToUse;
-        this.internalStringMetric = new SmithWatermanGotoh();
+        estimatedTimingConstant = 0.034400001168251038;
+        tokeniser = tokeniserToUse;
+        internalStringMetric = new SmithWatermanGotoh();
     }
 
     public MongeElkan(ITokeniser tokeniserToUse, AbstractStringMetric metricToUse)
     {
-        this.estimatedTimingConstant = 0.034400001168251038;
-        this.tokeniser = tokeniserToUse;
-        this.internalStringMetric = metricToUse;
+        estimatedTimingConstant = 0.034400001168251038;
+        tokeniser = tokeniserToUse;
+        internalStringMetric = metricToUse;
     }
 
     public override string LongDescriptionString => "Implements the Monge Elkan algorithm providing an matching style similarity measure between two strings";
@@ -45,17 +45,17 @@ internal class MongeElkan : AbstractStringMetric
         {
             return 0.0;
         }
-        Collection<string> collection = this.tokeniser.Tokenize(firstWord);
-        Collection<string> collection2 = this.tokeniser.Tokenize(secondWord);
-        double num = 0.0;
-        for (int i = 0; i < collection.Count; i++)
+        Collection<string> collection = tokeniser.Tokenize(firstWord);
+        Collection<string> collection2 = tokeniser.Tokenize(secondWord);
+        var num = 0.0;
+        for (var i = 0; i < collection.Count; i++)
         {
-            string str = collection[i];
-            double num3 = 0.0;
-            for (int j = 0; j < collection2.Count; j++)
+            var str = collection[i];
+            var num3 = 0.0;
+            for (var j = 0; j < collection2.Count; j++)
             {
-                string str2 = collection2[j];
-                double similarity = this.internalStringMetric.GetSimilarity(str, str2);
+                var str2 = collection2[j];
+                var similarity = internalStringMetric.GetSimilarity(str, str2);
                 if (similarity > num3)
                 {
                     num3 = similarity;
@@ -63,7 +63,7 @@ internal class MongeElkan : AbstractStringMetric
             }
             num += num3;
         }
-        return (num / ((double)collection.Count));
+        return (num / collection.Count);
     }
 
     public override string GetSimilarityExplained(string firstWord, string secondWord)
@@ -75,15 +75,15 @@ internal class MongeElkan : AbstractStringMetric
     {
         if ((firstWord != null) && (secondWord != null))
         {
-            double count = this.tokeniser.Tokenize(firstWord).Count;
-            double num2 = this.tokeniser.Tokenize(secondWord).Count;
-            return ((((count + num2) * count) + ((count + num2) * num2)) * this.estimatedTimingConstant);
+            double count = tokeniser.Tokenize(firstWord).Count;
+            double num2 = tokeniser.Tokenize(secondWord).Count;
+            return ((((count + num2) * count) + ((count + num2) * num2)) * estimatedTimingConstant);
         }
         return 0.0;
     }
 
     public override double GetUnnormalisedSimilarity(string firstWord, string secondWord)
     {
-        return this.GetSimilarity(firstWord, secondWord);
+        return GetSimilarity(firstWord, secondWord);
     }
 }

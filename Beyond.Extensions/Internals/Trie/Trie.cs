@@ -8,7 +8,7 @@ internal class Trie
     {
         var node = _root;
 
-        foreach (char c in word)
+        foreach (var c in word)
         {
             if (!node.Children.ContainsKey(c))
                 node.Children[c] = new TrieNode();
@@ -23,7 +23,7 @@ internal class Trie
     {
         var node = _root;
         word = ignorecase ? word.ToLower() : word;
-        foreach (char c in word)
+        foreach (var c in word)
         {
             var cc = ignorecase ? Char.ToLower(c) : c;
             if (!node.Children.ContainsKey(cc))

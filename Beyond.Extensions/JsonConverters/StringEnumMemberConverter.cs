@@ -98,7 +98,7 @@ public class StringEnumMemberConverter : JsonConverterFactory
                 {
                     var calculatedValue = 0UL;
 
-                    var flagValues = enumString.Split(new string[] { ", " }, StringSplitOptions.None);
+                    var flagValues = enumString.Split(new[] { ", " }, StringSplitOptions.None);
                     foreach (var flagValue in flagValues)
                     {
                         // Case sensitive search attempted first.

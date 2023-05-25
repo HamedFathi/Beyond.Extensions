@@ -2,10 +2,6 @@
 
 internal abstract class AbstractAffineGapCost : IAffineGapCost
 {
-    protected AbstractAffineGapCost()
-    {
-    }
-
     public abstract double MaxCost { get; }
 
     public abstract double MinCost { get; }

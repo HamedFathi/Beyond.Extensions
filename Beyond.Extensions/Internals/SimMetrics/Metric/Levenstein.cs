@@ -20,7 +20,7 @@ internal sealed class Levenstein : AbstractStringMetric
         {
             return 0.0;
         }
-        double unnormalisedSimilarity = this.GetUnnormalisedSimilarity(firstWord, secondWord);
+        var unnormalisedSimilarity = GetUnnormalisedSimilarity(firstWord, secondWord);
         double length = firstWord.Length;
         if (length < secondWord.Length)
         {
@@ -44,7 +44,7 @@ internal sealed class Levenstein : AbstractStringMetric
         {
             double length = firstWord.Length;
             double num2 = secondWord.Length;
-            return ((length * num2) * this.estimatedTimingConstant);
+            return ((length * num2) * estimatedTimingConstant);
         }
         return 0.0;
     }
@@ -55,35 +55,35 @@ internal sealed class Levenstein : AbstractStringMetric
         {
             return 0.0;
         }
-        int length = firstWord.Length;
-        int index = secondWord.Length;
+        var length = firstWord.Length;
+        var index = secondWord.Length;
         if (length == 0)
         {
-            return (double)index;
+            return index;
         }
         if (index == 0)
         {
-            return (double)length;
+            return length;
         }
         double[][] numArray = new double[length + 1][];
-        for (int i = 0; i < (length + 1); i++)
+        for (var i = 0; i < (length + 1); i++)
         {
             numArray[i] = new double[index + 1];
         }
-        for (int j = 0; j <= length; j++)
+        for (var j = 0; j <= length; j++)
         {
             numArray[j][0] = j;
         }
-        for (int k = 0; k <= index; k++)
+        for (var k = 0; k <= index; k++)
         {
             numArray[0][k] = k;
         }
-        for (int m = 1; m <= length; m++)
+        for (var m = 1; m <= length; m++)
         {
-            for (int n = 1; n <= index; n++)
+            for (var n = 1; n <= index; n++)
             {
-                double num8 = this.dCostFunction.GetCost(firstWord, m - 1, secondWord, n - 1);
-                numArray[m][n] = MathFunctions.MinOf3((double)(numArray[m - 1][n] + 1.0), (double)(numArray[m][n - 1] + 1.0), (double)(numArray[m - 1][n - 1] + num8));
+                var num8 = dCostFunction.GetCost(firstWord, m - 1, secondWord, n - 1);
+                numArray[m][n] = MathFunctions.MinOf3(numArray[m - 1][n] + 1.0, numArray[m][n - 1] + 1.0, numArray[m - 1][n - 1] + num8);
             }
         }
         return numArray[length][index];

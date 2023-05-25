@@ -9,7 +9,7 @@ public static class AsyncEnumeratorExtensions
 {
     public static async Task<int> CountAsync<T>(this IAsyncEnumerable<T> source)
     {
-        int count = 0;
+        var count = 0;
         await foreach (var item in source)
         {
             count++;
@@ -19,7 +19,7 @@ public static class AsyncEnumeratorExtensions
 
     public static async IAsyncEnumerable<T> SkipAsync<T>(this IAsyncEnumerable<T> source, int count)
     {
-        int skipped = 0;
+        var skipped = 0;
         await foreach (var item in source)
         {
             if (skipped++ < count) continue;
@@ -29,7 +29,7 @@ public static class AsyncEnumeratorExtensions
 
     public static async IAsyncEnumerable<T> TakeAsync<T>(this IAsyncEnumerable<T> source, int count)
     {
-        int taken = 0;
+        var taken = 0;
         await foreach (var item in source)
         {
             if (taken++ >= count) break;

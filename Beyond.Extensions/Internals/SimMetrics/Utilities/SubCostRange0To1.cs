@@ -17,7 +17,7 @@ internal sealed class SubCostRange0To1 : AbstractSubstitutionCost
     {
         if ((firstWord != null) && (secondWord != null))
         {
-            return ((firstWord[firstWordIndex] != secondWord[secondWordIndex]) ? ((double)1) : ((double)0));
+            return ((firstWord[firstWordIndex] != secondWord[secondWordIndex]) ? 1 : ((double)0));
         }
         return 0.0;
     }

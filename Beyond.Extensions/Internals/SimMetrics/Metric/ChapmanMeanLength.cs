@@ -23,7 +23,7 @@ internal sealed class ChapmanMeanLength : AbstractStringMetric
         {
             return 1.0;
         }
-        double num2 = (500.0 - num) / 500.0;
+        var num2 = (500.0 - num) / 500.0;
         return (1.0 - (((num2 * num2) * num2) * num2));
     }
 
@@ -39,6 +39,6 @@ internal sealed class ChapmanMeanLength : AbstractStringMetric
 
     public override double GetUnnormalisedSimilarity(string firstWord, string secondWord)
     {
-        return this.GetSimilarity(firstWord, secondWord);
+        return GetSimilarity(firstWord, secondWord);
     }
 }

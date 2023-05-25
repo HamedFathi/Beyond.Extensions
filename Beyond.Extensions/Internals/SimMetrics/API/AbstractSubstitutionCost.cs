@@ -2,10 +2,6 @@
 
 internal abstract class AbstractSubstitutionCost : ISubstitutionCost
 {
-    protected AbstractSubstitutionCost()
-    {
-    }
-
     public abstract double MaxCost { get; }
 
     public abstract double MinCost { get; }
