@@ -2,7 +2,7 @@
 
 public class ShortDateConverter : JsonConverter<DateTime>
 {
-    private readonly string serializationFormat;
+    private readonly string _serializationFormat;
 
     public ShortDateConverter() : this(null)
     {
@@ -10,7 +10,7 @@ public class ShortDateConverter : JsonConverter<DateTime>
 
     public ShortDateConverter(string serializationFormat)
     {
-        this.serializationFormat = serializationFormat ?? "yyyy-MM-dd";
+        this._serializationFormat = serializationFormat ?? "yyyy-MM-dd";
     }
 
     public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
@@ -20,5 +20,5 @@ public class ShortDateConverter : JsonConverter<DateTime>
     }
 
     public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
-        => writer.WriteStringValue(value.ToString(serializationFormat));
+        => writer.WriteStringValue(value.ToString(_serializationFormat));
 }

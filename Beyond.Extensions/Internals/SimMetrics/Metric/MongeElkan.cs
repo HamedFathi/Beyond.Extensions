@@ -5,10 +5,10 @@ namespace Beyond.Extensions.Internals.SimMetrics.Metric;
 
 internal class MongeElkan : AbstractStringMetric
 {
-    internal ITokeniser tokeniser;
-    private const double defaultMismatchScore = 0.0;
-    private double estimatedTimingConstant;
-    private AbstractStringMetric internalStringMetric;
+    internal ITokeniser Tokeniser;
+    private const double DefaultMismatchScore = 0.0;
+    private double _estimatedTimingConstant;
+    private AbstractStringMetric _internalStringMetric;
 
     public MongeElkan() : this(new TokeniserWhitespace())
     {
@@ -16,23 +16,23 @@ internal class MongeElkan : AbstractStringMetric
 
     public MongeElkan(AbstractStringMetric metricToUse)
     {
-        estimatedTimingConstant = 0.034400001168251038;
-        tokeniser = new TokeniserWhitespace();
-        internalStringMetric = metricToUse;
+        _estimatedTimingConstant = 0.034400001168251038;
+        Tokeniser = new TokeniserWhitespace();
+        _internalStringMetric = metricToUse;
     }
 
     public MongeElkan(ITokeniser tokeniserToUse)
     {
-        estimatedTimingConstant = 0.034400001168251038;
-        tokeniser = tokeniserToUse;
-        internalStringMetric = new SmithWatermanGotoh();
+        _estimatedTimingConstant = 0.034400001168251038;
+        Tokeniser = tokeniserToUse;
+        _internalStringMetric = new SmithWatermanGotoh();
     }
 
     public MongeElkan(ITokeniser tokeniserToUse, AbstractStringMetric metricToUse)
     {
-        estimatedTimingConstant = 0.034400001168251038;
-        tokeniser = tokeniserToUse;
-        internalStringMetric = metricToUse;
+        _estimatedTimingConstant = 0.034400001168251038;
+        Tokeniser = tokeniserToUse;
+        _internalStringMetric = metricToUse;
     }
 
     public override string LongDescriptionString => "Implements the Monge Elkan algorithm providing an matching style similarity measure between two strings";
@@ -41,12 +41,12 @@ internal class MongeElkan : AbstractStringMetric
 
     public override double GetSimilarity(string firstWord, string secondWord)
     {
-        if ((firstWord == null) || (secondWord == null))
+        if (firstWord == null || secondWord == null)
         {
             return 0.0;
         }
-        Collection<string> collection = tokeniser.Tokenize(firstWord);
-        Collection<string> collection2 = tokeniser.Tokenize(secondWord);
+        Collection<string> collection = Tokeniser.Tokenize(firstWord);
+        Collection<string> collection2 = Tokeniser.Tokenize(secondWord);
         var num = 0.0;
         for (var i = 0; i < collection.Count; i++)
         {
@@ -55,7 +55,7 @@ internal class MongeElkan : AbstractStringMetric
             for (var j = 0; j < collection2.Count; j++)
             {
                 var str2 = collection2[j];
-                var similarity = internalStringMetric.GetSimilarity(str, str2);
+                var similarity = _internalStringMetric.GetSimilarity(str, str2);
                 if (similarity > num3)
                 {
                     num3 = similarity;
@@ -63,7 +63,7 @@ internal class MongeElkan : AbstractStringMetric
             }
             num += num3;
         }
-        return (num / collection.Count);
+        return num / collection.Count;
     }
 
     public override string GetSimilarityExplained(string firstWord, string secondWord)
@@ -73,11 +73,11 @@ internal class MongeElkan : AbstractStringMetric
 
     public override double GetSimilarityTimingEstimated(string firstWord, string secondWord)
     {
-        if ((firstWord != null) && (secondWord != null))
+        if (firstWord != null && secondWord != null)
         {
-            double count = tokeniser.Tokenize(firstWord).Count;
-            double num2 = tokeniser.Tokenize(secondWord).Count;
-            return ((((count + num2) * count) + ((count + num2) * num2)) * estimatedTimingConstant);
+            double count = Tokeniser.Tokenize(firstWord).Count;
+            double num2 = Tokeniser.Tokenize(secondWord).Count;
+            return ((count + num2) * count + (count + num2) * num2) * _estimatedTimingConstant;
         }
         return 0.0;
     }

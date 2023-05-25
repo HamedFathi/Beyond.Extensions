@@ -8,7 +8,7 @@ internal abstract class AbstractStringMetric : IStringMetric
 
     public double[] BatchCompareSet(string[] setRenamed, string comparator)
     {
-        if ((setRenamed == null) || (comparator == null))
+        if (setRenamed == null || comparator == null)
         {
             return null;
         }
@@ -23,7 +23,7 @@ internal abstract class AbstractStringMetric : IStringMetric
     public double[] BatchCompareSets(string[] firstSet, string[] secondSet)
     {
         double[] numArray;
-        if ((firstSet == null) || (secondSet == null))
+        if (firstSet == null || secondSet == null)
         {
             return null;
         }
@@ -51,7 +51,7 @@ internal abstract class AbstractStringMetric : IStringMetric
         var num = (DateTime.Now.Ticks - 0x89f7ff5f7b58000L) / 0x2710L;
         GetSimilarity(firstWord, secondWord);
         var num2 = (DateTime.Now.Ticks - 0x89f7ff5f7b58000L) / 0x2710L;
-        return (num2 - num);
+        return num2 - num;
     }
 
     public abstract double GetSimilarityTimingEstimated(string firstWord, string secondWord);

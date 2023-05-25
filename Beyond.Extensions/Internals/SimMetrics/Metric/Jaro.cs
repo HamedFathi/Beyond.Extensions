@@ -4,8 +4,8 @@ namespace Beyond.Extensions.Internals.SimMetrics.Metric;
 
 internal sealed class Jaro : AbstractStringMetric
 {
-    private const double defaultMismatchScore = 0.0;
-    private double estimatedTimingConstant = 4.1200000850949436E-05;
+    private const double DefaultMismatchScore = 0.0;
+    private double _estimatedTimingConstant = 4.1200000850949436E-05;
 
     public override string LongDescriptionString => "Implements the Jaro algorithm providing a similarity measure between two strings allowing character transpositions to a degree";
 
@@ -13,11 +13,11 @@ internal sealed class Jaro : AbstractStringMetric
 
     public override double GetSimilarity(string firstWord, string secondWord)
     {
-        if ((firstWord == null) || (secondWord == null))
+        if (firstWord == null || secondWord == null)
         {
             return 0.0;
         }
-        var distanceSep = (Math.Min(firstWord.Length, secondWord.Length) / 2) + 1;
+        var distanceSep = Math.Min(firstWord.Length, secondWord.Length) / 2 + 1;
         var builder = GetCommonCharacters(firstWord, secondWord, distanceSep);
         var length = builder.Length;
         if (length == 0)
@@ -38,7 +38,7 @@ internal sealed class Jaro : AbstractStringMetric
             }
         }
         num3 /= 2;
-        return (((length / (3.0 * firstWord.Length)) + (length / (3.0 * secondWord.Length))) + ((length - num3) / (3.0 * length)));
+        return length / (3.0 * firstWord.Length) + length / (3.0 * secondWord.Length) + (length - num3) / (3.0 * length);
     }
 
     public override string GetSimilarityExplained(string firstWord, string secondWord)
@@ -48,11 +48,11 @@ internal sealed class Jaro : AbstractStringMetric
 
     public override double GetSimilarityTimingEstimated(string firstWord, string secondWord)
     {
-        if ((firstWord != null) && (secondWord != null))
+        if (firstWord != null && secondWord != null)
         {
             double length = firstWord.Length;
             double num2 = secondWord.Length;
-            return ((length * num2) * estimatedTimingConstant);
+            return length * num2 * _estimatedTimingConstant;
         }
         return 0.0;
     }
@@ -64,7 +64,7 @@ internal sealed class Jaro : AbstractStringMetric
 
     private static StringBuilder GetCommonCharacters(string firstWord, string secondWord, int distanceSep)
     {
-        if ((firstWord == null) || (secondWord == null))
+        if (firstWord == null || secondWord == null)
         {
             return null;
         }
@@ -74,7 +74,7 @@ internal sealed class Jaro : AbstractStringMetric
         {
             var ch = firstWord[i];
             var flag = false;
-            for (var j = Math.Max(0, i - distanceSep); !flag && (j < Math.Min(i + distanceSep, secondWord.Length)); j++)
+            for (var j = Math.Max(0, i - distanceSep); !flag && j < Math.Min(i + distanceSep, secondWord.Length); j++)
             {
                 if (builder2[j] == ch)
                 {

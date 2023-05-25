@@ -4,38 +4,38 @@ namespace Beyond.Extensions.Internals.SimMetrics.Utilities;
 
 internal sealed class SubCostRange5ToMinus3 : AbstractSubstitutionCost
 {
-    private const int charApproximateMatchScore = 3;
-    private const int charExactMatchScore = 5;
-    private const int charMismatchMatchScore = -3;
-    private Collection<string>[] approx = new Collection<string>[7];
+    private const int CharApproximateMatchScore = 3;
+    private const int CharExactMatchScore = 5;
+    private const int CharMismatchMatchScore = -3;
+    private Collection<string>[] _approx = new Collection<string>[7];
 
     public SubCostRange5ToMinus3()
     {
-        approx[0] = new Collection<string>();
-        approx[0].Add("d");
-        approx[0].Add("t");
-        approx[1] = new Collection<string>();
-        approx[1].Add("g");
-        approx[1].Add("j");
-        approx[2] = new Collection<string>();
-        approx[2].Add("l");
-        approx[2].Add("r");
-        approx[3] = new Collection<string>();
-        approx[3].Add("m");
-        approx[3].Add("n");
-        approx[4] = new Collection<string>();
-        approx[4].Add("b");
-        approx[4].Add("p");
-        approx[4].Add("v");
-        approx[5] = new Collection<string>();
-        approx[5].Add("a");
-        approx[5].Add("e");
-        approx[5].Add("i");
-        approx[5].Add("o");
-        approx[5].Add("u");
-        approx[6] = new Collection<string>();
-        approx[6].Add(",");
-        approx[6].Add(".");
+        _approx[0] = new Collection<string>();
+        _approx[0].Add("d");
+        _approx[0].Add("t");
+        _approx[1] = new Collection<string>();
+        _approx[1].Add("g");
+        _approx[1].Add("j");
+        _approx[2] = new Collection<string>();
+        _approx[2].Add("l");
+        _approx[2].Add("r");
+        _approx[3] = new Collection<string>();
+        _approx[3].Add("m");
+        _approx[3].Add("n");
+        _approx[4] = new Collection<string>();
+        _approx[4].Add("b");
+        _approx[4].Add("p");
+        _approx[4].Add("v");
+        _approx[5] = new Collection<string>();
+        _approx[5].Add("a");
+        _approx[5].Add("e");
+        _approx[5].Add("i");
+        _approx[5].Add("o");
+        _approx[5].Add("u");
+        _approx[6] = new Collection<string>();
+        _approx[6].Add(",");
+        _approx[6].Add(".");
     }
 
     public override double MaxCost => 5.0;
@@ -46,13 +46,13 @@ internal sealed class SubCostRange5ToMinus3 : AbstractSubstitutionCost
 
     public override double GetCost(string firstWord, int firstWordIndex, string secondWord, int secondWordIndex)
     {
-        if ((firstWord != null) && (secondWord != null))
+        if (firstWord != null && secondWord != null)
         {
-            if ((firstWord.Length <= firstWordIndex) || (firstWordIndex < 0))
+            if (firstWord.Length <= firstWordIndex || firstWordIndex < 0)
             {
                 return -3.0;
             }
-            if ((secondWord.Length <= secondWordIndex) || (secondWordIndex < 0))
+            if (secondWord.Length <= secondWordIndex || secondWordIndex < 0)
             {
                 return -3.0;
             }
@@ -64,9 +64,9 @@ internal sealed class SubCostRange5ToMinus3 : AbstractSubstitutionCost
             var item = ch.ToString().ToLowerInvariant();
             var ch2 = secondWord[secondWordIndex];
             var str2 = ch2.ToString().ToLowerInvariant();
-            for (var i = 0; i < approx.Length; i++)
+            for (var i = 0; i < _approx.Length; i++)
             {
-                if (approx[i].Contains(item) && approx[i].Contains(str2))
+                if (_approx[i].Contains(item) && _approx[i].Contains(str2))
                 {
                     return 3.0;
                 }

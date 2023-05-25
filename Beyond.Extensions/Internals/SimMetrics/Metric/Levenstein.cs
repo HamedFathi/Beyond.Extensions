@@ -5,10 +5,10 @@ namespace Beyond.Extensions.Internals.SimMetrics.Metric;
 
 internal sealed class Levenstein : AbstractStringMetric
 {
-    private const double defaultMismatchScore = 0.0;
-    private const double defaultPerfectMatchScore = 1.0;
-    private AbstractSubstitutionCost dCostFunction = new SubCostRange0To1();
-    private double estimatedTimingConstant = 0.00018000000272877514;
+    private const double DefaultMismatchScore = 0.0;
+    private const double DefaultPerfectMatchScore = 1.0;
+    private AbstractSubstitutionCost _dCostFunction = new SubCostRange0To1();
+    private double _estimatedTimingConstant = 0.00018000000272877514;
 
     public override string LongDescriptionString => "Implements the basic Levenstein algorithm providing a similarity measure between two strings";
 
@@ -16,7 +16,7 @@ internal sealed class Levenstein : AbstractStringMetric
 
     public override double GetSimilarity(string firstWord, string secondWord)
     {
-        if ((firstWord == null) || (secondWord == null))
+        if (firstWord == null || secondWord == null)
         {
             return 0.0;
         }
@@ -30,7 +30,7 @@ internal sealed class Levenstein : AbstractStringMetric
         {
             return 1.0;
         }
-        return (1.0 - (unnormalisedSimilarity / length));
+        return 1.0 - unnormalisedSimilarity / length;
     }
 
     public override string GetSimilarityExplained(string firstWord, string secondWord)
@@ -40,18 +40,18 @@ internal sealed class Levenstein : AbstractStringMetric
 
     public override double GetSimilarityTimingEstimated(string firstWord, string secondWord)
     {
-        if ((firstWord != null) && (secondWord != null))
+        if (firstWord != null && secondWord != null)
         {
             double length = firstWord.Length;
             double num2 = secondWord.Length;
-            return ((length * num2) * estimatedTimingConstant);
+            return length * num2 * _estimatedTimingConstant;
         }
         return 0.0;
     }
 
     public override double GetUnnormalisedSimilarity(string firstWord, string secondWord)
     {
-        if ((firstWord == null) || (secondWord == null))
+        if (firstWord == null || secondWord == null)
         {
             return 0.0;
         }
@@ -66,7 +66,7 @@ internal sealed class Levenstein : AbstractStringMetric
             return length;
         }
         double[][] numArray = new double[length + 1][];
-        for (var i = 0; i < (length + 1); i++)
+        for (var i = 0; i < length + 1; i++)
         {
             numArray[i] = new double[index + 1];
         }
@@ -82,7 +82,7 @@ internal sealed class Levenstein : AbstractStringMetric
         {
             for (var n = 1; n <= index; n++)
             {
-                var num8 = dCostFunction.GetCost(firstWord, m - 1, secondWord, n - 1);
+                var num8 = _dCostFunction.GetCost(firstWord, m - 1, secondWord, n - 1);
                 numArray[m][n] = MathFunctions.MinOf3(numArray[m - 1][n] + 1.0, numArray[m][n - 1] + 1.0, numArray[m - 1][n - 1] + num8);
             }
         }

@@ -93,19 +93,19 @@ public static partial class ObjectExtensions
     internal class ArrayTraverse
     {
         internal int[] Position;
-        private readonly int[] maxLengths;
+        private readonly int[] _maxLengths;
 
         internal ArrayTraverse(Array array)
         {
-            maxLengths = new int[array.Rank];
-            for (var i = 0; i < array.Rank; ++i) maxLengths[i] = array.GetLength(i) - 1;
+            _maxLengths = new int[array.Rank];
+            for (var i = 0; i < array.Rank; ++i) _maxLengths[i] = array.GetLength(i) - 1;
             Position = new int[array.Rank];
         }
 
         internal bool Step()
         {
             for (var i = 0; i < Position.Length; ++i)
-                if (Position[i] < maxLengths[i])
+                if (Position[i] < _maxLengths[i])
                 {
                     Position[i]++;
                     for (var j = 0; j < i; j++) Position[j] = 0;

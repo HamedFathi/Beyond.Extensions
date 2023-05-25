@@ -5,21 +5,21 @@ namespace Beyond.Extensions.Internals.SimMetrics.Metric;
 
 internal sealed class JaroWinkler : AbstractStringMetric
 {
-    private const int minPrefixTestLength = 4;
-    private const double prefixAdustmentScale = 0.10000000149011612;
-    private double estimatedTimingConstant = 4.3420001020422205E-05;
-    private AbstractStringMetric jaroStringMetric = new Jaro();
+    private const int MinPrefixTestLength = 4;
+    private const double PrefixAdustmentScale = 0.10000000149011612;
+    private double _estimatedTimingConstant = 4.3420001020422205E-05;
+    private AbstractStringMetric _jaroStringMetric = new Jaro();
     public override string LongDescriptionString => "Implements the Jaro-Winkler algorithm providing a similarity measure between two strings allowing character transpositions to a degree adjusting the weighting for common prefixes";
 
     public override string ShortDescriptionString => "JaroWinkler";
 
     public override double GetSimilarity(string firstWord, string secondWord)
     {
-        if ((firstWord != null) && (secondWord != null))
+        if (firstWord != null && secondWord != null)
         {
-            var similarity = jaroStringMetric.GetSimilarity(firstWord, secondWord);
+            var similarity = _jaroStringMetric.GetSimilarity(firstWord, secondWord);
             var prefixLength = GetPrefixLength(firstWord, secondWord);
-            return (similarity + ((prefixLength * 0.10000000149011612) * (1.0 - similarity)));
+            return similarity + prefixLength * 0.10000000149011612 * (1.0 - similarity);
         }
         return 0.0;
     }
@@ -31,11 +31,11 @@ internal sealed class JaroWinkler : AbstractStringMetric
 
     public override double GetSimilarityTimingEstimated(string firstWord, string secondWord)
     {
-        if ((firstWord != null) && (secondWord != null))
+        if (firstWord != null && secondWord != null)
         {
             double length = firstWord.Length;
             double num2 = secondWord.Length;
-            return ((length * num2) * estimatedTimingConstant);
+            return length * num2 * _estimatedTimingConstant;
         }
         return 0.0;
     }
@@ -47,7 +47,7 @@ internal sealed class JaroWinkler : AbstractStringMetric
 
     private static int GetPrefixLength(string firstWord, string secondWord)
     {
-        if ((firstWord == null) || (secondWord == null))
+        if (firstWord == null || secondWord == null)
         {
             return 4;
         }

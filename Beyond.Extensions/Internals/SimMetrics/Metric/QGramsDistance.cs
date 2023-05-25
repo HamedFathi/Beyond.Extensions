@@ -5,10 +5,10 @@ namespace Beyond.Extensions.Internals.SimMetrics.Metric;
 
 internal sealed class QGramsDistance : AbstractStringMetric
 {
-    private const double defaultMismatchScore = 0.0;
-    private double estimatedTimingConstant;
-    private ITokeniser tokeniser;
-    private TokeniserUtilities<string> tokenUtilities;
+    private const double DefaultMismatchScore = 0.0;
+    private double _estimatedTimingConstant;
+    private ITokeniser _tokeniser;
+    private TokeniserUtilities<string> _tokenUtilities;
 
     public QGramsDistance() : this(new TokeniserQGram3Extended())
     {
@@ -16,9 +16,9 @@ internal sealed class QGramsDistance : AbstractStringMetric
 
     public QGramsDistance(ITokeniser tokeniserToUse)
     {
-        estimatedTimingConstant = 0.0001340000017080456;
-        tokeniser = tokeniserToUse;
-        tokenUtilities = new TokeniserUtilities<string>();
+        _estimatedTimingConstant = 0.0001340000017080456;
+        _tokeniser = tokeniserToUse;
+        _tokenUtilities = new TokeniserUtilities<string>();
     }
 
     public override string LongDescriptionString => "Implements the Q Grams Distance algorithm providing a similarity measure between two strings using the qGram approach check matching qGrams/possible matching qGrams";
@@ -27,13 +27,13 @@ internal sealed class QGramsDistance : AbstractStringMetric
 
     public override double GetSimilarity(string firstWord, string secondWord)
     {
-        if ((firstWord != null) && (secondWord != null))
+        if (firstWord != null && secondWord != null)
         {
             var unnormalisedSimilarity = GetUnnormalisedSimilarity(firstWord, secondWord);
-            var num2 = tokenUtilities.FirstTokenCount + tokenUtilities.SecondTokenCount;
+            var num2 = _tokenUtilities.FirstTokenCount + _tokenUtilities.SecondTokenCount;
             if (num2 != 0)
             {
-                return ((num2 - unnormalisedSimilarity) / num2);
+                return (num2 - unnormalisedSimilarity) / num2;
             }
         }
         return 0.0;
@@ -46,26 +46,26 @@ internal sealed class QGramsDistance : AbstractStringMetric
 
     public override double GetSimilarityTimingEstimated(string firstWord, string secondWord)
     {
-        if ((firstWord != null) && (secondWord != null))
+        if (firstWord != null && secondWord != null)
         {
             double length = firstWord.Length;
             double num2 = secondWord.Length;
-            return ((length * num2) * estimatedTimingConstant);
+            return length * num2 * _estimatedTimingConstant;
         }
         return 0.0;
     }
 
     public override double GetUnnormalisedSimilarity(string firstWord, string secondWord)
     {
-        Collection<string> firstTokens = tokeniser.Tokenize(firstWord);
-        Collection<string> secondTokens = tokeniser.Tokenize(secondWord);
-        tokenUtilities.CreateMergedList(firstTokens, secondTokens);
+        Collection<string> firstTokens = _tokeniser.Tokenize(firstWord);
+        Collection<string> secondTokens = _tokeniser.Tokenize(secondWord);
+        _tokenUtilities.CreateMergedList(firstTokens, secondTokens);
         return GetActualSimilarity(firstTokens, secondTokens);
     }
 
     private double GetActualSimilarity(Collection<string> firstTokens, Collection<string> secondTokens)
     {
-        Collection<string> collection = tokenUtilities.CreateMergedSet(firstTokens, secondTokens);
+        Collection<string> collection = _tokenUtilities.CreateMergedSet(firstTokens, secondTokens);
         var num = 0;
         foreach (var str in collection)
         {

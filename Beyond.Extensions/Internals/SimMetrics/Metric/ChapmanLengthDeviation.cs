@@ -10,7 +10,7 @@ internal sealed class ChapmanLengthDeviation : AbstractStringMetric
 
     public override double GetSimilarity(string firstWord, string secondWord)
     {
-        if ((firstWord == null) || (secondWord == null))
+        if (firstWord == null || secondWord == null)
         {
             return 0.0;
         }
@@ -18,9 +18,9 @@ internal sealed class ChapmanLengthDeviation : AbstractStringMetric
         double num2 = secondWord.Length;
         if (length >= num2)
         {
-            return (num2 / length);
+            return num2 / length;
         }
-        return (length / num2);
+        return length / num2;
     }
 
     public override string GetSimilarityExplained(string firstWord, string secondWord)

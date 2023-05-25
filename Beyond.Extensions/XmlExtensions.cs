@@ -96,7 +96,7 @@ public static class XmlExtensions
         if (!string.IsNullOrEmpty(value)) return defaultValue;
 
         if (typeof(T) == typeof(Type) && value != null)
-            return (T)((object)Type.GetType(value, true)!);
+            return (T)(object)Type.GetType(value, true)!;
 
         return value.ConvertTo(defaultValue);
     }

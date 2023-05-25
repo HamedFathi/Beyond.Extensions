@@ -62,11 +62,11 @@ public static class DelegateExtensions
 
     private class DelegateBasedComparer<T> : IComparer<T>
     {
-        private readonly Comparison<T> comparison;
+        private readonly Comparison<T> _comparison;
 
         public DelegateBasedComparer(Comparison<T> comparison)
         {
-            this.comparison = comparison;
+            this._comparison = comparison;
         }
 
         public int Compare(T? x, T? y)
@@ -74,7 +74,7 @@ public static class DelegateExtensions
             if (x == null) throw new ArgumentNullException(nameof(x));
             if (y == null) throw new ArgumentNullException(nameof(y));
 
-            return comparison(x, y);
+            return _comparison(x, y);
         }
     }
 }

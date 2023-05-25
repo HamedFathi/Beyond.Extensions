@@ -4,8 +4,8 @@ namespace Beyond.Extensions.Internals.SimMetrics.Utilities;
 
 internal sealed class SubCostRange1ToMinus2 : AbstractSubstitutionCost
 {
-    private const int charExactMatchScore = 1;
-    private const int charMismatchMatchScore = -2;
+    private const int CharExactMatchScore = 1;
+    private const int CharMismatchMatchScore = -2;
 
     public override double MaxCost => 1.0;
 
@@ -15,18 +15,18 @@ internal sealed class SubCostRange1ToMinus2 : AbstractSubstitutionCost
 
     public override double GetCost(string firstWord, int firstWordIndex, string secondWord, int secondWordIndex)
     {
-        if ((firstWord == null) || (secondWord == null))
+        if (firstWord == null || secondWord == null)
         {
             return -2.0;
         }
-        if ((firstWord.Length <= firstWordIndex) || (firstWordIndex < 0))
+        if (firstWord.Length <= firstWordIndex || firstWordIndex < 0)
         {
             return -2.0;
         }
-        if ((secondWord.Length <= secondWordIndex) || (secondWordIndex < 0))
+        if (secondWord.Length <= secondWordIndex || secondWordIndex < 0)
         {
             return -2.0;
         }
-        return ((firstWord[firstWordIndex] != secondWord[secondWordIndex]) ? -2 : ((double)1));
+        return firstWord[firstWordIndex] != secondWord[secondWordIndex] ? -2 : (double)1;
     }
 }

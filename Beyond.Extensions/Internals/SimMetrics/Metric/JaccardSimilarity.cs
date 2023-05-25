@@ -5,10 +5,10 @@ namespace Beyond.Extensions.Internals.SimMetrics.Metric;
 
 internal sealed class JaccardSimilarity : AbstractStringMetric
 {
-    private const double defaultMismatchScore = 0.0;
-    private double estimatedTimingConstant;
-    private ITokeniser tokeniser;
-    private TokeniserUtilities<string> tokenUtilities;
+    private const double DefaultMismatchScore = 0.0;
+    private double _estimatedTimingConstant;
+    private ITokeniser _tokeniser;
+    private TokeniserUtilities<string> _tokenUtilities;
 
     public JaccardSimilarity() : this(new TokeniserWhitespace())
     {
@@ -16,9 +16,9 @@ internal sealed class JaccardSimilarity : AbstractStringMetric
 
     public JaccardSimilarity(ITokeniser tokeniserToUse)
     {
-        estimatedTimingConstant = 0.00014000000373926014;
-        tokeniser = tokeniserToUse;
-        tokenUtilities = new TokeniserUtilities<string>();
+        _estimatedTimingConstant = 0.00014000000373926014;
+        _tokeniser = tokeniserToUse;
+        _tokenUtilities = new TokeniserUtilities<string>();
     }
 
     public override string LongDescriptionString => "Implements the Jaccard Similarity algorithm providing a similarity measure between two strings";
@@ -27,12 +27,12 @@ internal sealed class JaccardSimilarity : AbstractStringMetric
 
     public override double GetSimilarity(string firstWord, string secondWord)
     {
-        if ((firstWord != null) && (secondWord != null))
+        if (firstWord != null && secondWord != null)
         {
-            Collection<string> collection = tokenUtilities.CreateMergedSet(tokeniser.Tokenize(firstWord), tokeniser.Tokenize(secondWord));
+            Collection<string> collection = _tokenUtilities.CreateMergedSet(_tokeniser.Tokenize(firstWord), _tokeniser.Tokenize(secondWord));
             if (collection.Count > 0)
             {
-                return (tokenUtilities.CommonSetTerms() / ((double)collection.Count));
+                return _tokenUtilities.CommonSetTerms() / (double)collection.Count;
             }
         }
         return 0.0;
@@ -45,11 +45,11 @@ internal sealed class JaccardSimilarity : AbstractStringMetric
 
     public override double GetSimilarityTimingEstimated(string firstWord, string secondWord)
     {
-        if ((firstWord != null) && (secondWord != null))
+        if (firstWord != null && secondWord != null)
         {
-            double count = tokeniser.Tokenize(firstWord).Count;
-            double num2 = tokeniser.Tokenize(secondWord).Count;
-            return ((count * num2) * estimatedTimingConstant);
+            double count = _tokeniser.Tokenize(firstWord).Count;
+            double num2 = _tokeniser.Tokenize(secondWord).Count;
+            return count * num2 * _estimatedTimingConstant;
         }
         return 0.0;
     }

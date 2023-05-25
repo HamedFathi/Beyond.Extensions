@@ -5,9 +5,9 @@ namespace Beyond.Extensions.Internals.SimMetrics.Metric;
 
 internal sealed class BlockDistance : AbstractStringMetric
 {
-    private double estimatedTimingConstant;
-    private ITokeniser tokeniser;
-    private TokeniserUtilities<string> tokenUtilities;
+    private double _estimatedTimingConstant;
+    private ITokeniser _tokeniser;
+    private TokeniserUtilities<string> _tokenUtilities;
 
     public BlockDistance() : this(new TokeniserWhitespace())
     {
@@ -15,9 +15,9 @@ internal sealed class BlockDistance : AbstractStringMetric
 
     public BlockDistance(ITokeniser tokeniserToUse)
     {
-        estimatedTimingConstant = 6.4457140979357064E-05;
-        tokeniser = tokeniserToUse;
-        tokenUtilities = new TokeniserUtilities<string>();
+        _estimatedTimingConstant = 6.4457140979357064E-05;
+        _tokeniser = tokeniserToUse;
+        _tokenUtilities = new TokeniserUtilities<string>();
     }
 
     public override string LongDescriptionString => "Implements the Block distance algorithm whereby vector space block distance is used to determine a similarity";
@@ -26,11 +26,11 @@ internal sealed class BlockDistance : AbstractStringMetric
 
     public override double GetSimilarity(string firstWord, string secondWord)
     {
-        Collection<string> firstTokens = tokeniser.Tokenize(firstWord);
-        Collection<string> secondTokens = tokeniser.Tokenize(secondWord);
+        Collection<string> firstTokens = _tokeniser.Tokenize(firstWord);
+        Collection<string> secondTokens = _tokeniser.Tokenize(secondWord);
         var num = firstTokens.Count + secondTokens.Count;
         var actualSimilarity = GetActualSimilarity(firstTokens, secondTokens);
-        return ((num - actualSimilarity) / num);
+        return (num - actualSimilarity) / num;
     }
 
     public override string GetSimilarityExplained(string firstWord, string secondWord)
@@ -40,21 +40,21 @@ internal sealed class BlockDistance : AbstractStringMetric
 
     public override double GetSimilarityTimingEstimated(string firstWord, string secondWord)
     {
-        double count = tokeniser.Tokenize(firstWord).Count;
-        double num2 = tokeniser.Tokenize(secondWord).Count;
-        return ((((count + num2) * count) + ((count + num2) * num2)) * estimatedTimingConstant);
+        double count = _tokeniser.Tokenize(firstWord).Count;
+        double num2 = _tokeniser.Tokenize(secondWord).Count;
+        return ((count + num2) * count + (count + num2) * num2) * _estimatedTimingConstant;
     }
 
     public override double GetUnnormalisedSimilarity(string firstWord, string secondWord)
     {
-        Collection<string> firstTokens = tokeniser.Tokenize(firstWord);
-        Collection<string> secondTokens = tokeniser.Tokenize(secondWord);
+        Collection<string> firstTokens = _tokeniser.Tokenize(firstWord);
+        Collection<string> secondTokens = _tokeniser.Tokenize(secondWord);
         return GetActualSimilarity(firstTokens, secondTokens);
     }
 
     private double GetActualSimilarity(Collection<string> firstTokens, Collection<string> secondTokens)
     {
-        Collection<string> collection = tokenUtilities.CreateMergedList(firstTokens, secondTokens);
+        Collection<string> collection = _tokenUtilities.CreateMergedList(firstTokens, secondTokens);
         var num = 0;
         foreach (var str in collection)
         {

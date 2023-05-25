@@ -5,10 +5,10 @@ namespace Beyond.Extensions.Internals.SimMetrics.Metric;
 
 internal sealed class MatchingCoefficient : AbstractStringMetric
 {
-    private const double defaultMismatchScore = 0.0;
-    private double estimatedTimingConstant;
-    private ITokeniser tokeniser;
-    private TokeniserUtilities<string> tokenUtilities;
+    private const double DefaultMismatchScore = 0.0;
+    private double _estimatedTimingConstant;
+    private ITokeniser _tokeniser;
+    private TokeniserUtilities<string> _tokenUtilities;
 
     public MatchingCoefficient() : this(new TokeniserWhitespace())
     {
@@ -16,9 +16,9 @@ internal sealed class MatchingCoefficient : AbstractStringMetric
 
     public MatchingCoefficient(ITokeniser tokeniserToUse)
     {
-        estimatedTimingConstant = 0.00019999999494757503;
-        tokeniser = tokeniserToUse;
-        tokenUtilities = new TokeniserUtilities<string>();
+        _estimatedTimingConstant = 0.00019999999494757503;
+        _tokeniser = tokeniserToUse;
+        _tokenUtilities = new TokeniserUtilities<string>();
     }
 
     public override string LongDescriptionString => "Implements the Matching Coefficient algorithm providing a similarity measure between two strings";
@@ -27,11 +27,11 @@ internal sealed class MatchingCoefficient : AbstractStringMetric
 
     public override double GetSimilarity(string firstWord, string secondWord)
     {
-        if ((firstWord != null) && (secondWord != null))
+        if (firstWord != null && secondWord != null)
         {
             var unnormalisedSimilarity = GetUnnormalisedSimilarity(firstWord, secondWord);
-            var num2 = Math.Max(tokenUtilities.FirstTokenCount, tokenUtilities.SecondTokenCount);
-            return (unnormalisedSimilarity / num2);
+            var num2 = Math.Max(_tokenUtilities.FirstTokenCount, _tokenUtilities.SecondTokenCount);
+            return unnormalisedSimilarity / num2;
         }
         return 0.0;
     }
@@ -43,25 +43,25 @@ internal sealed class MatchingCoefficient : AbstractStringMetric
 
     public override double GetSimilarityTimingEstimated(string firstWord, string secondWord)
     {
-        if ((firstWord != null) && (secondWord != null))
+        if (firstWord != null && secondWord != null)
         {
-            double count = tokeniser.Tokenize(firstWord).Count;
-            double num2 = tokeniser.Tokenize(secondWord).Count;
-            return ((num2 * count) * estimatedTimingConstant);
+            double count = _tokeniser.Tokenize(firstWord).Count;
+            double num2 = _tokeniser.Tokenize(secondWord).Count;
+            return num2 * count * _estimatedTimingConstant;
         }
         return 0.0;
     }
 
     public override double GetUnnormalisedSimilarity(string firstWord, string secondWord)
     {
-        Collection<string> firstTokens = tokeniser.Tokenize(firstWord);
-        Collection<string> secondTokens = tokeniser.Tokenize(secondWord);
+        Collection<string> firstTokens = _tokeniser.Tokenize(firstWord);
+        Collection<string> secondTokens = _tokeniser.Tokenize(secondWord);
         return GetActualSimilarity(firstTokens, secondTokens);
     }
 
     private double GetActualSimilarity(Collection<string> firstTokens, Collection<string> secondTokens)
     {
-        tokenUtilities.CreateMergedList(firstTokens, secondTokens);
+        _tokenUtilities.CreateMergedList(firstTokens, secondTokens);
         var num = 0;
         foreach (var str in firstTokens)
         {

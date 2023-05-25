@@ -2,7 +2,7 @@
 
 public class UtcDateTimeConverter : JsonConverter<DateTime>
 {
-    private readonly string serializationFormat;
+    private readonly string _serializationFormat;
 
     public UtcDateTimeConverter() : this(null)
     {
@@ -10,7 +10,7 @@ public class UtcDateTimeConverter : JsonConverter<DateTime>
 
     public UtcDateTimeConverter(string serializationFormat)
     {
-        this.serializationFormat = serializationFormat ?? "yyyy-MM-ddTHH:mm:ss.fffffffZ";
+        this._serializationFormat = serializationFormat ?? "yyyy-MM-ddTHH:mm:ss.fffffffZ";
     }
 
     public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
@@ -18,5 +18,5 @@ public class UtcDateTimeConverter : JsonConverter<DateTime>
 
     public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
         => writer.WriteStringValue((value.Kind == DateTimeKind.Local ? value.ToUniversalTime() : value)
-            .ToString(serializationFormat));
+            .ToString(_serializationFormat));
 }

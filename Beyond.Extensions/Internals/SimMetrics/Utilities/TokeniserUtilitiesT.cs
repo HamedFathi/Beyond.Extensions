@@ -2,68 +2,68 @@
 
 internal class TokeniserUtilities<T>
 {
-    private Collection<T> allTokens;
-    private int firstSetTokenCount;
-    private int firstTokenCount;
-    private int secondSetTokenCount;
-    private int secondTokenCount;
-    private Collection<T> tokenSet;
+    private Collection<T> _allTokens;
+    private int _firstSetTokenCount;
+    private int _firstTokenCount;
+    private int _secondSetTokenCount;
+    private int _secondTokenCount;
+    private Collection<T> _tokenSet;
 
     public TokeniserUtilities()
     {
-        allTokens = new Collection<T>();
-        tokenSet = new Collection<T>();
+        _allTokens = new Collection<T>();
+        _tokenSet = new Collection<T>();
     }
 
-    public int FirstSetTokenCount => firstSetTokenCount;
+    public int FirstSetTokenCount => _firstSetTokenCount;
 
-    public int FirstTokenCount => firstTokenCount;
+    public int FirstTokenCount => _firstTokenCount;
 
-    public Collection<T> MergedTokens => allTokens;
+    public Collection<T> MergedTokens => _allTokens;
 
-    public int SecondSetTokenCount => secondSetTokenCount;
+    public int SecondSetTokenCount => _secondSetTokenCount;
 
-    public int SecondTokenCount => secondTokenCount;
+    public int SecondTokenCount => _secondTokenCount;
 
-    public Collection<T> TokenSet => tokenSet;
+    public Collection<T> TokenSet => _tokenSet;
 
     public int CommonSetTerms()
     {
-        return ((FirstSetTokenCount + SecondSetTokenCount) - tokenSet.Count);
+        return FirstSetTokenCount + SecondSetTokenCount - _tokenSet.Count;
     }
 
     public int CommonTerms()
     {
-        return ((FirstTokenCount + SecondTokenCount) - allTokens.Count);
+        return FirstTokenCount + SecondTokenCount - _allTokens.Count;
     }
 
     public Collection<T> CreateMergedList(Collection<T> firstTokens, Collection<T> secondTokens)
     {
-        allTokens.Clear();
-        firstTokenCount = firstTokens.Count;
-        secondTokenCount = secondTokens.Count;
+        _allTokens.Clear();
+        _firstTokenCount = firstTokens.Count;
+        _secondTokenCount = secondTokens.Count;
         MergeLists(firstTokens);
         MergeLists(secondTokens);
-        return allTokens;
+        return _allTokens;
     }
 
     public Collection<T> CreateMergedSet(Collection<T> firstTokens, Collection<T> secondTokens)
     {
-        tokenSet.Clear();
-        firstSetTokenCount = CalculateUniqueTokensCount(firstTokens);
-        secondSetTokenCount = CalculateUniqueTokensCount(secondTokens);
+        _tokenSet.Clear();
+        _firstSetTokenCount = CalculateUniqueTokensCount(firstTokens);
+        _secondSetTokenCount = CalculateUniqueTokensCount(secondTokens);
         MergeIntoSet(firstTokens);
         MergeIntoSet(secondTokens);
-        return tokenSet;
+        return _tokenSet;
     }
 
     public Collection<T> CreateSet(Collection<T> tokenList)
     {
-        tokenSet.Clear();
+        _tokenSet.Clear();
         AddUniqueTokens(tokenList);
-        firstTokenCount = tokenSet.Count;
-        secondTokenCount = 0;
-        return tokenSet;
+        _firstTokenCount = _tokenSet.Count;
+        _secondTokenCount = 0;
+        return _tokenSet;
     }
 
     public void MergeIntoSet(Collection<T> firstTokens)
@@ -80,7 +80,7 @@ internal class TokeniserUtilities<T>
     {
         foreach (var local in tokenList)
         {
-            allTokens.Add(local);
+            _allTokens.Add(local);
         }
     }
 
@@ -88,9 +88,9 @@ internal class TokeniserUtilities<T>
     {
         foreach (var local in tokenList)
         {
-            if (!tokenSet.Contains(local))
+            if (!_tokenSet.Contains(local))
             {
-                tokenSet.Add(local);
+                _tokenSet.Add(local);
             }
         }
     }

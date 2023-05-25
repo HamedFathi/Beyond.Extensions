@@ -4,46 +4,46 @@ namespace Beyond.Extensions.Internals.SimMetrics.API;
 
 internal abstract class AbstractTokeniserQGramN : ITokeniser
 {
-    private const string defaultEndPadCharacter = "#";
-    private const string defaultStartPadCharacter = "?";
-    private int characterCombinationIndex;
-    private int qGramLength;
-    private ITermHandler stopWordHandler;
-    private string suppliedWord;
-    private TokeniserUtilities<string> tokenUtilities;
+    private const string DefaultEndPadCharacter = "#";
+    private const string DefaultStartPadCharacter = "?";
+    private int _characterCombinationIndex;
+    private int _qGramLength;
+    private ITermHandler _stopWordHandler;
+    private string _suppliedWord;
+    private TokeniserUtilities<string> _tokenUtilities;
 
     public int CharacterCombinationIndex
     {
-        get => characterCombinationIndex;
-        set => characterCombinationIndex = value;
+        get => _characterCombinationIndex;
+        set => _characterCombinationIndex = value;
     }
 
     public string Delimiters => string.Empty;
 
     public int QGramLength
     {
-        get => qGramLength;
-        set => qGramLength = value;
+        get => _qGramLength;
+        set => _qGramLength = value;
     }
 
     public abstract string ShortDescriptionString { get; }
 
     public ITermHandler StopWordHandler
     {
-        get => stopWordHandler;
-        set => stopWordHandler = value;
+        get => _stopWordHandler;
+        set => _stopWordHandler = value;
     }
 
     public string SuppliedWord
     {
-        get => suppliedWord;
-        set => suppliedWord = value;
+        get => _suppliedWord;
+        set => _suppliedWord = value;
     }
 
     public TokeniserUtilities<string> TokenUtilities
     {
-        get => tokenUtilities;
-        set => tokenUtilities = value;
+        get => _tokenUtilities;
+        set => _tokenUtilities = value;
     }
 
     public abstract Collection<string> Tokenize(string word);
@@ -63,7 +63,7 @@ internal abstract class AbstractTokeniserQGramN : ITokeniser
         {
             count = tokenLength - 1;
         }
-        var builder = new StringBuilder(length + (2 * count));
+        var builder = new StringBuilder(length + 2 * count);
         if (extended)
         {
             builder.Insert(0, "?", count);
@@ -80,12 +80,12 @@ internal abstract class AbstractTokeniserQGramN : ITokeniser
         }
         else
         {
-            num3 = (length - tokenLength) + 1;
+            num3 = length - tokenLength + 1;
         }
         for (var i = 0; i < num3; i++)
         {
             var termToTest = str.Substring(i, tokenLength);
-            if (!stopWordHandler.IsWord(termToTest))
+            if (!_stopWordHandler.IsWord(termToTest))
             {
                 collection.Add(termToTest);
             }
@@ -97,7 +97,7 @@ internal abstract class AbstractTokeniserQGramN : ITokeniser
             for (var j = 0; j < num3; j++)
             {
                 var str3 = str.Substring(j, count) + str.Substring(j + tokenLength, 1);
-                if (!stopWordHandler.IsWord(str3) && !collection.Contains(str3))
+                if (!_stopWordHandler.IsWord(str3) && !collection.Contains(str3))
                 {
                     collection.Add(str3);
                 }

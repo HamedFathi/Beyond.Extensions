@@ -4,8 +4,8 @@ namespace Beyond.Extensions.JsonConverters;
 
 public class StringEnumMemberConverter : JsonConverterFactory
 {
-    private readonly bool allowIntegerValues;
-    private readonly JsonNamingPolicy namingPolicy;
+    private readonly bool _allowIntegerValues;
+    private readonly JsonNamingPolicy _namingPolicy;
 
     public StringEnumMemberConverter()
         : this(namingPolicy: null, allowIntegerValues: true)
@@ -13,7 +13,7 @@ public class StringEnumMemberConverter : JsonConverterFactory
     }
 
     public StringEnumMemberConverter(JsonNamingPolicy namingPolicy = null, bool allowIntegerValues = true)
-        => (this.namingPolicy, this.allowIntegerValues) = (namingPolicy, allowIntegerValues);
+        => (this._namingPolicy, this._allowIntegerValues) = (namingPolicy, allowIntegerValues);
 
     public override bool CanConvert(Type typeToConvert)
     {
@@ -29,7 +29,7 @@ public class StringEnumMemberConverter : JsonConverterFactory
             typeof(StringGenericEnumMemberConverter<>).MakeGenericType(typeToConvert),
             BindingFlags.Instance | BindingFlags.Public,
             binder: null,
-            args: new object[] { namingPolicy, allowIntegerValues, isNullableEnum ? underlyingType : null },
+            args: new object[] { _namingPolicy, _allowIntegerValues, isNullableEnum ? underlyingType : null },
             culture: null)!;
     }
 
@@ -41,30 +41,30 @@ public class StringEnumMemberConverter : JsonConverterFactory
 
     internal class StringGenericEnumMemberConverter<T> : JsonConverter<T>
     {
-        private const BindingFlags enumBindings = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static;
+        private const BindingFlags EnumBindings = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static;
 
-        private readonly bool allowIntegerValues;
-        private readonly Type enumType;
-        private readonly TypeCode enumTypeCode;
-        private readonly bool isFlags;
-        private readonly Dictionary<ulong, EnumInfo> rawToTransformed;
-        private readonly Dictionary<string, EnumInfo> transformedToRaw;
-        private readonly Type underlyingType;
+        private readonly bool _allowIntegerValues;
+        private readonly Type _enumType;
+        private readonly TypeCode _enumTypeCode;
+        private readonly bool _isFlags;
+        private readonly Dictionary<ulong, EnumInfo> _rawToTransformed;
+        private readonly Dictionary<string, EnumInfo> _transformedToRaw;
+        private readonly Type _underlyingType;
 
         public StringGenericEnumMemberConverter(JsonNamingPolicy namingPolicy, bool allowIntegerValues, Type underlyingType)
         {
-            this.allowIntegerValues = allowIntegerValues;
-            this.underlyingType = underlyingType;
+            this._allowIntegerValues = allowIntegerValues;
+            this._underlyingType = underlyingType;
 
-            enumType = this.underlyingType ?? typeof(T);
-            enumTypeCode = Type.GetTypeCode(enumType);
-            isFlags = enumType.IsDefined(typeof(FlagsAttribute), true);
+            _enumType = this._underlyingType ?? typeof(T);
+            _enumTypeCode = Type.GetTypeCode(_enumType);
+            _isFlags = _enumType.IsDefined(typeof(FlagsAttribute), true);
 
-            var builtInNames = enumType.GetEnumNames();
-            var builtInValues = enumType.GetEnumValues();
+            var builtInNames = _enumType.GetEnumNames();
+            var builtInValues = _enumType.GetEnumValues();
 
-            rawToTransformed = new Dictionary<ulong, EnumInfo>();
-            transformedToRaw = new Dictionary<string, EnumInfo>();
+            _rawToTransformed = new Dictionary<ulong, EnumInfo>();
+            _transformedToRaw = new Dictionary<string, EnumInfo>();
 
             for (var i = 0; i < builtInNames.Length; i++)
             {
@@ -72,12 +72,12 @@ public class StringEnumMemberConverter : JsonConverterFactory
                 var rawValue = GetEnumValue(enumValue);
 
                 var name = builtInNames[i];
-                var field = enumType.GetField(name, enumBindings)!;
+                var field = _enumType.GetField(name, EnumBindings)!;
                 var enumMemberAttribute = field.GetCustomAttribute<EnumMemberAttribute>(true);
                 var transformedName = enumMemberAttribute?.Value ?? namingPolicy?.ConvertName(name) ?? name;
 
-                rawToTransformed[rawValue] = new EnumInfo(transformedName, enumValue, rawValue);
-                transformedToRaw[transformedName] = new EnumInfo(name, enumValue, rawValue);
+                _rawToTransformed[rawValue] = new EnumInfo(transformedName, enumValue, rawValue);
+                _transformedToRaw[transformedName] = new EnumInfo(name, enumValue, rawValue);
             }
         }
 
@@ -89,12 +89,12 @@ public class StringEnumMemberConverter : JsonConverterFactory
                 var enumString = reader.GetString()!;
 
                 // Case sensitive search attempted first.
-                if (transformedToRaw.TryGetValue(enumString, out var enumInfo))
+                if (_transformedToRaw.TryGetValue(enumString, out var enumInfo))
                 {
-                    return (T)Enum.ToObject(enumType, enumInfo.RawValue);
+                    return (T)Enum.ToObject(_enumType, enumInfo.RawValue);
                 }
 
-                if (isFlags)
+                if (_isFlags)
                 {
                     var calculatedValue = 0UL;
 
@@ -102,7 +102,7 @@ public class StringEnumMemberConverter : JsonConverterFactory
                     foreach (var flagValue in flagValues)
                     {
                         // Case sensitive search attempted first.
-                        if (transformedToRaw.TryGetValue(flagValue, out enumInfo))
+                        if (_transformedToRaw.TryGetValue(flagValue, out enumInfo))
                         {
                             calculatedValue |= enumInfo.RawValue;
                         }
@@ -110,7 +110,7 @@ public class StringEnumMemberConverter : JsonConverterFactory
                         {
                             // Case insensitive search attempted second.
                             var matched = false;
-                            foreach (var enumItem in transformedToRaw)
+                            foreach (var enumItem in _transformedToRaw)
                             {
                                 if (string.Equals(enumItem.Key, flagValue, StringComparison.OrdinalIgnoreCase))
                                 {
@@ -127,36 +127,36 @@ public class StringEnumMemberConverter : JsonConverterFactory
                         }
                     }
 
-                    return (T)Enum.ToObject(enumType, calculatedValue);
+                    return (T)Enum.ToObject(_enumType, calculatedValue);
                 }
 
                 // Case insensitive search attempted second.
-                foreach (var enumItem in transformedToRaw)
+                foreach (var enumItem in _transformedToRaw)
                 {
                     if (string.Equals(enumItem.Key, enumString, StringComparison.OrdinalIgnoreCase))
                     {
-                        return (T)Enum.ToObject(enumType, enumItem.Value.RawValue);
+                        return (T)Enum.ToObject(_enumType, enumItem.Value.RawValue);
                     }
                 }
 
                 throw new JsonException($"Unknown value {enumString}.");
             }
 
-            if (token != JsonTokenType.Number || !allowIntegerValues)
+            if (token != JsonTokenType.Number || !_allowIntegerValues)
             {
                 throw new JsonException();
             }
 
-            var result = enumTypeCode switch
+            var result = _enumTypeCode switch
             {
-                TypeCode.Int32 when reader.TryGetInt32(out var int32) => (T)Enum.ToObject(enumType, int32),
-                TypeCode.UInt32 when reader.TryGetUInt32(out var uint32) => (T)Enum.ToObject(enumType, uint32),
-                TypeCode.UInt64 when reader.TryGetUInt64(out var uint64) => (T)Enum.ToObject(enumType, uint64),
-                TypeCode.Int64 when reader.TryGetInt64(out var int64) => (T)Enum.ToObject(enumType, int64),
-                TypeCode.SByte when reader.TryGetSByte(out var byte8) => (T)Enum.ToObject(enumType, byte8),
-                TypeCode.Byte when reader.TryGetByte(out var ubyte8) => (T)Enum.ToObject(enumType, ubyte8),
-                TypeCode.Int16 when reader.TryGetInt16(out var int16) => (T)Enum.ToObject(enumType, int16),
-                TypeCode.UInt16 when reader.TryGetUInt16(out var uint16) => (T)Enum.ToObject(enumType, uint16),
+                TypeCode.Int32 when reader.TryGetInt32(out var int32) => (T)Enum.ToObject(_enumType, int32),
+                TypeCode.UInt32 when reader.TryGetUInt32(out var uint32) => (T)Enum.ToObject(_enumType, uint32),
+                TypeCode.UInt64 when reader.TryGetUInt64(out var uint64) => (T)Enum.ToObject(_enumType, uint64),
+                TypeCode.Int64 when reader.TryGetInt64(out var int64) => (T)Enum.ToObject(_enumType, int64),
+                TypeCode.SByte when reader.TryGetSByte(out var byte8) => (T)Enum.ToObject(_enumType, byte8),
+                TypeCode.Byte when reader.TryGetByte(out var ubyte8) => (T)Enum.ToObject(_enumType, ubyte8),
+                TypeCode.Int16 when reader.TryGetInt16(out var int16) => (T)Enum.ToObject(_enumType, int16),
+                TypeCode.UInt16 when reader.TryGetUInt16(out var uint16) => (T)Enum.ToObject(_enumType, uint16),
                 _ => throw new JsonException()
             };
 
@@ -169,18 +169,18 @@ public class StringEnumMemberConverter : JsonConverterFactory
             // converter in that case.
             var rawValue = GetEnumValue(value!);
 
-            if (rawToTransformed.TryGetValue(rawValue, out var enumInfo))
+            if (_rawToTransformed.TryGetValue(rawValue, out var enumInfo))
             {
                 writer.WriteStringValue(enumInfo.Name);
                 return;
             }
 
-            if (isFlags)
+            if (_isFlags)
             {
                 var calculatedValue = 0UL;
 
                 var builder = new StringBuilder();
-                foreach (var enumItem in rawToTransformed)
+                foreach (var enumItem in _rawToTransformed)
                 {
                     enumInfo = enumItem.Value;
                     if (!(value as Enum)!.HasFlag(enumInfo.EnumValue)
@@ -207,12 +207,12 @@ public class StringEnumMemberConverter : JsonConverterFactory
                 }
             }
 
-            if (!allowIntegerValues)
+            if (!_allowIntegerValues)
             {
                 throw new JsonException();
             }
 
-            switch (enumTypeCode)
+            switch (_enumTypeCode)
             {
                 case TypeCode.Int32:
                     writer.WriteNumberValue((int)rawValue);
@@ -252,7 +252,7 @@ public class StringEnumMemberConverter : JsonConverterFactory
         }
 
         private ulong GetEnumValue(object value)
-            => enumTypeCode switch
+            => _enumTypeCode switch
             {
                 TypeCode.Int32 => (ulong)(int)value,
                 TypeCode.UInt32 => (uint)value,

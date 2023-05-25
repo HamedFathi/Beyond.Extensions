@@ -4,18 +4,18 @@ namespace Beyond.Extensions.Internals.SimMetrics.Utilities;
 
 internal sealed class TokeniserWhitespace : ITokeniser
 {
-    private string delimiters = "\r\n\t \x00a0";
-    private ITermHandler stopWordHandler = new DummyStopTermHandler();
-    private TokeniserUtilities<string> tokenUtilities = new TokeniserUtilities<string>();
+    private string _delimiters = "\r\n\t \x00a0";
+    private ITermHandler _stopWordHandler = new DummyStopTermHandler();
+    private TokeniserUtilities<string> _tokenUtilities = new TokeniserUtilities<string>();
 
-    public string Delimiters => delimiters;
+    public string Delimiters => _delimiters;
 
     public string ShortDescriptionString => "TokeniserWhitespace";
 
     public ITermHandler StopWordHandler
     {
-        get => stopWordHandler;
-        set => stopWordHandler = value;
+        get => _stopWordHandler;
+        set => _stopWordHandler = value;
     }
 
     public Collection<string> Tokenize(string word)
@@ -32,16 +32,16 @@ internal sealed class TokeniserWhitespace : ITokeniser
                     i++;
                 }
                 length = word.Length;
-                for (var j = 0; j < delimiters.Length; j++)
+                for (var j = 0; j < _delimiters.Length; j++)
                 {
-                    var index = word.IndexOf(delimiters[j], i);
-                    if ((index < length) && (index != -1))
+                    var index = word.IndexOf(_delimiters[j], i);
+                    if (index < length && index != -1)
                     {
                         length = index;
                     }
                 }
                 var termToTest = word.Substring(i, length - i);
-                if (!stopWordHandler.IsWord(termToTest))
+                if (!_stopWordHandler.IsWord(termToTest))
                 {
                     collection.Add(termToTest);
                 }
@@ -54,7 +54,7 @@ internal sealed class TokeniserWhitespace : ITokeniser
     {
         if (word != null)
         {
-            return tokenUtilities.CreateSet(Tokenize(word));
+            return _tokenUtilities.CreateSet(Tokenize(word));
         }
         return null;
     }

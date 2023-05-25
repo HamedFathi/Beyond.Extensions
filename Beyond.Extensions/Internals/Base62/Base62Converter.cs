@@ -9,16 +9,16 @@ internal class Base62Converter
 {
     private const string DefaultCharacterSet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
     private const string InvertedCharacterSet = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    private readonly string characterSet;
+    private readonly string _characterSet;
 
     internal Base62Converter()
     {
-        characterSet = DefaultCharacterSet;
+        _characterSet = DefaultCharacterSet;
     }
 
     internal Base62Converter(Base62CharacterSet charset)
     {
-        characterSet = charset == Base62CharacterSet.Default ? DefaultCharacterSet : InvertedCharacterSet;
+        _characterSet = charset == Base62CharacterSet.Default ? DefaultCharacterSet : InvertedCharacterSet;
     }
 
     internal string Decode(string value)
@@ -26,7 +26,7 @@ internal class Base62Converter
         var arr = new int[value.Length];
         for (var i = 0; i < arr.Length; i++)
         {
-            arr[i] = characterSet.IndexOf(value[i]);
+            arr[i] = _characterSet.IndexOf(value[i]);
         }
 
         return Decode(arr);
@@ -87,7 +87,7 @@ internal class Base62Converter
         var builder = new StringBuilder();
         foreach (var t in converted)
         {
-            builder.Append(characterSet[t]);
+            builder.Append(_characterSet[t]);
         }
 
         return builder.ToString();
