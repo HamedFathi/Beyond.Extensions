@@ -7,11 +7,12 @@
 		<Authors>Hamed Fathi</Authors>
 		<Company />
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
-		<Version>0.0.30</Version>
+		<Version>0.0.31</Version>
 		<LangVersion>latest</LangVersion>
 		<PackageProjectUrl>https://github.com/HamedFathi/Beyond.Extensions</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/HamedFathi/Beyond.Extensions</RepositoryUrl>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 	</PropertyGroup>
 
 </Project>

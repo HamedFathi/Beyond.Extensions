@@ -141,7 +141,7 @@ public static class EnumerableExtensions
     public static IEnumerable<T?> AsNullable<T>(this IEnumerable<T> enumeration) where T : struct
     {
         return from item in enumeration
-               select new T?(item);
+            select new T?(item);
     }
 
     public static ReadOnlyCollection<T> AsReadOnlyCollection<T>(this IEnumerable<T>? @this)
@@ -229,8 +229,8 @@ public static class EnumerableExtensions
     public static IEnumerable<(T1 left, T2 right)> Cartesian<T1, T2>(this (IEnumerable<T1>, IEnumerable<T2>) seqs)
     {
         foreach (var a in seqs.Item1)
-            foreach (var b in seqs.Item2)
-                yield return (a, b);
+        foreach (var b in seqs.Item2)
+            yield return (a, b);
     }
 
     public static IEnumerable<(T1 left, T2 right)> Cartesian<T1, T2>(this IEnumerable<T1> left, IEnumerable<T2> right)
@@ -452,7 +452,8 @@ public static class EnumerableExtensions
         return list.Index(predicate) > -1;
     }
 
-    public static IEnumerable<TSource> FallbackIfEmpty<TSource>(this IEnumerable<TSource> source, IEnumerable<TSource> fallback)
+    public static IEnumerable<TSource> FallbackIfEmpty<TSource>(this IEnumerable<TSource> source,
+        IEnumerable<TSource> fallback)
     {
         if (source == null)
         {
@@ -467,7 +468,8 @@ public static class EnumerableExtensions
         return source.Any() ? source : fallback;
     }
 
-    public static IEnumerable<TSource> FallbackIfEmpty<TSource>(this IEnumerable<TSource> source, params TSource[] fallback)
+    public static IEnumerable<TSource> FallbackIfEmpty<TSource>(this IEnumerable<TSource> source,
+        params TSource[] fallback)
     {
         if (source == null)
         {
@@ -477,7 +479,8 @@ public static class EnumerableExtensions
         return source.Any() ? source : fallback;
     }
 
-    public static IEnumerable<TSource> FallbackIfNull<TSource>(this IEnumerable<TSource> source, IEnumerable<TSource> fallback)
+    public static IEnumerable<TSource> FallbackIfNull<TSource>(this IEnumerable<TSource> source,
+        IEnumerable<TSource> fallback)
     {
         if (fallback == null)
         {
@@ -487,17 +490,20 @@ public static class EnumerableExtensions
         return source ?? fallback;
     }
 
-    public static IEnumerable<TSource> FallbackIfNull<TSource>(this IEnumerable<TSource> source, params TSource[] fallback)
+    public static IEnumerable<TSource> FallbackIfNull<TSource>(this IEnumerable<TSource> source,
+        params TSource[] fallback)
     {
         return source ?? fallback;
     }
 
-    public static IEnumerable<TSource> FallbackIfNullOrEmpty<TSource>(this IEnumerable<TSource> source, IEnumerable<TSource> fallback)
+    public static IEnumerable<TSource> FallbackIfNullOrEmpty<TSource>(this IEnumerable<TSource> source,
+        IEnumerable<TSource> fallback)
     {
         return source.FallbackIfNull(fallback).FallbackIfEmpty(fallback);
     }
 
-    public static IEnumerable<TSource> FallbackIfNullOrEmpty<TSource>(this IEnumerable<TSource> source, params TSource[] fallback)
+    public static IEnumerable<TSource> FallbackIfNullOrEmpty<TSource>(this IEnumerable<TSource> source,
+        params TSource[] fallback)
     {
         return source.FallbackIfNull(fallback).FallbackIfEmpty(fallback);
     }
@@ -895,7 +901,7 @@ public static class EnumerableExtensions
     }
 
     public static IEnumerable<T> If<T>(
-                                                                                                                                                                                                                                                                                                                                                                                                    this IEnumerable<T> query,
+        this IEnumerable<T> query,
         bool should,
         params Func<IEnumerable<T>, IEnumerable<T>>[] transforms)
     {
@@ -948,15 +954,15 @@ public static class EnumerableExtensions
     public static IEnumerable<int> IndicesOf<T>(this IEnumerable<T> obj, T value)
     {
         return from i in Enumerable.Range(0, obj.Count())
-               where obj.ElementAt(i).Equals(value)
-               select i;
+            where obj.ElementAt(i).Equals(value)
+            select i;
     }
 
     public static IEnumerable<int> IndicesOf<T>(this IEnumerable<T> obj, IEnumerable<T> value)
     {
         return from i in Enumerable.Range(0, obj.Count())
-               where value.Contains(obj.ElementAt(i))
-               select i;
+            where value.Contains(obj.ElementAt(i))
+            select i;
     }
 
     public static IEnumerable<int> IndicesWhere<T>(this IEnumerable<T> enumeration, Func<T, bool> predicate)
@@ -1481,8 +1487,8 @@ public static class EnumerableExtensions
         if (source == null)
             throw new ArgumentNullException(nameof(source));
         foreach (var enumeration in source)
-            foreach (var item in enumeration)
-                yield return item;
+        foreach (var item in enumeration)
+            yield return item;
     }
 
     public static IEnumerable<T> SelectMany<T>(this IEnumerable<T[]> source)
@@ -1490,8 +1496,8 @@ public static class EnumerableExtensions
         if (source == null)
             throw new ArgumentNullException(nameof(source));
         foreach (var enumeration in source)
-            foreach (var item in enumeration)
-                yield return item;
+        foreach (var item in enumeration)
+            yield return item;
     }
 
     public static IEnumerable<T> SelectManyRecursive<T>(this IEnumerable<T> source, Func<T, IEnumerable<T>?> selector)
@@ -1522,6 +1528,30 @@ public static class EnumerableExtensions
         if (source == null) throw new ArgumentNullException(nameof(source));
         if (getChildren == null) return source;
         return SelectRecursiveIterator(source, getChildren, (s, _) => s);
+    }
+
+    public static IEnumerable<TResult> SelectWhere<TSource, TResult>(this IEnumerable<TSource> source,
+        Func<TSource, bool> predicate,
+        Func<TSource, TResult> selector)
+    {
+        foreach (var item in source)
+        {
+            if (predicate(item))
+            {
+                yield return selector(item);
+            }
+        }
+    }
+
+    public static IEnumerable<TResult> SelectWhere<TSource, TResult>(this IEnumerable<TSource> source,
+        Func<TSource, bool> predicate,
+        Func<TSource, TResult> selector,
+        TResult defaultValue)
+    {
+        foreach (var item in source)
+        {
+            yield return predicate(item) ? selector(item) : defaultValue;
+        }
     }
 
     public static bool SequenceEqual<T1, T2>(this IEnumerable<T1> left, IEnumerable<T2> right,
@@ -1606,7 +1636,8 @@ public static class EnumerableExtensions
         return items.ShuffleIterator();
     }
 
-    public static TSource Single<TSource, TException>(this IEnumerable<TSource> source, Func<TSource, bool> predicate,
+    public static TSource Single<TSource, TException>(this IEnumerable<TSource> source,
+        Func<TSource, bool> predicate,
         Func<TException> exceptionToThrow)
         where TException : Exception
     {
@@ -1851,7 +1882,8 @@ public static class EnumerableExtensions
         return collection.TakeWhile(item => !endCondition(item));
     }
 
-    public static TResult[] ToArray<TSource, TResult>(this IEnumerable<TSource> source, Func<TSource, TResult> selector)
+    public static TResult[] ToArray<TSource, TResult>(this IEnumerable<TSource> source,
+        Func<TSource, TResult> selector)
     {
         return source.Select(selector).ToArray();
     }
@@ -2040,12 +2072,20 @@ public static class EnumerableExtensions
         return returnValue;
     }
 
+    public static IEnumerable<TU> FindDuplicates<T, TU>(this IEnumerable<T> list, Func<T, TU> keySelector)
+    {
+        return list.GroupBy(keySelector)
+            .Where(group => group.Count() > 1)
+            .Select(group => group.Key).ToList();
+    }
+
     public static IEnumerable<T> WhereIf<T>(this IEnumerable<T> source, bool condition, Func<T, bool> predicate)
     {
         return condition ? source.Where(predicate) : source;
     }
 
-    public static IEnumerable<T> WhereIf<T>(this IEnumerable<T> source, bool condition, Func<T, int, bool> predicate)
+    public static IEnumerable<T> WhereIf<T>(this IEnumerable<T> source, bool condition,
+        Func<T, int, bool> predicate)
     {
         return condition ? source.Where(predicate) : source;
     }
@@ -2089,7 +2129,8 @@ public static class EnumerableExtensions
         return Without(source, (IEnumerable<TSource>)elements);
     }
 
-    public static IEnumerable<TSource> Without<TSource>(this IEnumerable<TSource> source, IEnumerable<TSource> elements)
+    public static IEnumerable<TSource> Without<TSource>(this IEnumerable<TSource> source,
+        IEnumerable<TSource> elements)
     {
         return WithoutIterator(source, elements, EqualityComparer<TSource>.Default);
     }
