@@ -462,4 +462,84 @@ public static class JsonExtensions
             }
         }
     }
+
+    public static ICollection<JsonDifference> CompareJson(this string oldJson, string newJson)
+    {
+
+        var doc1 = JsonDocument.Parse(oldJson);
+        var doc2 = JsonDocument.Parse(newJson);
+
+        var differences = new List<JsonDifference>();
+        CompareJson(doc1.RootElement, doc2.RootElement, "", differences);
+
+        return differences;
+    }
+
+    public static ICollection<JsonDifference> CompareJson(this JsonElement oldJson, JsonElement newJson)
+    {
+        var differences = new List<JsonDifference>();
+        CompareJson(oldJson, newJson, "", differences);
+        return differences;
+    }
+
+    public static ICollection<JsonDifference> CompareJson(this JsonDocument oldJson, JsonDocument newJson)
+    {
+        var differences = new List<JsonDifference>();
+        CompareJson(oldJson.RootElement, newJson.RootElement, "", differences);
+        return differences;
+    }
+
+    private static void CompareJson(JsonElement json1, JsonElement json2, string path, ICollection<JsonDifference> differences)
+    {
+        switch (json1.ValueKind)
+        {
+            case JsonValueKind.Object:
+                foreach (var prop in json1.EnumerateObject())
+                {
+                    var newPath = string.IsNullOrEmpty(path) ? prop.Name : $"{path}.{prop.Name}";
+
+                    if (!json2.TryGetProperty(prop.Name, out var matchedElement))
+                    {
+                        differences.Add(new JsonDifference { Path = newPath, ChangeType = JsonChangeType.Deleted, OldValue = prop.Value.ToString(), NewValue = null });
+                    }
+                    else
+                    {
+                        CompareJson(prop.Value, matchedElement, newPath, differences);
+                    }
+                }
+                foreach (var prop in json2.EnumerateObject())
+                {
+                    var newPath = string.IsNullOrEmpty(path) ? prop.Name : $"{path}.{prop.Name}";
+
+                    if (!json1.TryGetProperty(prop.Name, out _))
+                    {
+                        differences.Add(new JsonDifference { Path = newPath, ChangeType = JsonChangeType.Added, OldValue = null, NewValue = prop.Value.ToString() });
+                    }
+                }
+                break;
+
+            case JsonValueKind.Array:
+                var index = 0;
+                foreach (var arrayItem in json1.EnumerateArray())
+                {
+                    if (json2.GetArrayLength() > index)
+                    {
+                        CompareJson(arrayItem, json2[index], $"{path}[{index}]", differences);
+                    }
+                    else
+                    {
+                        differences.Add(new JsonDifference { Path = $"{path}[{index}]", ChangeType = JsonChangeType.Deleted, OldValue = arrayItem.ToString(), NewValue = null });
+                    }
+                    index++;
+                }
+                break;
+
+            default:
+                if (json1.ToString() != json2.ToString())
+                {
+                    differences.Add(new JsonDifference { Path = path, ChangeType = JsonChangeType.Modified, OldValue = json1.ToString(), NewValue = json2.ToString() });
+                }
+                break;
+        }
+    }
 }
