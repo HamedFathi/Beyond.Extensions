@@ -3,6 +3,8 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
 
+using Beyond.Extensions.ByteArrayExtended;
+
 namespace Beyond.Extensions.LongExtended;
 
 public static class LongExtensions
@@ -278,6 +280,11 @@ public static class LongExtensions
         } while (input > 0);
 
         return text;
+    }
+
+    public static string ToBase64(this long input, bool removePadding = false)
+    {
+        return BitConverter.GetBytes(input).ToBase64(removePadding);
     }
 
     public static string ToSequentialLetters(this long value, bool lowercase = false)

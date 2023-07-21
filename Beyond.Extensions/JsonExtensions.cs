@@ -5,17 +5,42 @@
 // ReSharper disable UnusedType.Global
 // ReSharper disable MemberCanBePrivate.Global
 
-using System.Text.Encodings.Web;
 using Beyond.Extensions.ByteArrayExtended;
 using Beyond.Extensions.Enums;
 using Beyond.Extensions.StreamExtended;
 using Beyond.Extensions.StringExtended;
 using Beyond.Extensions.Types;
+using System.Text.Encodings.Web;
 
 namespace Beyond.Extensions.JsonExtended;
 
 public static class JsonExtensions
 {
+    public static ICollection<JsonDifference> CompareJson(this string oldJson, string newJson)
+    {
+        var doc1 = JsonDocument.Parse(oldJson);
+        var doc2 = JsonDocument.Parse(newJson);
+
+        var differences = new List<JsonDifference>();
+        CompareJson(doc1.RootElement, doc2.RootElement, "", differences);
+
+        return differences;
+    }
+
+    public static ICollection<JsonDifference> CompareJson(this JsonElement oldJson, JsonElement newJson)
+    {
+        var differences = new List<JsonDifference>();
+        CompareJson(oldJson, newJson, "", differences);
+        return differences;
+    }
+
+    public static ICollection<JsonDifference> CompareJson(this JsonDocument oldJson, JsonDocument newJson)
+    {
+        var differences = new List<JsonDifference>();
+        CompareJson(oldJson.RootElement, newJson.RootElement, "", differences);
+        return differences;
+    }
+
     public static T? Deserialize<T>(this byte[] data, JsonSerializerOptions? options = null)
     {
         return JsonSerializer.Deserialize<T>(data.ToText(), options);
@@ -461,32 +486,6 @@ public static class JsonExtensions
                     throw new ArgumentOutOfRangeException();
             }
         }
-    }
-
-    public static ICollection<JsonDifference> CompareJson(this string oldJson, string newJson)
-    {
-
-        var doc1 = JsonDocument.Parse(oldJson);
-        var doc2 = JsonDocument.Parse(newJson);
-
-        var differences = new List<JsonDifference>();
-        CompareJson(doc1.RootElement, doc2.RootElement, "", differences);
-
-        return differences;
-    }
-
-    public static ICollection<JsonDifference> CompareJson(this JsonElement oldJson, JsonElement newJson)
-    {
-        var differences = new List<JsonDifference>();
-        CompareJson(oldJson, newJson, "", differences);
-        return differences;
-    }
-
-    public static ICollection<JsonDifference> CompareJson(this JsonDocument oldJson, JsonDocument newJson)
-    {
-        var differences = new List<JsonDifference>();
-        CompareJson(oldJson.RootElement, newJson.RootElement, "", differences);
-        return differences;
     }
 
     private static void CompareJson(JsonElement json1, JsonElement json2, string path, ICollection<JsonDifference> differences)

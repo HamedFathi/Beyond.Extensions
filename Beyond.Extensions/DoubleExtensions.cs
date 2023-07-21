@@ -3,6 +3,8 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable IdentifierTypo
 
+using Beyond.Extensions.ByteArrayExtended;
+
 namespace Beyond.Extensions.DoubleExtended;
 
 public static class DoubleExtensions
@@ -278,6 +280,11 @@ public static class DoubleExtensions
     public static double Tanh(this double value)
     {
         return Math.Tanh(value);
+    }
+
+    public static string ToBase64(this double input, bool removePadding = false)
+    {
+        return BitConverter.GetBytes(input).ToBase64(removePadding);
     }
 
     public static double ToMoney(this double @this)

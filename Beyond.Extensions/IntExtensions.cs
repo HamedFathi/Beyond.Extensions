@@ -2,6 +2,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
+using Beyond.Extensions.ByteArrayExtended;
 using Beyond.Extensions.EnumExtended;
 
 // ReSharper disable CommentTypo
@@ -434,6 +435,11 @@ public static class IntExtensions
         }
 
         return state;
+    }
+
+    public static string ToBase64(this int input, bool removePadding = false)
+    {
+        return BitConverter.GetBytes(input).ToBase64(removePadding);
     }
 
     public static string ToSequentialLetters(this int value, bool lowercase = false)

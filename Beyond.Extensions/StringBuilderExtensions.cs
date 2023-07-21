@@ -156,6 +156,19 @@ public static class StringBuilderExtensions
                 builder.AppendLine();
     }
 
+    public static string GetLastAppendedLine(this StringBuilder sb)
+    {
+        var text = sb.ToString();
+        var lines = text.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+        var lastLine = lines[^1];
+
+        if (string.IsNullOrWhiteSpace(lastLine) && lines.Length > 1)
+        {
+            lastLine = lines[^2];
+        }
+        return lastLine;
+    }
+
     public static bool IsEmpty(this StringBuilder stringBuilder)
     {
         return stringBuilder.ToString() == string.Empty;

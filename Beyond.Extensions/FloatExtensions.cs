@@ -1,6 +1,8 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable UnusedMember.Global
 
+using Beyond.Extensions.ByteArrayExtended;
+
 namespace Beyond.Extensions.FloatExtended;
 
 public static class FloatExtensions
@@ -108,5 +110,10 @@ public static class FloatExtensions
     public static int Sign(this float value)
     {
         return Math.Sign(value);
+    }
+
+    public static string ToBase64(this float input, bool removePadding = false)
+    {
+        return BitConverter.GetBytes(input).ToBase64(removePadding);
     }
 }

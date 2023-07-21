@@ -3,13 +3,13 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
 
-using System.Net.Mail;
 using Beyond.Extensions.CharExtended;
 using Beyond.Extensions.Enums;
 using Beyond.Extensions.Internals.Base62;
 using Beyond.Extensions.Internals.Pluralizer;
 using Beyond.Extensions.Internals.Trie;
 using Beyond.Extensions.Types;
+using System.Net.Mail;
 
 // ReSharper disable InconsistentNaming
 
@@ -2091,15 +2091,16 @@ public static class StringExtensions
         return base62.Encode(text);
     }
 
-    public static string ToBase64String(this string value)
+    public static string ToBase64String(this string value, bool removePadding = false)
     {
-        return value.ToBase64String(Encoding.UTF8);
+        return value.ToBase64String(Encoding.UTF8, removePadding);
     }
 
-    public static string ToBase64String(this string value, Encoding encoding)
+    public static string ToBase64String(this string value, Encoding encoding, bool removePadding = false)
     {
         var bytes = encoding.GetBytes(value);
-        return Convert.ToBase64String(bytes);
+        var base64 = Convert.ToBase64String(bytes);
+        return removePadding ? base64.TrimEnd('=') : base64;
     }
 
     public static bool ToBool(this string stringValue)

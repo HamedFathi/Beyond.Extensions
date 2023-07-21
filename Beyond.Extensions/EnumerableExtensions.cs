@@ -141,7 +141,7 @@ public static class EnumerableExtensions
     public static IEnumerable<T?> AsNullable<T>(this IEnumerable<T> enumeration) where T : struct
     {
         return from item in enumeration
-            select new T?(item);
+               select new T?(item);
     }
 
     public static ReadOnlyCollection<T> AsReadOnlyCollection<T>(this IEnumerable<T>? @this)
@@ -229,8 +229,8 @@ public static class EnumerableExtensions
     public static IEnumerable<(T1 left, T2 right)> Cartesian<T1, T2>(this (IEnumerable<T1>, IEnumerable<T2>) seqs)
     {
         foreach (var a in seqs.Item1)
-        foreach (var b in seqs.Item2)
-            yield return (a, b);
+            foreach (var b in seqs.Item2)
+                yield return (a, b);
     }
 
     public static IEnumerable<(T1 left, T2 right)> Cartesian<T1, T2>(this IEnumerable<T1> left, IEnumerable<T2> right)
@@ -548,6 +548,13 @@ public static class EnumerableExtensions
         var diffList = sequence.Select(x => new { n = x, diff = Math.Abs(x - value) });
         var result = diffList.First(x => x.diff == diffList.Select(y => y.diff).Min());
         return result.n;
+    }
+
+    public static IEnumerable<TU> FindDuplicates<T, TU>(this IEnumerable<T> list, Func<T, TU> keySelector)
+    {
+        return list.GroupBy(keySelector)
+            .Where(group => group.Count() > 1)
+            .Select(group => group.Key).ToList();
     }
 
     public static decimal FindFarthest(this IEnumerable<decimal> sequence, decimal value)
@@ -954,15 +961,15 @@ public static class EnumerableExtensions
     public static IEnumerable<int> IndicesOf<T>(this IEnumerable<T> obj, T value)
     {
         return from i in Enumerable.Range(0, obj.Count())
-            where obj.ElementAt(i).Equals(value)
-            select i;
+               where obj.ElementAt(i).Equals(value)
+               select i;
     }
 
     public static IEnumerable<int> IndicesOf<T>(this IEnumerable<T> obj, IEnumerable<T> value)
     {
         return from i in Enumerable.Range(0, obj.Count())
-            where value.Contains(obj.ElementAt(i))
-            select i;
+               where value.Contains(obj.ElementAt(i))
+               select i;
     }
 
     public static IEnumerable<int> IndicesWhere<T>(this IEnumerable<T> enumeration, Func<T, bool> predicate)
@@ -1487,8 +1494,8 @@ public static class EnumerableExtensions
         if (source == null)
             throw new ArgumentNullException(nameof(source));
         foreach (var enumeration in source)
-        foreach (var item in enumeration)
-            yield return item;
+            foreach (var item in enumeration)
+                yield return item;
     }
 
     public static IEnumerable<T> SelectMany<T>(this IEnumerable<T[]> source)
@@ -1496,8 +1503,8 @@ public static class EnumerableExtensions
         if (source == null)
             throw new ArgumentNullException(nameof(source));
         foreach (var enumeration in source)
-        foreach (var item in enumeration)
-            yield return item;
+            foreach (var item in enumeration)
+                yield return item;
     }
 
     public static IEnumerable<T> SelectManyRecursive<T>(this IEnumerable<T> source, Func<T, IEnumerable<T>?> selector)
@@ -2070,13 +2077,6 @@ public static class EnumerableExtensions
                     returnValue = returnValue.Union(e);
 
         return returnValue;
-    }
-
-    public static IEnumerable<TU> FindDuplicates<T, TU>(this IEnumerable<T> list, Func<T, TU> keySelector)
-    {
-        return list.GroupBy(keySelector)
-            .Where(group => group.Count() > 1)
-            .Select(group => group.Key).ToList();
     }
 
     public static IEnumerable<T> WhereIf<T>(this IEnumerable<T> source, bool condition, Func<T, bool> predicate)

@@ -54,6 +54,11 @@ public static class ByteArrayExtensions
         return @this;
     }
 
+    public static string ToBase64(this byte[] bytes, bool removePadding = false)
+    {
+        var base64 = Convert.ToBase64String(bytes);
+        return removePadding ? base64.TrimEnd('=') : base64;
+    }
     public static int ToBase64CharArray(this byte[] inArray, int offsetIn, int length, char[] outArray,
         int offsetOut)
     {
