@@ -10,7 +10,7 @@ public class ShortDateConverter : JsonConverter<DateTime>
 
     public ShortDateConverter(string serializationFormat)
     {
-        this._serializationFormat = serializationFormat ?? "yyyy-MM-dd";
+        _serializationFormat = serializationFormat ?? "yyyy-MM-dd";
     }
 
     public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)

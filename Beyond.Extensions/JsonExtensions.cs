@@ -16,6 +16,133 @@ namespace Beyond.Extensions.JsonExtended;
 
 public static class JsonExtensions
 {
+    public static ICollection<JsonComparisonResult> CompareJson(this string json1, string json2, bool formatBeforeCompare = true)
+    {
+        if (formatBeforeCompare)
+        {
+            json1 = json1.ToFormattedJson();
+            json2 = json2.ToFormattedJson();
+        }
+        var doc1 = JsonDocument.Parse(json1);
+        var doc2 = JsonDocument.Parse(json2);
+        return doc1.RootElement.CompareJson(doc2.RootElement);
+    }
+
+    public static ICollection<JsonComparisonResult> CompareJson(this JsonDocument json1, JsonDocument json2)
+    {
+        return json1.RootElement.CompareJson(json2.RootElement);
+    }
+
+    public static ICollection<JsonComparisonResult> CompareJson(this JsonElement json1, JsonElement json2)
+    {
+        var results = new List<JsonComparisonResult>();
+        CompareJsonRecursive(json1, json2, "$");
+
+        return results;
+
+        void CompareJsonRecursive(JsonElement root1, JsonElement root2, string path)
+        {
+            switch (root1.ValueKind)
+            {
+                case JsonValueKind.Object:
+                    foreach (var prop in root1.EnumerateObject())
+                    {
+                        var newPath = $"{path}.{prop.Name}";
+                        if (!root2.TryGetProperty(prop.Name, out var prop2))
+                        {
+                            results.Add(new JsonComparisonResult
+                            {
+                                Path = newPath,
+                                Status = JsonComparisonStatus.Deleted,
+                                OldValue = prop.Value.GetRawText(),
+                                NewValue = null
+                            });
+                        }
+                        else
+                        {
+                            CompareJsonRecursive(prop.Value, prop2, newPath);
+                        }
+                    }
+
+                    foreach (var prop in root2.EnumerateObject())
+                    {
+                        var newPath = $"{path}.{prop.Name}";
+                        if (!root1.TryGetProperty(prop.Name, out _))
+                        {
+                            results.Add(new JsonComparisonResult
+                            {
+                                Path = newPath,
+                                Status = JsonComparisonStatus.Inserted,
+                                OldValue = null,
+                                NewValue = prop.Value.GetRawText()
+                            });
+                        }
+                    }
+                    break;
+
+                case JsonValueKind.Array:
+                    var array1 = root1.EnumerateArray().Select(e => e.GetRawText()).ToList();
+                    var array2 = root2.EnumerateArray().Select(e => e.GetRawText()).ToList();
+
+                    var common = array1.Intersect(array2);
+                    var added = array2.Except(array1);
+                    var deleted = array1.Except(array2);
+
+                    foreach (var item in common)
+                    {
+                        results.Add(new JsonComparisonResult
+                        {
+                            Path = $"{path}[{item}]",
+                            Status = JsonComparisonStatus.Unchanged,
+                            OldValue = item,
+                            NewValue = item
+                        });
+                    }
+                    foreach (var item in added)
+                    {
+                        results.Add(new JsonComparisonResult
+                        {
+                            Path = $"{path}[{item}]",
+                            Status = JsonComparisonStatus.Inserted,
+                            OldValue = null,
+                            NewValue = item
+                        });
+                    }
+                    foreach (var item in deleted)
+                    {
+                        results.Add(new JsonComparisonResult
+                        {
+                            Path = $"{path}[{item}]",
+                            Status = JsonComparisonStatus.Deleted,
+                            OldValue = item,
+                            NewValue = null
+                        });
+                    }
+                    break;
+
+                default:
+                    var result = new JsonComparisonResult
+                    {
+                        Path = path,
+                        OldValue = root1.GetRawText(),
+                        NewValue = root2.GetRawText()
+                    };
+
+                    if (root1.GetRawText() != root2.GetRawText())
+                    {
+                        result.Status = JsonComparisonStatus.Modified;
+                    }
+                    else
+                    {
+                        result.Status = JsonComparisonStatus.Unchanged;
+                    }
+
+                    results.Add(result);
+                    break;
+            }
+        }
+    }
+
     public static T? Deserialize<T>(this byte[] data, JsonSerializerOptions? options = null)
     {
         return JsonSerializer.Deserialize<T>(data.ToText(), options);
@@ -236,6 +363,37 @@ public static class JsonExtensions
         {
             return null;
         }
+    }
+
+    public static string SortJson(this string jsonString, bool writeIndented = false, bool caseSensitive = false)
+    {
+        using var jsonDocument = JsonDocument.Parse(jsonString);
+        var orderedElement = SortJsonElement(jsonDocument.RootElement, caseSensitive);
+        var options = new JsonSerializerOptions
+        {
+            WriteIndented = writeIndented,
+        };
+        return JsonSerializer.Serialize(orderedElement, options);
+    }
+
+    public static string SortJson(this JsonDocument jsonDocument, bool writeIndented = false, bool caseSensitive = false)
+    {
+        var orderedElement = SortJsonElement(jsonDocument.RootElement, caseSensitive);
+        var options = new JsonSerializerOptions
+        {
+            WriteIndented = writeIndented,
+        };
+        return JsonSerializer.Serialize(orderedElement, options);
+    }
+
+    public static string SortJson(this JsonElement jsonElement, bool writeIndented = false, bool caseSensitive = false)
+    {
+        var orderedElement = jsonElement.SortJsonElement(caseSensitive);
+        var options = new JsonSerializerOptions
+        {
+            WriteIndented = writeIndented,
+        };
+        return JsonSerializer.Serialize(orderedElement, options);
     }
 
     public static string ToCSharpType(this JsonValueKind kind)
@@ -463,36 +621,6 @@ public static class JsonExtensions
         }
     }
 
-    public static string SortJson(this string jsonString, bool writeIndented = false, bool caseSensitive = false)
-    {
-        using var jsonDocument = JsonDocument.Parse(jsonString);
-        var orderedElement = SortJsonElement(jsonDocument.RootElement, caseSensitive);
-        var options = new JsonSerializerOptions
-        {
-            WriteIndented = writeIndented,
-        };
-        return JsonSerializer.Serialize(orderedElement, options);
-    }
-
-    public static string SortJson(this JsonDocument jsonDocument, bool writeIndented = false, bool caseSensitive = false)
-    {
-        var orderedElement = SortJsonElement(jsonDocument.RootElement, caseSensitive);
-        var options = new JsonSerializerOptions
-        {
-            WriteIndented = writeIndented,
-        };
-        return JsonSerializer.Serialize(orderedElement, options);
-    }
-
-    public static string SortJson(this JsonElement jsonElement, bool writeIndented = false, bool caseSensitive = false)
-    {
-        var orderedElement = jsonElement.SortJsonElement(caseSensitive);
-        var options = new JsonSerializerOptions
-        {
-            WriteIndented = writeIndented,
-        };
-        return JsonSerializer.Serialize(orderedElement, options);
-    }
     private static JsonElement SortJsonElement(this JsonElement element, bool caseSensitive)
     {
         var comparer = caseSensitive ? StringComparer.Ordinal : StringComparer.OrdinalIgnoreCase;
@@ -508,135 +636,9 @@ public static class JsonExtensions
             case JsonValueKind.Array:
                 var array = element.EnumerateArray().Select(e => SortJsonElement(e, caseSensitive)).ToList();
                 return JsonSerializer.Deserialize<JsonElement>(JsonSerializer.Serialize(array));
+
             default:
                 return element;
-        }
-    }
-
-    public static ICollection<JsonComparisonResult> CompareJson(this string json1, string json2, bool formatBeforeCompare = true)
-    {
-        if (formatBeforeCompare)
-        {
-            json1 = json1.ToFormattedJson();
-            json2 = json2.ToFormattedJson();
-        }
-        var doc1 = JsonDocument.Parse(json1);
-        var doc2 = JsonDocument.Parse(json2);
-        return doc1.RootElement.CompareJson(doc2.RootElement);
-    }
-
-    public static ICollection<JsonComparisonResult> CompareJson(this JsonDocument json1, JsonDocument json2)
-    {
-        return json1.RootElement.CompareJson(json2.RootElement);
-    }
-
-    public static ICollection<JsonComparisonResult> CompareJson(this JsonElement json1, JsonElement json2)
-    {
-        var results = new List<JsonComparisonResult>();
-        CompareJsonRecursive(json1, json2, "$");
-
-        return results;
-
-        void CompareJsonRecursive(JsonElement root1, JsonElement root2, string path)
-        {
-            switch (root1.ValueKind)
-            {
-                case JsonValueKind.Object:
-                    foreach (var prop in root1.EnumerateObject())
-                    {
-                        string newPath = $"{path}.{prop.Name}";
-                        if (!root2.TryGetProperty(prop.Name, out var prop2))
-                        {
-                            results.Add(new JsonComparisonResult
-                            {
-                                Path = newPath,
-                                Status = JsonComparisonStatus.Deleted,
-                                OldValue = prop.Value.GetRawText(),
-                                NewValue = null
-                            });
-                        }
-                        else
-                        {
-                            CompareJsonRecursive(prop.Value, prop2, newPath);
-                        }
-                    }
-
-                    foreach (var prop in root2.EnumerateObject())
-                    {
-                        string newPath = $"{path}.{prop.Name}";
-                        if (!root1.TryGetProperty(prop.Name, out _))
-                        {
-                            results.Add(new JsonComparisonResult
-                            {
-                                Path = newPath,
-                                Status = JsonComparisonStatus.Inserted,
-                                OldValue = null,
-                                NewValue = prop.Value.GetRawText()
-                            });
-                        }
-                    }
-                    break;
-
-                case JsonValueKind.Array:
-                    var array1 = root1.EnumerateArray().Select(e => e.GetRawText()).ToList();
-                    var array2 = root2.EnumerateArray().Select(e => e.GetRawText()).ToList();
-
-                    var common = array1.Intersect(array2);
-                    var added = array2.Except(array1);
-                    var deleted = array1.Except(array2);
-
-                    foreach (var item in common)
-                    {
-                        results.Add(new JsonComparisonResult
-                        {
-                            Path = $"{path}[{item}]",
-                            Status = JsonComparisonStatus.Unchanged,
-                            OldValue = item,
-                            NewValue = item
-                        });
-                    }
-                    foreach (var item in added)
-                    {
-                        results.Add(new JsonComparisonResult
-                        {
-                            Path = $"{path}[{item}]",
-                            Status = JsonComparisonStatus.Inserted,
-                            OldValue = null,
-                            NewValue = item
-                        });
-                    }
-                    foreach (var item in deleted)
-                    {
-                        results.Add(new JsonComparisonResult
-                        {
-                            Path = $"{path}[{item}]",
-                            Status = JsonComparisonStatus.Deleted,
-                            OldValue = item,
-                            NewValue = null
-                        });
-                    }
-                    break;
-
-                default:
-                    var result = new JsonComparisonResult
-                    {
-                        Path = path,
-                        OldValue = root1.GetRawText(),
-                        NewValue = root2.GetRawText()
-                    };
-
-                    if (root1.GetRawText() != root2.GetRawText())
-                    {
-                        result.Status = JsonComparisonStatus.Modified;
-                    }
-                    else
-                    {
-                        result.Status = JsonComparisonStatus.Unchanged;
-                    }
-
-                    results.Add(result);
-                    break;
-            }
         }
     }
 }

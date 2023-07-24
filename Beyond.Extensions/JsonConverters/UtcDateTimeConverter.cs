@@ -10,7 +10,7 @@ public class UtcDateTimeConverter : JsonConverter<DateTime>
 
     public UtcDateTimeConverter(string serializationFormat)
     {
-        this._serializationFormat = serializationFormat ?? "yyyy-MM-ddTHH:mm:ss.fffffffZ";
+        _serializationFormat = serializationFormat ?? "yyyy-MM-ddTHH:mm:ss.fffffffZ";
     }
 
     public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)

@@ -742,6 +742,11 @@ public static class TypeExtensions
                                              && x.GetGenericTypeDefinition() == typeof(IEnumerable<>));
     }
 
+    public static bool HasIndexer(this Type type)
+    {
+        return type.GetProperties().Any(p => p.GetIndexParameters().Length > 0);
+    }
+
     public static bool HasInterface(this Type type)
     {
         foreach (var l in GetNestedInterfaces(type))
@@ -851,7 +856,8 @@ public static class TypeExtensions
 
     public static bool IsCollection(this Type type)
     {
-        return type.GetInterface("ICollection") != null;
+        // return type.GetInterface("ICollection") != null;
+        return !type.IsArray && typeof(IEnumerable).IsAssignableFrom(type) && type != typeof(string);
     }
 
     public static bool IsConcrete(this Type? type)
@@ -901,7 +907,7 @@ public static class TypeExtensions
 
     public static bool IsDictionary(this Type type)
     {
-        return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Dictionary<,>);
+        return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Dictionary<,>) && typeof(IDictionary).IsAssignableFrom(type);
     }
 
     public static bool IsDotNetSystemType(this Type? type)
@@ -1099,6 +1105,11 @@ public static class TypeExtensions
     {
         var typeInfo = type.GetTypeInfo();
         return typeInfo.IsPrimitive && !IsString(type) && type != typeof(IntPtr);
+    }
+
+    public static bool IsQueryable(this Type type)
+    {
+        return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IQueryable<>);
     }
 
     public static bool IsRecord(this Type type)

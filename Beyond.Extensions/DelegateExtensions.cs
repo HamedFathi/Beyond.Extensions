@@ -66,7 +66,7 @@ public static class DelegateExtensions
 
         public DelegateBasedComparer(Comparison<T> comparison)
         {
-            this._comparison = comparison;
+            _comparison = comparison;
         }
 
         public int Compare(T? x, T? y)

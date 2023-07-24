@@ -6,11 +6,31 @@
 
 using Beyond.Extensions.Internals.ObjectMapper;
 using Beyond.Extensions.Internals.PropertyPathResolver;
+using Beyond.Extensions.TypeExtended;
+using Beyond.Extensions.Types;
 
 namespace Beyond.Extensions.ObjectExtended;
 
 public static partial class ObjectExtensions
 {
+    // Concurrent dictionary cache to store compiled functions for property access
+    private static readonly ConcurrentDictionary<string, Func<object, object>> GetCache = new();
+
+    // Concurrent dictionary cache to store compiled functions for property assignment
+    private static readonly ConcurrentDictionary<string, Action<object, object>?> SetCache = new();
+
+    public static PropertyAccessor<T> AccessProperty<T>(this T obj, string propertyName)
+    {
+        var _ = obj;
+        return new PropertyAccessor<T>(propertyName);
+    }
+
+    public static StaticPropertyAccessor<T> AccessStaticProperty<T>(this T obj, string propertyName)
+    {
+        var _ = obj;
+        return new StaticPropertyAccessor<T>(propertyName);
+    }
+
     public static IEnumerable<T> Across<T>(this T first, Func<T, T?> next) where T : class
     {
         if (first == null) throw new ArgumentNullException(nameof(first));
@@ -288,6 +308,118 @@ public static partial class ObjectExtensions
 
         IResolver resolver = new Resolver();
         return resolver.Resolve(obj, propertyNestedPath);
+    }
+
+    public static object GetPropertyValue(this object obj, string propertyPath, bool printable = false)
+    {
+        // Throws an ArgumentNullException if the object is null.
+        if (obj == null) throw new ArgumentNullException(nameof(obj));
+
+        // Throws an ArgumentNullException if the propertyPath is null or white space.
+        if (string.IsNullOrWhiteSpace(propertyPath)) throw new ArgumentNullException(nameof(propertyPath));
+
+        var options = new JsonSerializerOptions
+        {
+            WriteIndented = true
+        };
+
+        // Constructing a cache key.
+        var cacheKey = $"{obj.GetType().FullName}.{propertyPath}";
+
+        // If we've already compiled and cached a function for this type/propertyPath, use it.
+        if (GetCache.TryGetValue(cacheKey, out var func))
+        {
+            // Returns the value of the property. If printable is true, it returns a formatted JSON string.
+            return printable ? JsonSerializer.Serialize(func(obj), options) : func(obj);
+        }
+
+        // Get the object type and set up a parameter for the expression tree.
+        var type = obj.GetType();
+        var arg = Expression.Parameter(typeof(object), "x");
+        Expression expr = Expression.Convert(arg, type);
+
+        // Looping over each property in the property path.
+        foreach (var propertyName in propertyPath.Split('.'))
+        {
+            // If the property name contains an index (like in an array or list).
+            if (propertyName.Contains("["))
+            {
+                // If the index is not at the start of the property name, get the property without
+                // the index.
+                if (propertyName.IndexOf('[') > 0)
+                {
+                    var propertyWithoutIndex = propertyName[..propertyName.IndexOf('[')];
+                    var propertyInfo = type?.GetProperty(propertyWithoutIndex) ?? throw new InvalidOperationException();
+                    expr = Expression.Property(expr, propertyInfo);
+                    type = propertyInfo.PropertyType;
+                }
+
+                // The regular expression pattern to extract the index from the property name.
+                const string pattern = @"\[(.*?)\]";
+                var match = Regex.Match(propertyName, pattern);
+                var indexValue = match.Groups[1].Value;
+
+                // If the index is an integer, handle array and collection types.
+                if (int.TryParse(indexValue, out var arrayIndex))
+                {
+                    // If the type is an array.
+                    if (type is { IsArray: true })
+                    {
+                        expr = Expression.ArrayIndex(expr, Expression.Constant(arrayIndex));
+                        type = type.GetElementType();
+                    }
+                    // If the type is a collection.
+                    else if (type != null && type.IsCollection())
+                    {
+                        expr = Expression.Call(expr, type.GetMethod("get_Item") ?? throw new InvalidOperationException(), Expression.Constant(arrayIndex));
+                        type = type.GenericTypeArguments[0];
+                    }
+                    else
+                    {
+                        throw new NotSupportedException($"Property '{propertyName}' is not an array or list.");
+                    }
+                }
+                // If the type is a dictionary.
+                else if (type != null && type.IsDictionary())
+                {
+                    var propertyInfo2 = type.GetProperty("Item");
+                    var keyType = type.GetGenericArguments()[0];
+
+                    // Parsing complex Dictionary keys
+                    object? keyValue;
+                    if (keyType.IsPrimitive || keyType == typeof(string))
+                    {
+                        keyValue = Convert.ChangeType(indexValue, keyType);
+                    }
+                    else
+                    {
+                        keyValue = keyType.GetMethod("Parse", new[] { typeof(string) })?.Invoke(null, new object[] { indexValue });
+                    }
+
+                    if (propertyInfo2 == null) continue;
+                    expr = Expression.Property(expr, propertyInfo2, Expression.Constant(keyValue));
+                    type = propertyInfo2.PropertyType;
+                }
+            }
+            // If the property is a normal nested property.
+            else
+            {
+                var propertyInfo = type?.GetProperty(propertyName);
+                if (propertyInfo == null) continue;
+                expr = Expression.Property(expr, propertyInfo);
+                type = propertyInfo.PropertyType;
+            }
+        }
+
+        // Build and compile the lambda expression for the property accessor.
+        var lambda = Expression.Lambda<Func<object, object>>(Expression.Convert(expr, typeof(object)), arg);
+        func = lambda.Compile();
+
+        // Add the compiled function to the cache.
+        GetCache.TryAdd(cacheKey, func);
+
+        // Returns the value of the property. If printable is true, it returns a formatted JSON string.
+        return printable ? JsonSerializer.Serialize(func(obj), options) : func(obj);
     }
 
     public static TypeCode GetTypeCode(this object value)
@@ -714,6 +846,94 @@ public static partial class ObjectExtensions
     public static TOut Return<TIn, TOut>(this TIn value, Func<TIn, TOut> evaluateFunc)
     {
         return evaluateFunc(value);
+    }
+
+    public static void SetPropertyValue(this object obj, string propertyPath, object value)
+    {
+        // Check if the provided object or property path are null, if so, throw an exception
+        if (obj == null) throw new ArgumentNullException(nameof(obj));
+        if (string.IsNullOrWhiteSpace(propertyPath)) throw new ArgumentNullException(nameof(propertyPath));
+
+        // Create a unique key for this property setter, based on the type of the object and the
+        // property path
+        var cacheKey = $"{obj.GetType().FullName}.{propertyPath}";
+
+        // If we've previously created and cached a function to set this property, retrieve it
+        if (!SetCache.TryGetValue(cacheKey, out var setter))
+        {
+            // Get the object's type and set up the parameters for the expression tree
+            var type = obj.GetType();
+            var arg = Expression.Parameter(typeof(object), "x");
+            var valueArg = Expression.Parameter(typeof(object));
+            Expression expr = Expression.Convert(arg, type);
+
+            // Loop over each part of the property path, processing one level at a time
+            foreach (var propertyName in propertyPath.Split('.'))
+            {
+                // Check if the property name includes an index (e.g. for accessing an element in a
+                // list or array)
+                if (propertyName.Contains("["))
+                {
+                    // If the index is not at the start of the property name, get the property
+                    // before the index
+                    var propertyWithoutIndex = propertyName[..propertyName.IndexOf('[')];
+                    if (!string.IsNullOrEmpty(propertyWithoutIndex))
+                    {
+                        var propertyInfo = type?.GetProperty(propertyWithoutIndex) ?? throw new InvalidOperationException();
+                        expr = Expression.Property(expr, propertyInfo);
+                        type = propertyInfo.PropertyType;
+                    }
+
+                    // Regular expression to extract the index from the property name
+                    const string pattern = @"\[(.*?)\]";
+                    var match = Regex.Match(propertyName, pattern);
+                    var indexValue = match.Groups[1].Value;
+
+                    if (!int.TryParse(indexValue, out var arrayIndex)) continue;
+
+                    // Handle array and collection types The code here constructs the necessary
+                    // expression to set an indexed element
+                    if (type is { IsArray: true })
+                    {
+                        expr = Expression.ArrayAccess(expr, Expression.Constant(arrayIndex));
+                        type = type.GetElementType();
+                    }
+                    else if (type != null && type.IsCollection())
+                    {
+                        expr = Expression.Property(expr, "Item", Expression.Constant(arrayIndex));
+                        type = type.GenericTypeArguments[0];
+                    }
+                    else
+                    {
+                        throw new NotSupportedException($"Property '{propertyName}' is not an array or list.");
+                    }
+                }
+                else
+                {
+                    // If the property is a normal nested property (not an indexed element)
+                    var propertyInfo = type?.GetProperty(propertyName);
+                    if (propertyInfo == null) throw new InvalidOperationException();
+                    expr = Expression.Property(expr, propertyInfo);
+                    type = propertyInfo.PropertyType;
+                }
+            }
+
+            // Convert the provided value to the correct type, compile the expression into a
+            // function, and cache it for future use
+            if (type != null)
+            {
+                var convertedValue = Expression.Convert(valueArg, type);
+                var assignExpr = Expression.Assign(expr, convertedValue);
+                var lambda = Expression.Lambda<Action<object, object>>(assignExpr, arg, valueArg);
+                setter = lambda.Compile();
+            }
+
+            // Add the compiled function to the cache
+            SetCache.TryAdd(cacheKey, setter);
+        }
+
+        // Invoke the setter to set the property value
+        setter?.Invoke(obj, value);
     }
 
     public static T? ShallowCopy<T>([DisallowNull] this T @this)

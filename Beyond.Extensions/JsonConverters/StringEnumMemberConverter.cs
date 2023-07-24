@@ -13,7 +13,7 @@ public class StringEnumMemberConverter : JsonConverterFactory
     }
 
     public StringEnumMemberConverter(JsonNamingPolicy namingPolicy = null, bool allowIntegerValues = true)
-        => (this._namingPolicy, this._allowIntegerValues) = (namingPolicy, allowIntegerValues);
+        => (_namingPolicy, _allowIntegerValues) = (namingPolicy, allowIntegerValues);
 
     public override bool CanConvert(Type typeToConvert)
     {
@@ -53,10 +53,10 @@ public class StringEnumMemberConverter : JsonConverterFactory
 
         public StringGenericEnumMemberConverter(JsonNamingPolicy namingPolicy, bool allowIntegerValues, Type underlyingType)
         {
-            this._allowIntegerValues = allowIntegerValues;
-            this._underlyingType = underlyingType;
+            _allowIntegerValues = allowIntegerValues;
+            _underlyingType = underlyingType;
 
-            _enumType = this._underlyingType ?? typeof(T);
+            _enumType = _underlyingType ?? typeof(T);
             _enumTypeCode = Type.GetTypeCode(_enumType);
             _isFlags = _enumType.IsDefined(typeof(FlagsAttribute), true);
 

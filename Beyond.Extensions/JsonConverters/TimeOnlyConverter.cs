@@ -13,7 +13,7 @@
 
         public TimeOnlyConverter(string serializationFormat)
         {
-            this._serializationFormat = serializationFormat ?? "HH:mm:ss.fff";
+            _serializationFormat = serializationFormat ?? "HH:mm:ss.fff";
         }
 
         public override TimeOnly Read(ref Utf8JsonReader reader,
