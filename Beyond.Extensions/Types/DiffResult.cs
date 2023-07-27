@@ -1,4 +1,6 @@
-﻿namespace Beyond.Extensions.Types;
+﻿using Beyond.Extensions.Enums;
+
+namespace Beyond.Extensions.Types;
 
 public class DiffResult
 {
