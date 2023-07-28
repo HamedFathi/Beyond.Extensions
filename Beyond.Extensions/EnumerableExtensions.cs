@@ -12,6 +12,37 @@ namespace Beyond.Extensions.EnumerableExtended;
 public static class EnumerableExtensions
 {
     private static readonly Random Rnd = new(Guid.NewGuid().GetHashCode());
+    public static int CountDuplicates<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector)
+    {
+        return source.GroupBy(keySelector)
+                     .Where(group => group.Count() > 1)
+                     .Sum(group => group.Count() - 1);
+    }
+
+    public static IEnumerable<TSource> GetDuplicates<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector)
+    {
+        return source.GroupBy(keySelector)
+                     .Where(group => group.Count() > 1)
+                     .SelectMany(group => group.Skip(1));
+    }
+
+    public static bool HasDuplicates<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector)
+    {
+        return source.GroupBy(keySelector).Any(group => group.Count() > 1);
+    }
+    public static Dictionary<TKey, int> CountBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector)
+    where TKey : notnull
+    {
+        var countsByKey = new Dictionary<TKey, int>();
+        foreach (var x in source)
+        {
+            var key = keySelector(x);
+            if (!countsByKey.ContainsKey(key))
+                countsByKey[key] = 0;
+            countsByKey[key] += 1;
+        }
+        return countsByKey;
+    }
 
     public static string Aggregate<T>(this IEnumerable<T> enumeration, Func<T, string> toString, string separator)
     {
