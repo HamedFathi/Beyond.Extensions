@@ -18,6 +18,24 @@ public static class CollectionExtensions
 
         return false;
     }
+    public static T ReachAt<T>(this ICollection<T> collection, int index)
+    {
+        if (collection == null)
+            throw new ArgumentNullException(nameof(collection));
+
+        if (index >= 0)
+        {
+            if (index >= collection.Count)
+                throw new ArgumentOutOfRangeException(nameof(index));
+            return collection.ElementAt(index);
+        }
+        else
+        {
+            if (-index > collection.Count)
+                throw new ArgumentOutOfRangeException(nameof(index));
+            return collection.ElementAt(collection.Count + index);
+        }
+    }
 
     public static bool AddIfNotContains<T>(this ICollection<T> @this, T value)
     {

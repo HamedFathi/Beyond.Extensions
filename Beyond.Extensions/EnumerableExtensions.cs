@@ -18,7 +18,26 @@ public static class EnumerableExtensions
                      .Where(group => group.Count() > 1)
                      .Sum(group => group.Count() - 1);
     }
+    public static T ReachAt<T>(this IEnumerable<T> collection, int index)
+    {
+        if (collection == null)
+            throw new ArgumentNullException(nameof(collection));
 
+        int count = collection.Count();
+
+        if (index >= 0)
+        {
+            if (index >= count)
+                throw new ArgumentOutOfRangeException(nameof(index));
+            return collection.ElementAt(index);
+        }
+        else
+        {
+            if (-index > count)
+                throw new ArgumentOutOfRangeException(nameof(index));
+            return collection.ElementAt(count + index);
+        }
+    }
     public static IEnumerable<TSource> GetDuplicates<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector)
     {
         return source.GroupBy(keySelector)

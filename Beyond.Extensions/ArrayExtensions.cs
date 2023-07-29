@@ -31,6 +31,25 @@ public static class ArrayExtensions
         return array.All(predicate);
     }
 
+    public static T ReachAt<T>(this T[] array, int index)
+    {
+        if (array == null)
+            throw new ArgumentNullException(nameof(array));
+
+        if (index >= 0)
+        {
+            if (index >= array.Length)
+                throw new ArgumentOutOfRangeException(nameof(index));
+            return array[index];
+        }
+        else
+        {
+            if (-index > array.Length)
+                throw new ArgumentOutOfRangeException(nameof(index));
+            return array[array.Length + index];
+        }
+    }
+
     public static bool AllSafe<T>(this T[] array)
     {
         if (array == null) throw new ArgumentNullException(nameof(array));
