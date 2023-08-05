@@ -1,6 +1,6 @@
 ﻿namespace Beyond.Extensions.JsonConverters;
-// var options = new JsonSerializerOptions(JsonSerializerDefaults.Web);
-// options.Converters.Add(new DateOnlyConverter()); options.Converters.Add(new TimeOnlyConverter());
+// var options = new JsonSerializerOptions(JsonSerializerDefaults.Web); options.Converters.Add(new
+// DateOnlyConverter()); options.Converters.Add(new TimeOnlyConverter());
 
 public class TimeOnlyConverter : JsonConverter<TimeOnly>
 {

@@ -30,20 +30,7 @@ public static class StringExtensions
             throw new ArgumentNullException(nameof(@this), $"{nameof(@this)} path is null or empty");
         return new DirectoryInfo(@this);
     }
-    public static string RemoveNonPrintableChars(this string input, Func<string, string>? postProcess = null)
-    {
-        if (input is null)
-        {
-            throw new ArgumentNullException(nameof(input));
-        }
 
-        var result = new string(input.Where(c => !char.IsControl(c)).ToArray());
-        if (postProcess != null)
-        {
-            return postProcess(result);
-        }
-        return result;
-    }
     public static FileStream AsFileStream(this string @this, FileMode fileMode, FileAccess fileAccess,
         FileShare fileShare, int bufferSize = 8192)
     {
@@ -1482,6 +1469,21 @@ public static class StringExtensions
     public static string RemoveLetter(this string @this)
     {
         return new string(@this.ToCharArray().Where(x => !char.IsLetter(x)).ToArray());
+    }
+
+    public static string RemoveNonPrintableChars(this string input, Func<string, string>? postProcess = null)
+    {
+        if (input is null)
+        {
+            throw new ArgumentNullException(nameof(input));
+        }
+
+        var result = new string(input.Where(c => !char.IsControl(c)).ToArray());
+        if (postProcess != null)
+        {
+            return postProcess(result);
+        }
+        return result;
     }
 
     public static string RemoveNumber(this string @this)

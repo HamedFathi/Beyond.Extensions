@@ -36,6 +36,14 @@ public static class IntExtensions
         return char.ConvertFromUtf32(utf32);
     }
 
+    public static IEnumerable<int> CountDown(this int start)
+    {
+        for (var i = start; i >= 0; i--)
+        {
+            yield return i;
+        }
+    }
+
     public static int DaysInMonth(this int year, int month)
     {
         return DateTime.DaysInMonth(year, month);
@@ -56,6 +64,11 @@ public static class IntExtensions
     public static bool FactorOf(this int @this, int factorNumber)
     {
         return factorNumber % @this == 0;
+    }
+
+    public static IEnumerable<int> From(this int start, int count)
+    {
+        return Enumerable.Range(start, count);
     }
 
     public static TimeSpan FromDays(this int days)
@@ -285,6 +298,14 @@ public static class IntExtensions
     public static TimeSpan Seconds(this int @this)
     {
         return TimeSpan.FromSeconds(@this);
+    }
+
+    public static IEnumerable<int> Sequence(this int start, int count)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            yield return start + i;
+        }
     }
 
     public static int Sign(this int value)

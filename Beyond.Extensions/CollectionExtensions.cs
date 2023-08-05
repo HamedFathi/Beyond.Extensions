@@ -18,24 +18,6 @@ public static class CollectionExtensions
 
         return false;
     }
-    public static T ReachAt<T>(this ICollection<T> collection, int index)
-    {
-        if (collection == null)
-            throw new ArgumentNullException(nameof(collection));
-
-        if (index >= 0)
-        {
-            if (index >= collection.Count)
-                throw new ArgumentOutOfRangeException(nameof(index));
-            return collection.ElementAt(index);
-        }
-        else
-        {
-            if (-index > collection.Count)
-                throw new ArgumentOutOfRangeException(nameof(index));
-            return collection.ElementAt(collection.Count + index);
-        }
-    }
 
     public static bool AddIfNotContains<T>(this ICollection<T> @this, T value)
     {
@@ -217,6 +199,25 @@ public static class CollectionExtensions
     public static bool IsNotNullOrEmpty<T>(this ICollection<T>? @this)
     {
         return @this != null && @this.Count != 0;
+    }
+
+    public static T ReachAt<T>(this ICollection<T> collection, int index)
+    {
+        if (collection == null)
+            throw new ArgumentNullException(nameof(collection));
+
+        if (index >= 0)
+        {
+            if (index >= collection.Count)
+                throw new ArgumentOutOfRangeException(nameof(index));
+            return collection.ElementAt(index);
+        }
+        else
+        {
+            if (-index > collection.Count)
+                throw new ArgumentOutOfRangeException(nameof(index));
+            return collection.ElementAt(collection.Count + index);
+        }
     }
 
     public static void Remove<T>(this ICollection<T> collection, Func<T, bool> predicate)
