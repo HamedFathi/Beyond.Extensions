@@ -232,6 +232,16 @@ public static class XmlExtensions
         return doc;
     }
 
+    public static string ToXmlString(this XmlNodeList nodeList)
+    {
+        if (nodeList == null) throw new ArgumentNullException(nameof(nodeList));
+        var sb = new StringBuilder();
+        foreach (XmlNode node in nodeList)
+        {
+            sb.AppendLine(node.OuterXml);
+        }
+        return sb.ToString();
+    }
     // ReSharper disable once CognitiveComplexity
     private static XElement SortXmlElement(this XElement xe, bool sortAttributes = true,
         Action<XElement>? postSort = null, params string[]? customAttributes)

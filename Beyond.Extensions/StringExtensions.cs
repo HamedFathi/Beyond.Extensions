@@ -38,6 +38,50 @@ public static class StringExtensions
         return new FileStream(@this, fileMode, fileAccess, fileShare, bufferSize);
     }
 
+    public static IEnumerable<string> Chunk(this string str, int maxLength, bool breakWord)
+    {
+        if (string.IsNullOrEmpty(str)) throw new ArgumentException("The string cannot be null or empty.");
+        if (maxLength <= 0) throw new ArgumentException("Max length should be greater than zero.");
+        if (breakWord)
+        {
+            for (int i = 0; i < str.Length; i += maxLength)
+            {
+                if (i + maxLength <= str.Length)
+                {
+                    yield return str.Substring(i, maxLength);
+                }
+                else
+                {
+                    yield return str.Substring(i);
+                }
+            }
+        }
+        else
+        {
+            int startIndex = 0;
+            while (startIndex < str.Length)
+            {
+                int length = maxLength;
+                while (length > 0 && startIndex + length < str.Length && !char.IsWhiteSpace(str[startIndex + length]))
+                {
+                    length--;
+                }
+                if (length == 0)
+                {
+                    length = maxLength;
+                }
+                string chunk = str.Substring(startIndex, Math.Min(length, str.Length - startIndex));
+                yield return chunk;
+                startIndex += chunk.Length;
+                while (startIndex < str.Length && char.IsWhiteSpace(str[startIndex]))
+                {
+                    startIndex++;
+                }
+            }
+        }
+
+    }
+
     public static int CompareOrdinal(this string strA, string strB)
     {
         return string.CompareOrdinal(strA, strB);
@@ -1742,7 +1786,6 @@ public static class StringExtensions
     {
         return Regex.Replace(value, regexPattern, evaluator, options);
     }
-
     public static string Reverse(this string @this)
     {
         if (@this.Length <= 1) return @this;
