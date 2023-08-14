@@ -314,6 +314,15 @@ public static class DateTimeExtensions
         return source.CompareTo(other) > 0;
     }
 
+    public static bool IsAfterMonth(this DateTime date, int month)
+    {
+        if (month is < 1 or > 12)
+        {
+            throw new ArgumentOutOfRangeException(nameof(month), "Month should be between 1 and 12.");
+        }
+        return date.Month > month;
+    }
+
     public static bool IsAfternoon(this DateTime @this)
     {
         return @this.TimeOfDay >= new DateTime(2000, 1, 1, 12, 0, 0).TimeOfDay;
@@ -322,6 +331,15 @@ public static class DateTimeExtensions
     public static bool IsBefore(this DateTime source, DateTime other)
     {
         return source.CompareTo(other) < 0;
+    }
+
+    public static bool IsBeforeMonth(this DateTime date, int month)
+    {
+        if (month is < 1 or > 12)
+        {
+            throw new ArgumentOutOfRangeException(nameof(month), "Month should be between 1 and 12.");
+        }
+        return date.Month < month;
     }
 
     public static bool IsDateEqual(this DateTime date, DateTime dateToCompare)

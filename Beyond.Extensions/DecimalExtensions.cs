@@ -117,6 +117,22 @@ public static class DecimalExtensions
         return result;
     }
 
+    public static decimal Power(this decimal baseValue, int exponent)
+    {
+        decimal result = 1;
+        for (var i = 0; i < Math.Abs(exponent); i++)
+        {
+            result *= baseValue;
+        }
+
+        if (exponent < 0)
+        {
+            return 1 / result;
+        }
+
+        return result;
+    }
+
     public static decimal Remainder(this decimal d1, decimal d2)
     {
         return decimal.Remainder(d1, d2);
@@ -145,6 +161,11 @@ public static class DecimalExtensions
     public static int Sign(this decimal value)
     {
         return Math.Sign(value);
+    }
+
+    public static decimal Square(this decimal baseValue)
+    {
+        return baseValue * baseValue;
     }
 
     public static decimal Subtract(this decimal d1, decimal d2)

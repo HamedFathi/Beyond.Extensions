@@ -295,6 +295,11 @@ public static class IntExtensions
         return n.Factorial() / (n - r).Factorial();
     }
 
+    public static double Power(this int baseValue, double exponent)
+    {
+        return Math.Pow(baseValue, exponent);
+    }
+
     public static TimeSpan Seconds(this int @this)
     {
         return TimeSpan.FromSeconds(@this);
@@ -414,6 +419,11 @@ public static class IntExtensions
                 throw new Exception(
                     $"Unsupported Type: {@this}. Please let us know about this type and we will support it: sales@zzzprojects.com");
         }
+    }
+
+    public static int Square(this int baseValue)
+    {
+        return baseValue * baseValue;
     }
 
     public static int SumOfDigits(this int number)

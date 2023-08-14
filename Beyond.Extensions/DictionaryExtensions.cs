@@ -124,6 +124,11 @@ public static class DictionaryExtensions
                 source.Add(kvp);
     }
 
+    public static IDictionary<TKey, TValue> AllValuesMeet<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, Func<TValue, bool> predicate) where TKey : notnull
+    {
+        return dictionary.Where(pair => predicate(pair.Value)).ToDictionary(pair => pair.Key, pair => pair.Value);
+    }
+
     public static IDictionary<TKey, TValue> AsReadOnly<TKey, TValue>(this IDictionary<TKey, TValue> dictionary)
         where TKey : notnull
     {
@@ -501,5 +506,21 @@ public static class DictionaryExtensions
         if (self is null) throw new ArgumentNullException(nameof(self));
 
         return self.TryGetValue(key, out value) && self.Remove(key);
+    }
+
+    public static IDictionary<TKey, TValue> WithoutKey<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key) where TKey : notnull
+    {
+        if (dict == null)
+            throw new ArgumentNullException(nameof(dict));
+
+        return dict.Where(kvp => !kvp.Key.Equals(key)).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+    }
+
+    public static IDictionary<TKey, TValue> WithoutValue<TKey, TValue>(this IDictionary<TKey, TValue> dict, TValue value) where TKey : notnull
+    {
+        if (dict == null)
+            throw new ArgumentNullException(nameof(dict));
+
+        return dict.Where(kvp => kvp.Value != null && !kvp.Value.Equals(value)).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
     }
 }

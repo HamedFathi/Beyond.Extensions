@@ -246,6 +246,11 @@ public static class LongExtensions
         return result;
     }
 
+    public static double Power(this long baseValue, double exponent)
+    {
+        return Math.Pow(baseValue, exponent);
+    }
+
     public static TimeSpan Seconds(this long @this)
     {
         return TimeSpan.FromSeconds(@this);
@@ -254,6 +259,11 @@ public static class LongExtensions
     public static int Sign(this long value)
     {
         return Math.Sign(value);
+    }
+
+    public static long Square(this long baseValue)
+    {
+        return baseValue * baseValue;
     }
 
     public static void Times(this long value, Action action)

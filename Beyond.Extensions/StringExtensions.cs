@@ -24,6 +24,11 @@ public static class StringExtensions
     private static readonly Regex TabOrWhiteSpaceRegex =
         new(@"(\s*\\\$tb(\d+)\s*)|(\s*\\\$ws(\d+)\s*)", RegexOptions.Compiled);
 
+    public static bool AreAllCharsUnique(this string str)
+    {
+        return str.Distinct().Count() == str.Length;
+    }
+
     public static DirectoryInfo AsDirectoryInfo(this string @this)
     {
         if (@this.IsNullOrEmpty())
@@ -79,7 +84,6 @@ public static class StringExtensions
                 }
             }
         }
-
     }
 
     public static int CompareOrdinal(this string strA, string strB)
@@ -610,6 +614,11 @@ public static class StringExtensions
         return Encoding.UTF8.GetString(buffer);
     }
 
+    public static bool HasEvenLength(this string str)
+    {
+        return str.Length % 2 == 0;
+    }
+
     public static bool HasMultipleInstancesOf(this string input, char charToFind)
     {
         if (string.IsNullOrEmpty(input) || input.Length == 0 || input.IndexOf(charToFind) == 0)
@@ -619,6 +628,22 @@ public static class StringExtensions
             return true;
 
         return false;
+    }
+
+    public static bool HasOddLength(this string str)
+    {
+        return str.Length % 2 != 0;
+    }
+
+    public static bool HasRepeatedChars(this string str)
+    {
+        return str.Distinct().Count() == 1;
+    }
+
+    public static bool HasSpaces(this string str, int count = 1)
+    {
+        if (count <= 0) throw new ArgumentOutOfRangeException(nameof(count));
+        return str.Count(c => c == ' ') == count;
     }
 
     public static byte[] HexStringToByteArray(this string hexString)
@@ -961,6 +986,11 @@ public static class StringExtensions
         return !Regex.IsMatch(@this, "[^0-9]");
     }
 
+    public static bool IsPalindrome(this string? str)
+    {
+        return str != null && str.SequenceEqual(str.Reverse());
+    }
+
     public static bool IsPunctuation(this string s, int index)
     {
         return char.IsPunctuation(s, index);
@@ -979,6 +1009,21 @@ public static class StringExtensions
     public static bool IsSeparator(this string s, int index)
     {
         return char.IsSeparator(s, index);
+    }
+
+    public static bool IsStartsAndEndsSame(this string str, string value, StringComparison stringComparison = StringComparison.Ordinal)
+    {
+        if (string.IsNullOrEmpty(str))
+            throw new ArgumentException("The string should not be null or empty.", nameof(str));
+        return str.StartsWith(value, stringComparison) && str.EndsWith(value, stringComparison);
+    }
+
+    public static bool IsStartsAndEndsWithSameChar(this string str)
+    {
+        if (string.IsNullOrEmpty(str))
+            throw new ArgumentException("The string should not be null or empty.", nameof(str));
+
+        return str.First() == str.Last();
     }
 
     public static bool IsSurrogate(this string s, int index)
@@ -1786,6 +1831,7 @@ public static class StringExtensions
     {
         return Regex.Replace(value, regexPattern, evaluator, options);
     }
+
     public static string Reverse(this string @this)
     {
         if (@this.Length <= 1) return @this;

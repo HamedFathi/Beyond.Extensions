@@ -242,6 +242,7 @@ public static class XmlExtensions
         }
         return sb.ToString();
     }
+
     // ReSharper disable once CognitiveComplexity
     private static XElement SortXmlElement(this XElement xe, bool sortAttributes = true,
         Action<XElement>? postSort = null, params string[]? customAttributes)

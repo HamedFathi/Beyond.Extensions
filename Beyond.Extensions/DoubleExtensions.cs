@@ -222,6 +222,11 @@ public static class DoubleExtensions
         return Math.Pow(x, y);
     }
 
+    public static double Power(this double baseValue, double exponent)
+    {
+        return Math.Pow(baseValue, exponent);
+    }
+
     public static double Round(this double a)
     {
         return Math.Round(a);
@@ -270,6 +275,11 @@ public static class DoubleExtensions
     public static double Sqrt(this double d)
     {
         return Math.Sqrt(d);
+    }
+
+    public static double Square(this double baseValue)
+    {
+        return baseValue * baseValue;
     }
 
     public static double Tan(this double a)

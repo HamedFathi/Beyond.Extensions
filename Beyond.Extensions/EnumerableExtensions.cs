@@ -55,6 +55,74 @@ public static class EnumerableExtensions
         return values.All(value => list.Contains(value));
     }
 
+    public static IEnumerable<int> AllEvenNumbers(this IEnumerable<int> numbers)
+    {
+        return numbers.Where(i => i % 2 == 0);
+    }
+
+    public static IEnumerable<long> AllEvenNumbers(this IEnumerable<long> numbers)
+    {
+        return numbers.Where(i => i % 2 == 0);
+    }
+
+    public static IEnumerable<T> AllItemsSame<T>(this IEnumerable<T> list)
+    {
+        if (!list.Any())
+            return list;
+        var firstItem = list.First();
+        return list.All(item => EqualityComparer<T>.Default.Equals(item, firstItem)) ? list : Enumerable.Empty<T>();
+    }
+
+    public static bool AllNegative(this IEnumerable<int> list)
+    {
+        return list.All(item => item < 0);
+    }
+
+    public static bool AllNegative(this IEnumerable<long> list)
+    {
+        return list.All(item => item < 0);
+    }
+
+    public static IEnumerable<int> AllNegativeNumbers(this IEnumerable<int> list)
+    {
+        return list.Where(item => item < 0);
+    }
+
+    public static IEnumerable<long> AllNegativeNumbers(this IEnumerable<long> list)
+    {
+        return list.Where(item => item < 0);
+    }
+
+    public static IEnumerable<int> AllOddNumbers(this IEnumerable<int> numbers)
+    {
+        return numbers.Where(i => i % 2 != 0);
+    }
+
+    public static IEnumerable<long> AllOddNumbers(this IEnumerable<long> numbers)
+    {
+        return numbers.Where(i => i % 2 != 0);
+    }
+
+    public static bool AllPositive(this IEnumerable<int> list)
+    {
+        return list.All(item => item >= 0);
+    }
+
+    public static bool AllPositive(this IEnumerable<long> list)
+    {
+        return list.All(item => item >= 0);
+    }
+
+    public static IEnumerable<int> AllPositiveNumbers(this IEnumerable<int> list)
+    {
+        return list.Where(item => item >= 0);
+    }
+
+    public static IEnumerable<long> AllPositiveNumbers(this IEnumerable<long> list)
+    {
+        return list.Where(item => item >= 0);
+    }
+
     public static bool AllSafe<T>(this IEnumerable<T>? enumerable, Func<T, bool> predicate)
     {
         return enumerable?.All(predicate) == true;
@@ -130,6 +198,34 @@ public static class EnumerableExtensions
     {
         foreach (var item in source) yield return item;
         yield return element;
+    }
+
+    public static bool AreAllEven(this IEnumerable<int> numbers)
+    {
+        return numbers.All(i => i % 2 == 0);
+    }
+
+    public static bool AreAllEven(this IEnumerable<long> numbers)
+    {
+        return numbers.All(i => i % 2 == 0);
+    }
+
+    public static bool AreAllItemsSame<T>(this IEnumerable<T> list)
+    {
+        if (!list.Any())
+            return true;
+        var firstItem = list.First();
+        return list.All(item => EqualityComparer<T>.Default.Equals(item, firstItem));
+    }
+
+    public static bool AreAllOdd(this IEnumerable<int> numbers)
+    {
+        return numbers.All(i => i % 2 != 0);
+    }
+
+    public static bool AreAllOdd(this IEnumerable<long> numbers)
+    {
+        return numbers.All(i => i % 2 != 0);
     }
 
     public static bool AreAllSame<T>(this IEnumerable<T> enumerable)
@@ -443,6 +539,11 @@ public static class EnumerableExtensions
             return false;
         foreach (var item in source) return item.ContainsIgnoreCase(str);
         return false;
+    }
+
+    public static bool ContainsNull<T>(this IEnumerable<T?> list) where T : class
+    {
+        return list.Any(item => item == null);
     }
 
     public static int Count(this IEnumerable enumerable, bool excludeNullValues = false)
@@ -1174,6 +1275,11 @@ public static class EnumerableExtensions
                 (t1, t2) => t1.Concat(new[] { t2 }));
     }
 
+    public static IEnumerable<T> GetNoNullItems<T>(this IEnumerable<T?> list) where T : class
+    {
+        return list.Where(item => item != null).Cast<T>();
+    }
+
     public static IEnumerable<IEnumerable<T>> GetPermutations<T>(this IEnumerable<T> list, int length)
     {
         if (length == 1) return list.Select(t => new[] { t });
@@ -1240,6 +1346,11 @@ public static class EnumerableExtensions
     public static bool HasDuplicates<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector)
     {
         return source.GroupBy(keySelector).Any(group => group.Count() > 1);
+    }
+
+    public static bool HasUniqueItems<T>(this IEnumerable<T> list, bool excludeNullValues = false)
+    {
+        return list.Distinct().Count(excludeNullValues) == list.Count(excludeNullValues);
     }
 
     public static IEnumerable<T> If<T>(
@@ -1481,6 +1592,23 @@ public static class EnumerableExtensions
         return source.Intersect(toCompareWith, comparerToUse).Count() == countSource;
     }
 
+    public static bool IsFirstItem<T>(this IEnumerable<T> collection, T item)
+    {
+        var firstItem = collection.FirstOrDefault();
+        return EqualityComparer<T>.Default.Equals(firstItem, item);
+    }
+
+    public static bool IsItemRepeated<T>(this IEnumerable<T> collection, T item, int times)
+    {
+        return collection.Count(i => EqualityComparer<T>.Default.Equals(i, item)) == times;
+    }
+
+    public static bool IsLastItem<T>(this IEnumerable<T> collection, T item)
+    {
+        var lastItem = collection.LastOrDefault();
+        return EqualityComparer<T>.Default.Equals(lastItem, item);
+    }
+
     public static IEnumerable<string> IsLike(this IEnumerable<string> @this, string pattern)
     {
         return @this.Where(x => x.IsLike(pattern));
@@ -1517,6 +1645,36 @@ public static class EnumerableExtensions
             throw new ArgumentNullException(nameof(source));
         using var enumerator = source.GetEnumerator();
         return enumerator.MoveNext() && !enumerator.MoveNext();
+    }
+
+    public static bool IsSorted(this IEnumerable<int> list)
+    {
+        return list.SequenceEqual(list.OrderBy(i => i));
+    }
+
+    public static bool IsSorted(this IEnumerable<string> list)
+    {
+        return list.SequenceEqual(list.OrderBy(s => s));
+    }
+
+    public static bool IsSorted(this IEnumerable<char> list)
+    {
+        return list.SequenceEqual(list.OrderBy(c => c));
+    }
+
+    public static bool IsSortedDescending(this IEnumerable<int> list)
+    {
+        return list.SequenceEqual(list.OrderByDescending(i => i));
+    }
+
+    public static bool IsSortedDescending(this IEnumerable<string> list)
+    {
+        return list.SequenceEqual(list.OrderByDescending(s => s));
+    }
+
+    public static bool IsSortedDescending(this IEnumerable<char> list)
+    {
+        return list.SequenceEqual(list.OrderByDescending(c => c));
     }
 
     public static string Join(this IEnumerable<string> values, string separator)

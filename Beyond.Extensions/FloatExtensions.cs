@@ -107,9 +107,19 @@ public static class FloatExtensions
         return (decimal)(value / percentOf * 100);
     }
 
+    public static float Power(this float baseValue, double exponent)
+    {
+        return (float)Math.Pow(baseValue, exponent);
+    }
+
     public static int Sign(this float value)
     {
         return Math.Sign(value);
+    }
+
+    public static float Square(this float baseValue)
+    {
+        return baseValue * baseValue;
     }
 
     public static string ToBase64(this float input, bool removePadding = false)
